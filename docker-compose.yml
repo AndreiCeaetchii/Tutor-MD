@@ -1,0 +1,33 @@
+# docker-compose up -d
+# docker-compose down
+
+version: "3.6"
+networks:
+  localdev:
+    name: localdev
+
+services:
+  db-server:
+    image: postgres:latest
+    container_name: db-server
+    ports:
+      - "5432:5432"
+    networks:
+      - localdev
+    environment:
+      - POSTGRES_USER=admin # The PostgreSQL user (useful to connect to the database)
+      - POSTGRES_PASSWORD=admin # The PostgreSQL password (useful to connect to the database)
+      - POSTGRES_DB=Tutor # The PostgreSQL default database (automatically created at first launch)
+  tutor-api:
+    build:
+      context: .
+      dockerfile: src/Tutor.Api/Dockerfile
+    image: tutor-api:local
+    container_name: tutor-api
+    depends_on:
+      - db-server
+    networks:
+      - localdev
+
+volumes:
+  sqlvolume:
