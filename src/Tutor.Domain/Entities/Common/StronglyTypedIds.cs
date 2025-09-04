@@ -25,3 +25,4 @@ public partial struct UserId : IGuid
         return new UserId(guid);
     }
 }
+

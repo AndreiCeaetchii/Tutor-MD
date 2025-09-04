@@ -19,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tutor.Domain\Tutor.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Features\Users.cs" />
   </ItemGroup> 
 
 </Project>

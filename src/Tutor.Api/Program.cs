@@ -7,12 +7,19 @@ using Microsoft.Extensions.Logging;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
+using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
+using Tutor.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+
 // Controllers
 builder.AddValidationSetup();
+
+//Repository
+builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
 builder.Services.AddAuthorization();
 
