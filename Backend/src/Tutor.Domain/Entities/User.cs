@@ -16,7 +16,7 @@ public class User : Entity<int>
     public DateTime? Birthdate { get; set; }
     public int? PhotoId { get; set; }
     public bool IsActive { get; set; }
-    public DateTime? LastLoginAt { get; set; }
+    public DateTime LastLoginAt { get; set; }
 
     // Navigation properties
     public virtual Photo Photo { get; set; }

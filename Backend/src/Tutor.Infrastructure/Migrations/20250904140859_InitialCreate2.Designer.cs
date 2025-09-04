@@ -12,8 +12,8 @@ using Tutor.Infrastructure;
 namespace Tutor.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250904105521_PendingChanges")]
-    partial class PendingChanges
+    [Migration("20250904140859_InitialCreate2")]
+    partial class InitialCreate2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -533,7 +533,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<DateTime?>("LastLoginAt")
+                    b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")

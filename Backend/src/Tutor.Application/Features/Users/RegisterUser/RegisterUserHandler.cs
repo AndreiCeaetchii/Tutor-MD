@@ -1,15 +1,13 @@
 ﻿using Ardalis.Result;
 using MediatR;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Domain.Entities;
-using Tutor.Domain.Entities.Common;
 using Tutor.Domain.Interfaces;
 
-namespace Tutor.Application.Features.Users;
+namespace Tutor.Application.Features.Users.RegisterUser;
 
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<UserResponseDto>>
 {
@@ -24,58 +22,39 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
         _passwordHasher = passwordHasher;
     }
 
-
     public async Task<Result<UserResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         var registerDto = request.RegisterUserDto;
 
-        // Check if user already exists using the repository
+        // Check if user already exists
         var existingUser = await _userRepository.FindAsyncDefault(u => 
             u.Email == registerDto.Email || u.Username == registerDto.Username);
 
         if (existingUser != null)
         {
-            return Result<UserResponseDto>.Failure("User with this email or username already exists");
+            return Result<UserResponseDto>.Error("User with this email or username already exists");
         }
 
-        // Hash password
-        var salt = _passwordHasher.GenerateSalt();
-        var hashedPassword = _passwordHasher.HashPassword(registerDto.Password, salt);
+        // Hash password (salt is embedded internally)
+        var hashedPassword = _passwordHasher.HashPassword(registerDto.Password);
 
-        // Create user entity
-        var user = new User
-        {
-            Id = Guid.NewGuid().ToString().,
-            Email = registerDto.Email,
-            HashedPassword = hashedPassword,
-            SaltPassword = salt,
-            Username = registerDto.Username,
-            Name = registerDto.Name,
-            Surname = registerDto.Surname,
-            PhoneNumber = registerDto.PhoneNumber,
-            DateOfBirth = registerDto.DateOfBirth,
-            Description = registerDto.Description,
-            IsActive = true,
-            LastLoginAt = DateTime.UtcNow
-        };
+        // Map DTO to User entity using the mapper
+        var user = UserMapper.ToEntity(registerDto, hashedPassword);
 
-        // Add to database using repository
+        // Add user to database
         await _userRepository.Create(user);
-        
-        // Note: You might need to call SaveChanges if your repository doesn't do it automatically
-        // This depends on your repository implementation
 
-        // Return response
+        // Map User entity to response DTO
         var response = new UserResponseDto
         {
-            Id = user.Id.Value,
+            Id = user.Id, // auto-assigned by DB
             Email = user.Email,
             Username = user.Username,
-            Name = user.Name,
-            Surname = user.Surname,
-            PhoneNumber = user.PhoneNumber,
-            DateOfBirth = user.DateOfBirth,
-            Description = user.Description,
+            Name = user.FirstName,
+            Surname = user.LastName,
+            PhoneNumber = user.Phone,
+            DateOfBirth = user.Birthdate,
+            Description = user.Bio,
             LastLoginAt = user.LastLoginAt
         };
 

@@ -11,10 +11,12 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.StartTime)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp with time zone");;
 
         builder.Property(x => x.EndTime)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp with time zone");;
 
         builder.Property(x => x.PriceSnapshot)
             .IsRequired()

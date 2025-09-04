@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
+using Tutor.Application.Interfaces;
+using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Repositories;
@@ -20,7 +23,7 @@ builder.AddValidationSetup();
 
 //Repository
 builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddAuthorization();
 
 // Swagger
@@ -82,9 +85,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHeroEndpoints();
-app.MapGroup("api/identity")
-    .WithTags("Identity")
-    .MapIdentityApi<ApplicationUser>();
+// app.MapHeroEndpoints();
+app.MapUserEndpoints();
+
+// app.MapGroup("api/identity")
+//     .WithTags("Identity")
+//     .MapIdentityApi<ApplicationUser>();
 
 await app.RunAsync();

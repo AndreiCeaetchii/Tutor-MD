@@ -8,4 +8,10 @@
     <RootNamespace>Tutor.Api.UnitTests</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" />
+  </ItemGroup>
+
 </Project>

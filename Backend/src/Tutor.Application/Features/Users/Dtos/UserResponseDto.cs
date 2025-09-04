@@ -11,7 +11,7 @@ public record UserResponseDto
     public string Name { get; set; } = string.Empty;
     public string Surname { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public DateOnly DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
     public string? Description { get; set; }
     public DateTime LastLoginAt { get; set; }
 }

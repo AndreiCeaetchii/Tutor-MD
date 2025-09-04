@@ -12,8 +12,8 @@ using Tutor.Infrastructure;
 namespace Tutor.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250904104900_AddedEntities")]
-    partial class AddedEntities
+    [Migration("20250904143144_InitialCreateUpdate")]
+    partial class InitialCreateUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -376,14 +376,8 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("Grade")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("UserId");
 
@@ -427,14 +421,8 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<int?>("ExperienceYears")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("VerificationStatus")
                         .ValueGeneratedOnAdd()
@@ -545,7 +533,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<DateTime?>("LastLoginAt")
+                    b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
