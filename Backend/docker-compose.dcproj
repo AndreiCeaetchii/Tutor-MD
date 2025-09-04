@@ -9,10 +9,15 @@
     <DockerServiceName>tutor.api</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="Backend\.dockerignore" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
     <None Include="docker-compose.yml" />
-    <None Include=".dockerignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitattributes" />
+    <Content Include="Backend\CODE_OF_CONDUCT.md" />
+    <Content Include="Backend\CONTRIBUTING.md" />
   </ItemGroup>
 </Project>

@@ -13,14 +13,7 @@ public class TutorConfiguration : IEntityTypeConfiguration<Domain.Entities.Tutor
         builder.Property(x => x.VerificationStatus)
             .IsRequired()
             .HasDefaultValue(VerificationStatus.Pending);
-
-        builder.Property(x => x.CreatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        builder.Property(x => x.UpdatedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
+        
 
         // Relationships
         builder.HasOne(x => x.User)
