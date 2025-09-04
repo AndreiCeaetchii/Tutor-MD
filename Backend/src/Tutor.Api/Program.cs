@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
@@ -17,6 +18,7 @@ using Tutor.Infrastructure.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Controllers
 builder.AddValidationSetup();
@@ -84,6 +86,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 // app.MapHeroEndpoints();
 app.MapUserEndpoints();
