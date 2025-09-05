@@ -46,7 +46,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import hero1_img from '../assets/hero-1-img.png';
+  import hero1_img from '../../assets/hero-1-img.png';
   import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
 
 </script>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import Hero1 from "../components/Hero1.vue";
-import Hero3 from "../components/Hero3.vue";
+import Hero1 from "../components/landing/Hero1.vue";
+import Hero3 from "../components/landing/Hero3.vue";
 import Footer from "../components/Footer.vue";
 import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
-import InstructorCard from "../components/InstructorCard.vue";
-import CardCarousel from "../components/CardCarousel.vue";
+import InstructorCard from "../components/landing/InstructorCard.vue";
+import CardCarousel from "../components/landing/CardCarousel.vue";
 
 // stare pentru loader
 const loading = ref(true);
@@ -30,7 +30,8 @@ onMounted(() => {
 
     <div>
       <Hero1 />
-        <div class="py-16 bg-white sm:py-24">
+      <!-- Section 2-->
+      <div class="py-16 bg-white sm:py-24">
           <div class="relative mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <div class="mb-6 flex justify-center">
               <svg width="60" height="25" viewBox="0 0 80 30" class="text-orange-500 ">
@@ -80,7 +81,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-
       <Hero3 />
 
 
