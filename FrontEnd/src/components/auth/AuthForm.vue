@@ -1,3 +1,98 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
+import logoImage from '../../assets/tutor2.png'; 
+
+library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
+
+interface Role {
+  value: string;
+  label: string;
+  icon: [string, string];
+}
+
+interface AuthFormProps {
+  title?: string;
+  subtitle?: string;
+  logoSrc?: string;
+  showRoleSelector?: boolean;
+  roles?: Role[];
+  submitButtonText?: string;
+  googleButtonText?: string;
+  footerText?: string;
+  footerLinkText?: string;
+  footerLinkPath?: string;
+  isSignupForm?: boolean;
+}
+
+// Folosește withDefaults pentru a defini valorile implicite
+const props = withDefaults(defineProps<AuthFormProps>(), {
+  title: 'Tutor',
+  isSignupForm: false,
+  showRoleSelector: false
+});
+
+const defaultRoles: Role[] = [
+  { value: 'tutor', label: 'Tutor', icon: ['fas', 'chalkboard-teacher'] },
+  { value: 'student', label: 'Student', icon: ['fas', 'user-graduate'] }
+];
+
+const roles = props.roles ?? defaultRoles;
+
+interface FormData {
+  email: string;
+  password: string;
+  role: string;
+  phoneNumber?: string;
+}
+
+interface SocialLoginPayload {
+  provider: string;
+}
+
+const emit = defineEmits<{
+  (e: 'submit', formData: FormData): void;
+  (e: 'socialLogin', payload: SocialLoginPayload): void;
+}>();
+
+const logoSrc = props.logoSrc || logoImage;
+const email = ref('');
+const phoneNumber = ref('');
+const password = ref('');
+const selectedRole = ref(roles[0]?.value || 'tutor');
+const showPassword = ref(false);
+
+const handleSubmit = () => {
+  const formData: FormData = {
+    email: email.value,
+    password: password.value,
+    role: selectedRole.value,
+  };
+
+  if (props.isSignupForm) {
+    formData.phoneNumber = `+373${phoneNumber.value}`;
+  }
+  
+  emit('submit', formData);
+};
+
+const handleSocialLogin = (provider: string): void => {
+  emit('socialLogin', { provider });
+};
+
+const actionText = computed(() => {
+  if (!props.submitButtonText) return 'Submit';
+  return props.submitButtonText.includes('Sign in') ? 'Sign in as' : 'Sign up as';
+});
+
+const dynamicSubmitButtonText = computed(() => {
+  const currentRole = roles.find(r => r.value === selectedRole.value);
+  return `${actionText.value} ${currentRole?.label || 'User'}`;
+});
+</script>
+
 <template>
   <div class="bg-white p-5 sm:p-8 flex flex-col max-w-md mx-auto">
     <div class="text-center mb-4 sm:mb-5">
@@ -113,98 +208,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
-import logoImage from '../../assets/tutor2.png'; 
-
-library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
-
-interface Role {
-  value: string;
-  label: string;
-  icon: [string, string];
-}
-
-interface AuthFormProps {
-  title?: string;
-  subtitle?: string;
-  logoSrc?: string;
-  showRoleSelector?: boolean;
-  roles?: Role[];
-  submitButtonText?: string;
-  googleButtonText?: string;
-  footerText?: string;
-  footerLinkText?: string;
-  footerLinkPath?: string;
-  isSignupForm?: boolean;
-}
-
-// Folosește withDefaults pentru a defini valorile implicite
-const props = withDefaults(defineProps<AuthFormProps>(), {
-  title: 'Tutor',
-  isSignupForm: false,
-  showRoleSelector: false
-});
-
-const defaultRoles: Role[] = [
-  { value: 'tutor', label: 'Tutor', icon: ['fas', 'chalkboard-teacher'] },
-  { value: 'student', label: 'Student', icon: ['fas', 'user-graduate'] }
-];
-
-const roles = props.roles ?? defaultRoles;
-
-interface FormData {
-  email: string;
-  password: string;
-  role: string;
-  phoneNumber?: string;
-}
-
-interface SocialLoginPayload {
-  provider: string;
-}
-
-const emit = defineEmits<{
-  (e: 'submit', formData: FormData): void;
-  (e: 'socialLogin', payload: SocialLoginPayload): void;
-}>();
-
-const logoSrc = props.logoSrc || logoImage;
-const email = ref('');
-const phoneNumber = ref('');
-const password = ref('');
-const selectedRole = ref(roles[0]?.value || 'tutor');
-const showPassword = ref(false);
-
-const handleSubmit = () => {
-  const formData: FormData = {
-    email: email.value,
-    password: password.value,
-    role: selectedRole.value,
-  };
-
-  if (props.isSignupForm) {
-    formData.phoneNumber = `+373${phoneNumber.value}`;
-  }
-  
-  emit('submit', formData);
-};
-
-const handleSocialLogin = (provider: string): void => {
-  emit('socialLogin', { provider });
-};
-
-const actionText = computed(() => {
-  if (!props.submitButtonText) return 'Submit';
-  return props.submitButtonText.includes('Sign in') ? 'Sign in as' : 'Sign up as';
-});
-
-const dynamicSubmitButtonText = computed(() => {
-  const currentRole = roles.find(r => r.value === selectedRole.value);
-  return `${actionText.value} ${currentRole?.label || 'User'}`;
-});
-</script>
