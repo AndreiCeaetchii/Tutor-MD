@@ -1,19 +1,3 @@
-<template>
-  <BaseAuthForm
-    title="Tutor"
-    subtitle="Please sign up to continue"
-    :showRoleSelector="true"
-    :isSignupForm="true"
-    submitButtonText="Sign up as Tutor"
-    googleButtonText="Sign up with Google"
-    footerText="Already have an account?"
-    footerLinkText="Sign in"
-    footerLinkPath="/login"
-    @submit="handleSubmit"
-    @socialLogin="handleSocialLogin"
-  />
-</template>
-
 <script setup lang="ts">
 import BaseAuthForm from '../auth/AuthForm.vue';
 
@@ -32,3 +16,19 @@ const handleSocialLogin = ({ provider }: { provider: string }) => {
 
 };
 </script>
+
+<template>
+  <BaseAuthForm
+    title="Tutor"
+    subtitle="Please sign up to continue"
+    :showRoleSelector="true"
+    :isSignupForm="true"
+    submitButtonText="Sign up as Tutor"
+    googleButtonText="Sign up with Google"
+    footerText="Already have an account?"
+    footerLinkText="Sign in"
+    footerLinkPath="/login"
+    @submit="handleSubmit"
+    @socialLogin="handleSocialLogin"
+  />
+</template>
