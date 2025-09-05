@@ -1,15 +1,46 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import BaseAuthForm from '../auth/AuthForm.vue';
-import { useAuth } from '../../services/useAuth.ts'
+import { useRouter } from "vue-router";
+import BaseAuthForm from "../auth/AuthForm.vue";
+import { useAuth } from "../../services/useAuth.ts";
+import { userStore } from "../../store/userStore";
+
+interface SignupFormData {
+  email: string;
+  password: string;
+  role: string;
+  phoneNumber?: string;
+}
 
 const { signup, errorMessage } = useAuth();
+const router = useRouter();
+const store = userStore();
 
-const handleSubmit = async (formData: any) => {
+const handleSubmit = async (formData: SignupFormData) => {
+  console.log("Signup form submitted:", formData);
+
   try {
-      await signup(formData);
+    // Apelăm API-ul real de signup
+    const userData = await signup(formData);
+
+    // Actualizăm store-ul după signup
+    store.currentUser = {
+      id: userData.id || "123",
+      email: formData.email,
+      role: formData.role as any,
+      token: userData.token || "sample-token",
+    };
+    store.isAuthenticated = true;
+
+    // Redirecționare în funcție de rol
+    if (formData.role === "tutor") {
+      router.push("/tutor-dashboard");
+    } else if (formData.role === "student") {
+      router.push("/student-dashboard");
+    } else if (formData.role === "admin") {
+      router.push("/admin-dashboard");
+    }
   } catch (err) {
-    console.error('Signup error:', err);
+    console.error("Signup error:", err);
   }
 };
 
@@ -20,17 +51,19 @@ const handleSocialLogin = ({ provider }: { provider: string }) => {
 
 <template>
   <BaseAuthForm
-      title="Create an account"
-      subtitle="Please sign up to continue"
-      :showRoleSelector="true"
-      :isSignupForm="true"
-      submitButtonText="Sign up"
-      googleButtonText="Sign up with Google"
-      footerText="Already have an account?"
-      footerLinkText="Sign in"
-      footerLinkPath="/login"
-      @submit="handleSubmit"
-      @socialLogin="handleSocialLogin"
-      :errorMessage="errorMessage"
+    title="Create an account" 
+    subtitle="Please sign up to continue"
+    :showRoleSelector="true"
+    :isSignupForm="true"
+    :isLogin="false"
+    submitButtonText="Sign up as Tutor"
+    googleButtonText="Sign up with Google"
+    footerText="Already have an account?"
+    footerLinkText="Sign in"
+    footerLinkPath="/login"
+    @submit="handleSubmit"
+    @socialLogin="handleSocialLogin"
+    :errorMessage="errorMessage"
   />
 </template>
+
