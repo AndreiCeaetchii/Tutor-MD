@@ -15,14 +15,14 @@ const routes = [
     path: "/signup",
     component: SignupPage,
   },
-    {
-        path: "/landing",
-        component: LandingPage,
-    },
-  // {
-  //   path: '/catchAll(.*)',
-  //   component: NotFoundPage,
-  // }
+  {
+    path: "/landing",
+    component: LandingPage,
+  },
+  {
+    path: "/",
+    component: LandingPage,
+  },
 ];
 
 const router = createRouter({

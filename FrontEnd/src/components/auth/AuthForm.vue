@@ -115,7 +115,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, computed, withDefaults } from 'vue';
+import { ref, computed } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
