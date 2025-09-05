@@ -1,34 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
+import { userStore } from "../../store/userStore";
 
-const props = defineProps({
-  userRole: {
-    type: String,
-    default: 'student', // sau 'tutor'
-    validator: (value: string) => ['student', 'tutor'].includes(value)
-  }
-});
-
-const activeTab = ref('');
+const store = userStore();
+const activeTab = ref("");
 
 const tutorTabs = [
-  { name: 'Availability', icon: 'calendar_month' },
-  { name: 'Profile', icon: 'person' },
-  { name: 'Bookings', icon: 'book' },
-  { name: 'Reviews', icon: 'star' },
-  { name: 'Messages', icon: 'chat' }
+  { name: "Availability", icon: "calendar_month" },
+  { name: "Profile", icon: "person" },
+  { name: "Bookings", icon: "book" },
+  { name: "Reviews", icon: "star" },
+  { name: "Messages", icon: "chat" },
 ];
 
 const studentTabs = [
-  { name: 'Find Tutors', icon: 'search' },
-  { name: 'My Bookings', icon: 'book' },
-  { name: 'Reviews', icon: 'star' },
-  { name: 'Messages', icon: 'chat' },
-  { name: 'My Account', icon: 'person' }
+  { name: "Find Tutors", icon: "search" },
+  { name: "My Bookings", icon: "book" },
+  { name: "Reviews", icon: "star" },
+  { name: "Messages", icon: "chat" },
+  { name: "My Account", icon: "person" },
 ];
 
 const tabs = computed(() => {
-  return props.userRole === 'tutor' ? tutorTabs : studentTabs;
+  return store.userRole === "tutor" ? tutorTabs : studentTabs;
 });
 
 const initializeActiveTab = () => {
@@ -37,7 +31,6 @@ const initializeActiveTab = () => {
   }
 };
 
-// Inițializăm tabul activ
 initializeActiveTab();
 
 const setActiveTab = (tabName: string) => {
@@ -46,13 +39,18 @@ const setActiveTab = (tabName: string) => {
 </script>
 
 <template>
-  <div class="navigation-bar bg-white rounded-full p-2 flex justify-between shadow-sm">
-    <div 
-      v-for="tab in tabs" 
+  <div
+    class="navigation-bar bg-white rounded-full p-2 flex justify-between shadow-sm"
+  >
+    <div
+      v-for="tab in tabs"
       :key="tab.name"
       @click="setActiveTab(tab.name)"
       class="tab-item flex items-center px-4 py-2 rounded-full cursor-pointer"
-      :class="{ 'bg-purple-50 text-purple-700': activeTab === tab.name, 'text-gray-600': activeTab !== tab.name }"
+      :class="{
+        'bg-purple-50 text-purple-700': activeTab === tab.name,
+        'text-gray-600': activeTab !== tab.name,
+      }"
     >
       <span class="material-icons mr-2">{{ tab.icon }}</span>
       <span>{{ tab.name }}</span>
