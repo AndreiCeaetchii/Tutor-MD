@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/Footer.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/Footer.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/LandingPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/LandingPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +13,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -76,7 +79,7 @@
       <workItem from="1756987073396" duration="230000" />
       <workItem from="1757013242973" duration="1092000" />
       <workItem from="1757015768085" duration="1528000" />
-      <workItem from="1757051797792" duration="5797000" />
+      <workItem from="1757051797792" duration="6928000" />
     </task>
     <servers />
   </component>
