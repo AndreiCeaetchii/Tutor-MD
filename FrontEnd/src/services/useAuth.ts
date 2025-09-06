@@ -40,7 +40,6 @@ export function useAuth() {
             // Mesaj în consolă pentru succes
             console.log('Signup successful!');
 
-            await router.push('/');
         } catch (err: any) {
             console.error('Signup error:', err);
             errorMessage.value = err.message || 'Network or server error';
@@ -73,7 +72,6 @@ export function useAuth() {
 
             console.log('Login successful!');
 
-            await router.push('/');
         } catch (err: any) {
             console.error('Login error:', err);
             errorMessage.value = err.message || 'Network or server error';

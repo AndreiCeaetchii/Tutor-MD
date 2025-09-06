@@ -67,7 +67,6 @@ const logoSrc = props.logoSrc || logoImage;
 const email = ref("");
 const phoneNumber = ref("");
 const password = ref("");
-const selectedRole = ref<UserRole | null>(null);
 
 const showPassword = ref(false);
 const store = userStore();
@@ -76,6 +75,8 @@ const selectRole = (role: UserRole) => {
   selectedRole.value = role;
   store.setSelectedRole(role);
 };
+
+const selectedRole = ref<UserRole | null>(store.selectedRole);
 
 const handleSubmit = () => {
   const formData: FormData = {
@@ -230,13 +231,11 @@ const dynamicSubmitButtonText = computed(() => {
       @click="handleSocialLogin('google')"
     >
       <svg
-        width="18"
-        height="18"
-        sm:width="20"
-        sm:height="20"
-        viewBox="0 0 48 48"
+          class="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]"
+          viewBox="0 0 48 48"
       >
-        <path
+
+      <path
           fill="#EA4335"
           d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
         />
