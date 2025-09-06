@@ -22,12 +22,14 @@ const handleSubmit = async (formData: SignupFormData) => {
     // Apelăm API-ul real de signup
     const userData = await signup(formData);
 
+    console.log(userData);
+
     // Actualizăm store-ul după signup
     store.currentUser = {
-      id: userData.id || "123",
+      id: "123",
       email: formData.email,
       role: formData.role as any,
-      token: userData.token || "sample-token",
+      token: "sample-token",
     };
     store.isAuthenticated = true;
 

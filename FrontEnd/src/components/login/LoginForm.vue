@@ -19,15 +19,17 @@ const handleSubmit = async (formData: LoginFormData) => {
   console.log("Login form submitted:", formData);
 
   try {
-    // Apelăm funcția login din composable
+    // Apelăm funcția login din servicii
     const userData = await login(formData);
+
+    console.log(userData);
 
     // Actualizăm store-ul dacă login-ul a reușit
     store.login({
-      id: userData.id || "123",
+      id: "123",
       email: formData.email,
       role: formData.role as any,
-      token: userData.token || "sample-token",
+      token: "sample-token",
     });
 
     // Redirecționare pe baza rolului
@@ -47,6 +49,7 @@ const handleSubmit = async (formData: LoginFormData) => {
 const handleSocialLogin = ({ provider }: { provider: string }) => {
   console.log(`${provider} login clicked`);
 };
+
 </script>
 
 <template>
