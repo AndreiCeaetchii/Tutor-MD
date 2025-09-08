@@ -1,125 +1,16 @@
-<template>
-  <div class="bg-white p-5 sm:p-8 flex flex-col max-w-md mx-auto">
-    <div class="text-center mb-4 sm:mb-5">
-      <img :src="logoSrc" :alt="title" class="h-12 sm:h-14 mx-auto mb-2 sm:mb-3">
-      <p class="text-gray-500 text-sm">{{ subtitle }}</p>
-    </div>
-    
-    <div v-if="showRoleSelector" class="flex flex-wrap gap-3 mb-4 sm:mb-5 justify-center">
-      <button
-        v-for="role in roles"
-        :key="role.value"
-        type="button"
-        class="flex-1 min-w-[100px] px-4 sm:px-6 py-2.5 bg-transparent border font-semibold rounded-full transition-colors flex items-center justify-center gap-2"
-        :class="selectedRole === role.value 
-          ? 'border-[#5f22d9] bg-[#5f22d9]/5 text-[#5f22d9]' 
-          : 'border-gray-300 text-gray-500 hover:bg-gray-100'"
-        @click="selectedRole = role.value"
-      >
-        <font-awesome-icon :icon="role.icon" />
-        <span>{{ role.label }}</span>
-      </button>
-    </div>
-
-    <form @submit.prevent="handleSubmit">
-      <slot name="fields-before"></slot>
-      <div class="mb-3 sm:mb-4">
-        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="email"
-          placeholder="Enter your email"
-          class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9]"
-          required
-        />
-      </div>
-
-      <div v-if="isSignupForm" class="mb-4 sm:mb-5">
-        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-        <div class="flex">
-          <div class="flex items-center bg-gray-50 border border-gray-300 rounded-l-lg px-3 text-gray-600 font-medium">
-            <img src="https://flagcdn.com/w20/md.png" alt="Moldova flag" class="mr-2 h-">
-            <span>+373</span>
-          </div>
-          <input
-            type="tel"
-            id="phone"
-            v-model="phoneNumber"
-            placeholder="Enter phone number"
-            class="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9]"
-          />
-        </div>
-      </div>
-
-      <div class="mb-4 sm:mb-5">
-        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <div class="relative">
-          <input
-            :type="showPassword ? 'text' : 'password'"
-            id="password"
-            v-model="password"
-            placeholder="Enter your password"
-            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9] pr-12"
-            required
-          />
-          <button
-            type="button"
-            class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#5f22d9]"
-            @click="showPassword = !showPassword"
-          >
-            <font-awesome-icon :icon="['fas', showPassword ? 'eye' : 'eye-slash']" />
-          </button>
-        </div>
-      </div>
-      
-      <slot name="fields-after"></slot>
-
-      <button
-        type="submit"
-        class="w-full px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-[#5f22d9] to-[#2c016d] text-white font-semibold rounded-full transition-all hover:shadow-lg"
-      >
-        {{ dynamicSubmitButtonText }}
-      </button>
-    </form>
-
-    <div class="flex items-center my-4 sm:my-5">
-      <div class="flex-grow h-px bg-gray-200"></div>
-      <span class="px-3 text-gray-500 text-sm">or continue</span>
-      <div class="flex-grow h-px bg-gray-200"></div>
-    </div>
-    
-    <button 
-      type="button" 
-      class="w-full px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-gray-300 text-gray-800 font-semibold rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 sm:gap-3"
-      @click="handleSocialLogin('google')"
-    >
-      <svg width="18" height="18" sm:width="20" sm:height="20" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      <span>{{ googleButtonText }}</span>
-    </button>
-
-    <div class="text-center mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-gray-100">
-      <slot name="footer">
-        <p class="text-gray-500 text-sm">
-          {{ footerText }}
-          <router-link :to="footerLinkPath || '/'" class="text-[#5f22d9] font-medium hover:underline">{{ footerLinkText }}</router-link>
-        </p>
-      </slot>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, computed, withDefaults } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate } from '@fortawesome/free-solid-svg-icons';
-import logoImage from '../../assets/tutor2.png'; 
+import { ref, computed} from "vue";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faEye,
+  faEyeSlash,
+  faChalkboardTeacher,
+  faUserGraduate,
+} from "@fortawesome/free-solid-svg-icons";
+import logoImage from "../../assets/tutor2.png";
+import { userStore } from "../../store/userStore";
+import type { UserRole } from "../../store/userStore";
 
 library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
 
@@ -141,22 +32,8 @@ interface AuthFormProps {
   footerLinkText?: string;
   footerLinkPath?: string;
   isSignupForm?: boolean;
+  isLogin: boolean;
 }
-
-// Folosește withDefaults pentru a defini valorile implicite
-const props = withDefaults(defineProps<AuthFormProps>(), {
-  title: 'Tutor',
-  isSignupForm: false,
-  showRoleSelector: false
-});
-
-const defaultRoles: Role[] = [
-  { value: 'tutor', label: 'Tutor', icon: ['fas', 'chalkboard-teacher'] },
-  { value: 'student', label: 'Student', icon: ['fas', 'user-graduate'] }
-];
-
-const roles = props.roles ?? defaultRoles;
-
 interface FormData {
   email: string;
   password: string;
@@ -168,43 +45,227 @@ interface SocialLoginPayload {
   provider: string;
 }
 
+const props = withDefaults(defineProps<AuthFormProps>(), {
+  title: "Tutor",
+  isSignupForm: false,
+  showRoleSelector: false,
+});
+
+const defaultRoles: Role[] = [
+  { value: "tutor", label: "Tutor", icon: ["fas", "chalkboard-teacher"] },
+  { value: "student", label: "Student", icon: ["fas", "user-graduate"] },
+];
+
+const roles = props.roles ?? defaultRoles;
+
 const emit = defineEmits<{
-  (e: 'submit', formData: FormData): void;
-  (e: 'socialLogin', payload: SocialLoginPayload): void;
+  (e: "submit", formData: FormData): void;
+  (e: "socialLogin", payload: SocialLoginPayload): void;
 }>();
 
 const logoSrc = props.logoSrc || logoImage;
-const email = ref('');
-const phoneNumber = ref('');
-const password = ref('');
-const selectedRole = ref(roles[0]?.value || 'tutor');
+const email = ref("");
+const phoneNumber = ref("");
+const password = ref("");
+
 const showPassword = ref(false);
+const store = userStore();
+
+const selectRole = (role: UserRole) => {
+  selectedRole.value = role;
+  store.setSelectedRole(role);
+};
+
+const selectedRole = ref<UserRole | null>(store.selectedRole);
 
 const handleSubmit = () => {
   const formData: FormData = {
     email: email.value,
     password: password.value,
-    role: selectedRole.value,
+    role: selectedRole.value ?? "",
   };
 
   if (props.isSignupForm) {
     formData.phoneNumber = `+373${phoneNumber.value}`;
   }
-  
-  emit('submit', formData);
+
+  emit("submit", formData);
 };
 
 const handleSocialLogin = (provider: string): void => {
-  emit('socialLogin', { provider });
+  emit("socialLogin", { provider });
 };
 
 const actionText = computed(() => {
-  if (!props.submitButtonText) return 'Submit';
-  return props.submitButtonText.includes('Sign in') ? 'Sign in as' : 'Sign up as';
+  if (!props.submitButtonText) return "Submit";
+  return props.submitButtonText.includes("Sign in")
+    ? "Sign in as"
+    : "Sign up as";
 });
 
 const dynamicSubmitButtonText = computed(() => {
-  const currentRole = roles.find(r => r.value === selectedRole.value);
-  return `${actionText.value} ${currentRole?.label || 'User'}`;
+  const currentRole = roles.find((r) => r.value === selectedRole.value);
+  return `${actionText.value} ${currentRole?.label || "User"}`;
 });
 </script>
+
+<template>
+  <div class="bg-white p-5 sm:p-8 flex flex-col max-w-md mx-auto">
+    <div class="text-center mb-4 sm:mb-5">
+      <img
+        :src="logoSrc"
+        :alt="title"
+        class="h-12 sm:h-14 mx-auto mb-2 sm:mb-3"
+      />
+      <p class="text-gray-500 text-sm">{{ subtitle }}</p>
+    </div>
+
+    <div
+      v-if="showRoleSelector"
+      class="flex flex-wrap gap-3 mb-4 sm:mb-5 justify-center"
+    >
+      <button
+        v-for="role in roles"
+        :key="role.value"
+        type="button"
+        class="flex-1 min-w-[100px] px-4 sm:px-6 py-2.5 bg-transparent border font-semibold rounded-full transition-colors flex items-center justify-center gap-2"
+        :class="
+          selectedRole === role.value
+            ? 'border-[#5f22d9] bg-[#5f22d9]/5 text-[#5f22d9]'
+            : 'border-gray-300 text-gray-500 hover:bg-gray-100'
+        "
+        @click="selectRole(role.value as UserRole)"
+      >
+        <font-awesome-icon :icon="role.icon" />
+        <span>{{ role.label }}</span>
+      </button>
+    </div>
+
+    <form @submit.prevent="handleSubmit">
+      <slot name="fields-before"></slot>
+      <div class="mb-3 sm:mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1"
+          >Email</label
+        >
+        <input
+          type="email"
+          id="email"
+          v-model="email"
+          placeholder="Enter your email"
+          class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9]"
+          required
+        />
+      </div>
+
+      <div v-if="isSignupForm" class="mb-4 sm:mb-5">
+        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1"
+          >Phone Number</label
+        >
+        <div class="flex">
+          <div
+            class="flex items-center bg-gray-50 border border-gray-300 rounded-l-lg px-3 text-gray-600 font-medium"
+          >
+            <img
+              src="https://flagcdn.com/w20/md.png"
+              alt="Moldova flag"
+              class="mr-2 h-"
+            />
+            <span>+373</span>
+          </div>
+          <input
+            type="tel"
+            id="phone"
+            v-model="phoneNumber"
+            placeholder="Enter phone number"
+            class="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9]"
+          />
+        </div>
+      </div>
+
+      <div class="mb-4 sm:mb-5">
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+          >Password</label
+        >
+        <div class="relative">
+          <input
+            :type="showPassword ? 'text' : 'password'"
+            id="password"
+            v-model="password"
+            placeholder="Enter your password"
+            class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-[#5f22d9] pr-12"
+            required
+          />
+          <button
+            type="button"
+            class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#5f22d9]"
+            @click="showPassword = !showPassword"
+          >
+            <font-awesome-icon
+              :icon="['fas', showPassword ? 'eye' : 'eye-slash']"
+            />
+          </button>
+        </div>
+      </div>
+
+      <slot name="fields-after"></slot>
+
+      <button
+        type="submit"
+        class="w-full px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-[#5f22d9] to-[#2c016d] text-white font-semibold rounded-full transition-all hover:shadow-lg"
+      >
+        {{ dynamicSubmitButtonText }}
+      </button>
+    </form>
+
+    <div class="flex items-center my-4 sm:my-5">
+      <div class="flex-grow h-px bg-gray-200"></div>
+      <span class="px-3 text-gray-500 text-sm">or continue</span>
+      <div class="flex-grow h-px bg-gray-200"></div>
+    </div>
+
+    <button
+      type="button"
+      class="w-full px-6 sm:px-8 py-2.5 sm:py-3 bg-transparent border border-gray-300 text-gray-800 font-semibold rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 sm:gap-3"
+      @click="handleSocialLogin('google')"
+    >
+      <svg
+          class="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]"
+          viewBox="0 0 48 48"
+      >
+
+      <path
+          fill="#EA4335"
+          d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+        />
+        <path
+          fill="#4285F4"
+          d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+        />
+        <path
+          fill="#FBBC05"
+          d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+        />
+        <path
+          fill="#34A853"
+          d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+        />
+      </svg>
+      <span>{{ googleButtonText }}</span>
+    </button>
+
+    <div class="text-center mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-gray-100">
+      <slot name="footer">
+        <p class="text-gray-500 text-sm">
+          {{ footerText }}
+          <router-link
+            :to="footerLinkPath || '/'"
+            class="text-[#5f22d9] font-medium hover:underline"
+            >{{ footerLinkText }}</router-link
+          >
+        </p>
+      </slot>
+    </div>
+  </div>
+</template>

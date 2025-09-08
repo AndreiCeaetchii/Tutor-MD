@@ -1,7 +1,14 @@
+<script setup lang="ts">
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faArrowRight);
+</script>
+
 <template>
   <div class="bg-gradient-to-br from-purple-50 to-white p-8 flex justify-center items-center h-full overflow-y-auto">
     <div class="w-full max-w-lg mx-auto">
-      <!-- Wavy SVG -->
       <div class="mb-6">
         <svg width="60" height="25" viewBox="0 0 80 30" class="text-orange-500">
           <path d="M0,15 C10,5 20,25 40,15 C60,5 70,25 80,15" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
@@ -31,11 +38,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faArrowRight);
-</script>

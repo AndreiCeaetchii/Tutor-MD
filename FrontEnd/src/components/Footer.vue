@@ -1,11 +1,11 @@
 <template>
-  <footer class="bg-[#5f22d9] text-gray-300 py-12 lg:py-16">
+  <footer class="bg-gray-100 text-gray-700 py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-8 lg:gap-12">
         <div class="col-span-1 md:col-span-2">
-          <!--          <div class="flex items-center space-x-2 mb-4">-->
-          <!--            <img class="h-8" src="../assets/tutor2.png" alt="TutorConnect Logo">-->
-          <!--          </div>-->
+                    <div class="flex items-center space-x-2 mb-4">
+                      <img class="h-8" src="../assets/tutor2.png" alt="TutorConnect Logo">
+                    </div>
           <p class="text-sm leading-relaxed mb-4">
             Connecting students and tutors worldwide for personalized, effective learning experiences.
           </p>
@@ -26,7 +26,7 @@
         </div>
 
         <div>
-          <h5 class="text-white font-semibold mb-3">Platform</h5>
+          <h5 class="font-semibold mb-3">Platform</h5>
           <ul class="space-y-2 text-sm">
             <li><a href="#" class="hover:text-white transition-colors">How it Works</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Find Tutors</a></li>
@@ -35,7 +35,7 @@
           </ul>
         </div>
         <div>
-          <h5 class="text-white font-semibold mb-3">Popular Subjects</h5>
+          <h5 class=" font-semibold mb-3">Popular Subjects</h5>
           <ul class="space-y-2 text-sm">
             <li><a href="#" class="hover:text-white transition-colors">Mathematics</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Science</a></li>
@@ -44,7 +44,7 @@
           </ul>
         </div>
         <div>
-          <h5 class="text-white font-semibold mb-3">Support</h5>
+          <h5 class=" font-semibold mb-3">Support</h5>
           <ul class="space-y-2 text-sm">
             <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
@@ -53,7 +53,7 @@
           </ul>
         </div>
         <div>
-          <h5 class="text-white font-semibold mb-3">Company</h5>
+          <h5 class=" font-semibold mb-3">Company</h5>
           <ul class="space-y-2 text-sm">
             <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
             <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>

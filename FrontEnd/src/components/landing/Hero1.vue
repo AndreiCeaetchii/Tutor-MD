@@ -15,10 +15,10 @@
           Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ad minim veniam.
         </p>
         <div class="mt-8 flex flex-col sm:flex-row items-center sm:items-start justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-          <button class="w-full sm:w-auto px-8 py-3 bg-orange-500 text-white font-semibold rounded-full shadow-lg hover:bg-orange-600 transition-colors">
+          <button class="w-full sm:w-auto px-8 py-3 bg-orange-500 text-white font-semibold rounded-full shadow-lg hover:bg-orange-600 transition-colors" @click="startAsStudent">
             Start as student
           </button>
-          <button class="w-full sm:w-auto px-8 py-3 bg-transparent border border-gray-300 text-gray-800 font-semibold rounded-full hover:bg-gray-100 transition-colors">
+          <button class="w-full sm:w-auto px-8 py-3 bg-transparent border border-gray-300 text-gray-800 font-semibold rounded-full hover:bg-gray-100 transition-colors" @click="joinAsInstructor">
             Join as Instructor
           </button>
         </div>
@@ -46,7 +46,22 @@
   </div>
 </template>
 <script setup lang="ts">
-  import hero1_img from '../assets/hero-1-img.png';
+  import hero1_img from '../../assets/hero-1-img.png';
   import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+  import { useRouter } from 'vue-router';
+  import { useUserStore, type UserRole } from "../../store/landingStore.ts";
+
+  const store = useUserStore();
+  const router = useRouter();
+
+  const startAsStudent = () => {
+    store.setSelectedRole("student");
+    router.push('/signup');
+  };
+
+  const joinAsInstructor = () => {
+    store.setSelectedRole("tutor");
+    router.push('/signup');
+  };
 
 </script>
