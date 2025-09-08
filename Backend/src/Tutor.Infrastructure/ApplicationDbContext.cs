@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Text.RegularExpressions;
 using Tutor.Application.Common;
 using Tutor.Domain.Entities;
 using Tutor.Infrastructure.Configuration;
@@ -29,6 +30,8 @@ namespace Tutor.Infrastructure;
         public DbSet<Booking> Bookings { get; set; } = null!;
         public DbSet<Review> Reviews { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<Password> Passwords { get; set; } = null!;
+        public DbSet<GoogleAuth> GoogleAuths { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

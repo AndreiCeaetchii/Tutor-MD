@@ -5,12 +5,11 @@ using Tutor.Domain.Entities;
 namespace Tutor.Application.Mappers;
 public static class UserMapper
 {
-    public static User ToEntity(RegisterUserDto dto, string hashedPassword)
+    public static User ToEntity(RegisterUserDto dto)
     {
         return new User
         {
             Email = dto.Email,
-            PasswordHash = hashedPassword,
             IsActive = true,
             LastLoginAt = DateTime.UtcNow
         };
@@ -20,4 +19,5 @@ public static class UserMapper
     {
         return new UserResponseDto { Email = user.Email, Token = token, Username = user.Username, Id = user.Id };
     }
+    
 }

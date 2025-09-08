@@ -11,17 +11,20 @@ namespace Tutor.Infrastructure.Services;
 public class AuthService : IAuthService
 {
     private readonly IGenericRepository<User, int> _userRepository;
+    private readonly IGenericRepository<Password, int> _passwordRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
 
     public AuthService(
         IGenericRepository<User, int> userRepository,
         IPasswordHasher passwordHasher,
-        ITokenService tokenService)
+        ITokenService tokenService,
+        IGenericRepository<Password, int> passwordRepository)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
+        _passwordRepository = passwordRepository;
     }
 
     public async Task<Result<UserResponseDto>> LoginAsync(LoginUserDto loginDto)
@@ -29,7 +32,10 @@ public class AuthService : IAuthService
         var user = await _userRepository.FindAsyncDefault(u => u.Email == loginDto.Email);
         if (user == null) return Result<UserResponseDto>.Error("Invalid Email");
 
-        if (!_passwordHasher.VerifyPassword(loginDto.Password, user.PasswordHash))
+        var password =await  _passwordRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        if (password == null) return Result<UserResponseDto>.Error("No password found for this email ");
+
+        if (!_passwordHasher.VerifyPassword(loginDto.Password, password.PasswordHash))
             return Result<UserResponseDto>.Error("Invalid Password");
 
         var token = _tokenService.GenerateToken(user);
@@ -41,14 +47,23 @@ public class AuthService : IAuthService
 
     public async Task<Result<UserResponseDto>> RegisterAsync(RegisterUserDto registerDto)
     {
+        // Map DTO to User entity
+        var user = UserMapper.ToEntity(registerDto);
+
+        // Persist user first (to get Id)
+        await _userRepository.Create(user);
+
         // Hash password
         var hashedPassword = _passwordHasher.HashPassword(registerDto.Password);
 
-        // Map DTO to entity
-        var user = UserMapper.ToEntity(registerDto, hashedPassword);
+        // Create Password entity
+        var password = new Password
+        {
+            UserId = user.Id,
+            PasswordHash = hashedPassword
+        };
 
-        // Persist user
-        await _userRepository.Create(user);
+        await _passwordRepository.Create(password);
 
         // Generate token
         var token = _tokenService.GenerateToken(user);

@@ -13,18 +13,30 @@ namespace Tutor.Application.Services;
 public class UserService : IUserService
 {
     private readonly IGenericRepository<User, int> _userRepository;
+    private readonly IGenericRepository<GoogleAuth, int> _googleAuthRepository;
 
-    public UserService(IGenericRepository<User, int> userRepository)
+
+    public UserService(IGenericRepository<User, int> userRepository, IGenericRepository<GoogleAuth, int> googleAuthRepository)
     {
         _userRepository = userRepository;
+        _googleAuthRepository = googleAuthRepository;
     }
 
     public async Task<User?> GetUserByOAuthIdAsync(string provider, string providerId)
     {
-        Expression<Func<User, bool>> predicate = u => 
+        // Validate input parameters
+        if (string.IsNullOrEmpty(provider) || string.IsNullOrEmpty(providerId))
+            return null;
+
+        Expression<Func<GoogleAuth, bool>> predicate = u => 
             u.OAuthProvider == provider && u.OAuthProviderId == providerId;
-        
-        return await _userRepository.FindAsyncDefault(predicate);
+    
+        var googleAuth = await _googleAuthRepository.FindAsyncDefault(predicate);
+    
+        if (googleAuth == null)
+            return null;
+    
+        return await _userRepository.GetById(googleAuth.UserId);
     }
 
     public async Task<User?> GetUserByEmailAsync(string email)
@@ -46,13 +58,23 @@ public class UserService : IUserService
         var user = new User
         {
             Email = email,
-            OAuthProvider = provider,
-            OAuthProviderId = providerId,
             IsActive = true,
             LastLoginAt =DateTime.UtcNow,
         };
 
+        
+        
+
         await _userRepository.Create(user);
+        
+        var googleAuth = new GoogleAuth
+        {
+            UserId = user.Id,
+            OAuthProvider = provider,
+            OAuthProviderId = providerId,
+        };
+        
+        await _googleAuthRepository.Create(googleAuth);
         return user;
     }
     
@@ -98,12 +120,12 @@ public class UserService : IUserService
         return user != null;
     }
 
-    public async Task<bool> UserExistsByOAuthIdAsync(string provider, string providerId)
-    {
-        Expression<Func<User, bool>> predicate = u => 
-            u.OAuthProvider == provider && u.OAuthProviderId == providerId;
-        
-        var user = await _userRepository.FindAsyncDefault(predicate);
-        return user != null;
-    }
+    // public async Task<bool> UserExistsByOAuthIdAsync(string provider, string providerId)
+    // {
+    //     Expression<Func<User, bool>> predicate = u => 
+    //         u.OAuthProvider == provider && u.OAuthProviderId == providerId;
+    //     
+    //     var user = await _userRepository.FindAsyncDefault(predicate);
+    //     return user != null;
+    // }
 }

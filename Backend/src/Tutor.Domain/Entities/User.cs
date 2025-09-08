@@ -8,7 +8,6 @@ public class User : Entity<int>
 {
     public string? Username { get; set; }
     public string Email { get; set; }
-    public string? PasswordHash { get; set; }
     public string? Phone { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
@@ -18,10 +17,6 @@ public class User : Entity<int>
     public bool IsActive { get; set; }
     public DateTime LastLoginAt { get; set; }
     
-    public string OAuthProvider { get; set; } = string.Empty;
-    
-    public string OAuthProviderId { get; set; } = string.Empty;
-    
     // Navigation properties
     public virtual Photo Photo { get; set; }
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
@@ -29,4 +24,8 @@ public class User : Entity<int>
     public virtual Tutor Tutor { get; set; }
     public virtual ICollection<Notification> ReceivedNotifications { get; set; } = new List<Notification>();
     public virtual ICollection<Notification> SentNotifications { get; set; } = new List<Notification>();
+    
+    public virtual Password Password    { get; set; }
+    
+    public virtual GoogleAuth GoogleAuth { get; set; }
 }
