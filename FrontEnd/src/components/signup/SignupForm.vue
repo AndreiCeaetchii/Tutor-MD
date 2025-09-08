@@ -20,9 +20,8 @@ const handleSubmit = async (formData: SignupFormData) => {
 
   try {
     // Apelăm API-ul real de signup
-    const userData = await signup(formData);
+    // const userData = await signup(formData);
 
-    console.log(userData);
 
     // Actualizăm store-ul după signup
     store.currentUser = {
