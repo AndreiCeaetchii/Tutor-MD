@@ -73,11 +73,9 @@ public static class UserEndpoints
 
                     if (!int.TryParse(userIdClaim, out var userId))
                         return Results.BadRequest("Invalid UserId in token");
-
-                    // Create command
+                    
                     var command = new CreateProfileCommand(userId, profileDto);
-
-                    // Send to MediatR handler
+                    
                     var result = await mediator.Send(command);
 
                     return result.IsSuccess

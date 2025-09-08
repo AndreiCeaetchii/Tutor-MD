@@ -130,9 +130,4 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-// app.MapHeroEndpoints();
-
-// app.MapGroup("api/identity")
-//     .WithTags("Identity")
-//     .MapIdentityApi<ApplicationUser>();
 await app.RunAsync();

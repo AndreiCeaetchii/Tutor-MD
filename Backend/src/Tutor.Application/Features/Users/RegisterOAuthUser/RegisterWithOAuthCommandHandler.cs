@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
 
 namespace Tutor.Application.Features.Users.RegisterOAuthUser;
@@ -71,11 +72,6 @@ public class RegisterUserWithOAuthCommandHandler
         // Generate JWT token
         var token = _jwtTokenService.GenerateToken(user);
 
-        return Result.Success(new UserResponseDto
-        {
-            Token = token,
-            Id = user.Id,
-            Email = user.Email,
-        });
+        return Result.Success( UserMapper.ToResponseDto(user, token));
     }
 }

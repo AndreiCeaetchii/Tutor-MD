@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
 
@@ -33,13 +34,7 @@ public class AuthService : IAuthService
 
         var token = _tokenService.GenerateToken(user);
 
-        var response = new UserResponseDto
-        {
-            Id = user.Id,
-            Email = user.Email,
-            Username = user.Username,
-            Token = token
-        };
+        var response = UserMapper.ToResponseDto(user, token);
 
         return Result<UserResponseDto>.Success(response);
     }
@@ -59,12 +54,7 @@ public class AuthService : IAuthService
         var token = _tokenService.GenerateToken(user);
 
         // Map entity to response DTO
-        var response = new UserResponseDto
-        {
-            Id = user.Id,
-            Email = user.Email,
-            Token = token
-        };
+        var response = UserMapper.ToResponseDto(user, token);
 
         return Result<UserResponseDto>.Success(response);
     }

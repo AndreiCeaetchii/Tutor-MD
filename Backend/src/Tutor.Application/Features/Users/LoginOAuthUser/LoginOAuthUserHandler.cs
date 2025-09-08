@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
 
 namespace Tutor.Application.Features.Users.LoginOAuthUser;
@@ -59,20 +60,11 @@ public class LoginOAuthUserCommandHandler
         {
             // User found with OAuth ID - generate token and login
             var token = _jwtTokenService.GenerateToken(user);
-            return Result.Success(CreateUserResponse(user, token));
+            return Result.Success( UserMapper.ToResponseDto(user, token));
         }
         
         return Result<UserResponseDto>.Error("Invalid OAuth user");
     }
 
-    private UserResponseDto CreateUserResponse(User user, string token)
-    {
-        return new UserResponseDto
-        {
-            Token = token,
-            Id = user.Id,
-            Email = user.Email,
-            Username = user.Username
-        };
-    }
+    
 }

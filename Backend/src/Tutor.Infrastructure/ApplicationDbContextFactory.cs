@@ -9,7 +9,6 @@ namespace Tutor.Infrastructure;
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            // Load configuration (from API project, since that’s your startup)
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false)

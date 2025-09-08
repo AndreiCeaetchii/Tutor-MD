@@ -7,7 +7,7 @@ public abstract class Entity<T>
 {
     public Entity()
     {
-        CreatedAt = UpdatedAt = DateTime.Now; // or DateTime.UtcNow
+        CreatedAt = UpdatedAt = DateTime.UtcNow; 
     }
     
     public virtual T Id { get; set; } = default!;
