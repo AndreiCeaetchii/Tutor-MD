@@ -5,6 +5,7 @@ import LandingPage from "../pages/LandingPage.vue";
 import TutorDashboard from "../pages/TutorDashboard.vue";
 import StudentDashboard from "../pages/StudentDashboard.vue";
 import { userStore } from "../store/userStore";
+import TutorProfile from "../components/tutor/TutorProfile.vue";
 
 const routes = [
   {
@@ -28,6 +29,14 @@ const routes = [
   {
     path: "/tutor-dashboard",
     component: TutorDashboard,
+    meta: {
+      requiresAuth: true,
+      role: "tutor",
+    },
+  },
+  {
+    path: "/tutor-dashboard-profile",
+    component: TutorProfile,
     meta: {
       requiresAuth: true,
       role: "tutor",
