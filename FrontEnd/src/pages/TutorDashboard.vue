@@ -116,32 +116,6 @@ const handleDateSelected = (date: Date) => {
           v-else-if="activeTab === 'Availability'" 
           class="content-container"
         >
-          <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
-            <h2 class="mb-4 text-xl font-semibold">Manage Your Availability</h2>
-            <p class="mb-6">Set your available hours for tutoring sessions.</p>
-            
-            <!-- Calendar component or availability settings would go here -->
-            <div class="p-4 mb-6 border border-gray-200 bg-gray-50 rounded-xl">
-              <h3 class="mb-3 text-lg font-medium">Weekly Schedule</h3>
-              <div class="grid grid-cols-1 gap-2 text-center md:grid-cols-7">
-                <div v-for="day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']" 
-                     :key="day" 
-                     class="p-3 bg-white border border-gray-100 rounded-lg">
-                  <p class="mb-2 font-medium">{{ day }}</p>
-                  <div class="text-sm text-gray-600">
-                    <p>9:00 AM - 5:00 PM</p>
-                    <button class="mt-2 text-xs text-purple-600 hover:underline">Edit</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex justify-end">
-              <button class="px-6 py-2 text-white transition-colors bg-purple-600 rounded-full hover:bg-purple-700">
-                Save Schedule
-              </button>
-            </div>
-          </div>
           
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <TutorCalendar @dateSelected="handleDateSelected" />
