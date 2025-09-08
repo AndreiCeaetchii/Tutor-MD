@@ -4,12 +4,67 @@ import { useRouter } from "vue-router";
 import NavigationBar from "../components/navigation/NavigationBar.vue";
 import TutorProfile from "../components/tutor/TutorProfile.vue";
 import TutorBookings from "../components/tutor/TutorBookings.vue"; // Import the TutorBookings component
+import TutorReview from "../components/tutor/TutorReview.vue";
+import TutorCalendar from "../components/tutor/TutorCalendar.vue";
+import TutorSlots from "../components/tutor/TutorSlots.vue";
+import TutorSlotsCards from "../components/tutor/TutorSlotCards.vue";
 import { userStore } from "../store/userStore";
 import Footer from "../components/Footer.vue";
 
 const store = userStore();
 const router = useRouter();
-const activeTab = ref('Availability'); // Default to first tab
+const activeTab = ref('Availability');
+const selectedDate = ref(new Date());
+
+// Example slot data structure - in a real app, this would come from an API or store
+const slotData = ref({
+  8: [
+    {
+      id: '1',
+      startTime: '10:00',
+      endTime: '11:00',
+      status: 'booked',
+      studentName: 'Alex Chen'
+    },
+    {
+      id: '2',
+      startTime: '14:00',
+      endTime: '15:00',
+      status: 'available'
+    }
+  ],
+  15: [
+    {
+      id: '3',
+      startTime: '09:00',
+      endTime: '10:00',
+      status: 'available'
+    },
+    {
+      id: '4',
+      startTime: '15:00',
+      endTime: '16:30',
+      status: 'booked',
+      studentName: 'Maria Rodriguez'
+    }
+  ],
+  16: [
+    {
+      id: '5',
+      startTime: '13:00',
+      endTime: '14:00',
+      status: 'available'
+    }
+  ],
+  17: [
+    {
+      id: '6',
+      startTime: '13:00',
+      endTime: '14:00',
+      status: 'available'
+    }
+  ]
+});
 
 onMounted(() => {
   if (!store.isAuthenticated) {
@@ -29,6 +84,10 @@ onMounted(() => {
 const handleTabChange = (tabName: string) => {
   activeTab.value = tabName;
 };
+
+const handleDateSelected = (date: Date) => {
+  selectedDate.value = date;
+};
 </script>
 
 <template>
@@ -46,9 +105,13 @@ const handleTabChange = (tabName: string) => {
       
       <!-- Dynamic content based on active tab -->
       <div class="mt-8">
+        <!-- Profile Tab -->
         <TutorProfile v-if="activeTab === 'Profile'" />
         
-        <!-- Content for other tabs -->
+        <!-- Reviews Tab -->
+        <TutorReview v-else-if="activeTab === 'Reviews'" />
+        
+        <!-- Availability Tab -->
         <div 
           v-else-if="activeTab === 'Availability'" 
           class="content-container"
@@ -78,7 +141,13 @@ const handleTabChange = (tabName: string) => {
                 Save Schedule
               </button>
             </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <TutorCalendar @dateSelected="handleDateSelected" />
+            <TutorSlots :date="selectedDate" />
           </div>
+          
+          <!-- New Statistics Cards -->
+          <TutorSlotsCards :slot-data="slotData" />
         </div>
         
         <TutorBookings v-else-if="activeTab === 'Bookings'" />
@@ -124,8 +193,46 @@ const handleTabChange = (tabName: string) => {
               </div>
             </div>
           </div>
+        <!-- Bookings Tab -->
+        <div 
+          v-else-if="activeTab === 'Bookings'" 
+          class="content-container"
+        >
+          <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
+            <h2 class="mb-4 text-xl font-semibold">Your Bookings</h2>
+            <p class="mb-6">View and manage your upcoming and past tutoring sessions.</p>
+            
+            <!-- Booking list would go here -->
+            <div class="space-y-4">
+              <div class="flex flex-col items-start justify-between gap-4 p-4 border border-gray-200 rounded-xl md:flex-row md:items-center">
+                <div>
+                  <h3 class="font-medium">Math Tutoring Session</h3>
+                  <p class="text-sm text-gray-600">With Alex Johnson • Monday, Sept 9 • 3:00 PM - 4:00 PM</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-4 py-1 text-sm text-white bg-purple-600 rounded-full">Details</button>
+                  <button class="px-4 py-1 text-sm text-gray-700 border border-gray-300 rounded-full">Cancel</button>
+                </div>
+              </div>
+              
+              <div class="flex flex-col items-start justify-between gap-4 p-4 border border-gray-200 rounded-xl md:flex-row md:items-center">
+                <div>
+                  <h3 class="font-medium">Calculus Review</h3>
+                  <p class="text-sm text-gray-600">With Michael Smith • Wednesday, Sept 11 • 2:00 PM - 3:30 PM</p>
+                </div>
+                <div class="flex gap-2">
+                  <button class="px-4 py-1 text-sm text-white bg-purple-600 rounded-full">Details</button>
+                  <button class="px-4 py-1 text-sm text-gray-700 border border-gray-300 rounded-full">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Statistics Cards for Bookings Tab -->
+          <TutorSlotsCards :slot-data="slotData" />
         </div>
         
+        <!-- Messages Tab -->
         <div 
           v-else-if="activeTab === 'Messages'" 
           class="content-container"

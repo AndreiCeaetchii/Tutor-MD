@@ -4,9 +4,9 @@ import SignupPage from "../pages/SignupPage.vue";
 import LandingPage from "../pages/LandingPage.vue";
 import TutorDashboard from "../pages/TutorDashboard.vue";
 import StudentDashboard from "../pages/StudentDashboard.vue";
-import ReviewDashboard from "../pages/ReviewPage.vue";
 import { userStore } from "../store/userStore";
 import TutorProfile from "../components/tutor/TutorProfile.vue";
+import TutorReview from "../components/tutor/TutorReview.vue";
 
 
 const routes = [
@@ -37,16 +37,14 @@ const routes = [
     },
   },
   {
-    path: '/reviews',
-    component: ReviewDashboard,
+    path: '/tutor-dashboard-reviews',
+    component: TutorReview,
     meta: {
       requiresAuth: true,
       role: 'tutor',
     },
   },
   {
-    path: '/student-dashboard',
-
     path: "/tutor-dashboard-profile",
     component: TutorProfile,
     meta: {
