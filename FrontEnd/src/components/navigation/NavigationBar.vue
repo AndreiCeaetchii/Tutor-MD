@@ -42,22 +42,17 @@ const setActiveTab = (tabName: string) => {
 </script>
 
 <template>
-  <div
-    class="navigation-bar bg-white rounded-full p-2 flex flex-wrap justify-center md:justify-between gap-2 shadow-sm"
-  >
-    <div
-      v-for="tab in tabs"
+  <div class="flex p-2 mb-6 bg-gray-100 rounded-full navigation-bar">
+    <button 
+      v-for="tab in tabs" 
       :key="tab.name"
       @click="setActiveTab(tab.name)"
-      class="tab-item flex items-center px-3 md:px-4 py-2 rounded-full cursor-pointer text-sm md:text-base"
-      :class="{
-        'bg-purple-50 text-purple-700': activeTab === tab.name,
-        'text-gray-600': activeTab !== tab.name,
-      }"
+      class="flex items-center justify-center flex-1 px-4 py-2 text-center transition-colors rounded-full"
+      :class="activeTab === tab.name ? 'bg-white shadow-sm text-purple-700' : 'text-gray-600 hover:bg-purple-50'"
     >
-      <span class="material-icons text-sm md:text-base mr-1 md:mr-2">{{ tab.icon }}</span>
-      <span>{{ tab.name }}</span>
-    </div>
+      <span class="mr-1 text-sm material-icons md:text-base md:mr-2">{{ tab.icon }}</span>
+      <span class="text-sm md:text-base">{{ tab.name }}</span>
+    </button>
   </div>
 </template>
 
@@ -68,20 +63,27 @@ const setActiveTab = (tabName: string) => {
   overflow-x: auto;
 }
 
-.tab-item {
-  transition: all 0.3s ease;
+button {
   white-space: nowrap;
-  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
 
-.tab-item:hover {
-  background-color: #f9f5ff;
+button:hover {
+  color: #7e22ce; /* Purple-700 equivalent */
+}
+
+button.bg-white {
+  color: #7e22ce;
 }
 
 @media (max-width: 640px) {
   .navigation-bar {
     justify-content: flex-start;
     border-radius: 1rem;
+  }
+  
+  button {
+    flex: 0 0 auto;
   }
 }
 </style>
