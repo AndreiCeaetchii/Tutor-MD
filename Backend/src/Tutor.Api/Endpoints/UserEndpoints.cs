@@ -63,7 +63,8 @@ public static class UserEndpoints
             .WithName("RegisterAuthUser");
 
         group.MapPut("/profile",
-                [Authorize] async (IMediator mediator,[FromBody] CreateProfileDto profileDto, HttpContext httpContext) =>
+                [Authorize]
+                async (IMediator mediator, [FromBody] CreateProfileDto profileDto, HttpContext httpContext) =>
                 {
                     // Extract UserId from JWT claims
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -85,8 +86,7 @@ public static class UserEndpoints
                 })
             .WithName("CreateProfile")
             .Produces<CreateProfileDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status401Unauthorized)
-            .WithName("CreateProfile");
+            .Produces(StatusCodes.Status401Unauthorized);
     }
     
         

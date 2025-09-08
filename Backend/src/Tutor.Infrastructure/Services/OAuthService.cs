@@ -27,7 +27,15 @@ public class OAuthService : IOAuthService
         client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
         var response = await client.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
-        response.EnsureSuccessStatusCode();
+        try
+        {
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            var errorMessage = $"OAuth validation failed: Google token validation returned status code {(int)response.StatusCode} ({response.ReasonPhrase}).";
+            throw new InvalidOperationException(errorMessage, ex);
+        }
 
         var content = await response.Content.ReadFromJsonAsync<GoogleUserInfoResponse>();
         
