@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
@@ -16,6 +19,7 @@
     <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
   <ItemGroup>

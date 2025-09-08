@@ -10,6 +10,7 @@ public static class ApplicationSetup
     {
         services.AddScoped<IContext, ApplicationDbContext>();
         return services;
+        
     }
     
     

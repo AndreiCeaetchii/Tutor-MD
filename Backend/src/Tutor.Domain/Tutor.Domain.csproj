@@ -8,12 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="StronglyTypedId" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="StronglyTypedId.Templates" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
   
 

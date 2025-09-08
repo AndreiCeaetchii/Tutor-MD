@@ -4,4 +4,4 @@ using Tutor.Application.Features.Users.Dtos;
 
 namespace Tutor.Application.Features.Users;
 
-public record RegisterUserCommand(RegisterUserDto RegisterUserDto) : IRequest<Result<UserResponseDto>>;
+public record RegisterUserCommand(RegisterUserDto RegisterUserDto) : IRequest<Result<UserResponseDto>>{};

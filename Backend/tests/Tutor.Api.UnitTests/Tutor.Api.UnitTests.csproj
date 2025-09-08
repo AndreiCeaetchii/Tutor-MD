@@ -9,9 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
 </Project>

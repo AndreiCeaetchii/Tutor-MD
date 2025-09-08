@@ -11,12 +11,16 @@
   <ItemGroup>
     <PackageReference Include="Bogus" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="Respawn" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio">
