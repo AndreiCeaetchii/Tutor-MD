@@ -6,6 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,11 +18,6 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="main" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -33,33 +33,34 @@
   }
 }</component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 1
+  &quot;associatedIndex&quot;: 3
 }</component>
-  <component name="ProjectId" id="32EVqRv8jbPpNLHD31VubpTeMWO" />
+  <component name="ProjectId" id="32GzyAUWVvVXOG9hYCN5anDESI8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "landing__v2",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/ionvo/OneDrive/Desktop/Tutor-Backend",
+    "git-widget-placeholder": "feat-login-signup-logic",
     "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier",
     "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\landing" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -70,16 +71,16 @@
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="" />
-      <created>1756985908611</created>
+      <created>1757061959023</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1756985908611</updated>
-      <workItem from="1756985909878" duration="289000" />
-      <workItem from="1756986740083" duration="54000" />
-      <workItem from="1756987073396" duration="230000" />
-      <workItem from="1757013242973" duration="1092000" />
-      <workItem from="1757015768085" duration="1528000" />
-      <workItem from="1757051797792" duration="6928000" />
+      <updated>1757061959023</updated>
+      <workItem from="1757061961506" duration="189000" />
+      <workItem from="1757069809235" duration="11850000" />
+      <workItem from="1757152549543" duration="128000" />
+      <workItem from="1757158047322" duration="3804000" />
+      <workItem from="1757256795418" duration="378000" />
+      <workItem from="1757315376836" duration="9275000" />
     </task>
     <servers />
   </component>

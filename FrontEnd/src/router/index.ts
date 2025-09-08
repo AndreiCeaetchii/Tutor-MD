@@ -1,44 +1,53 @@
-import { createRouter, createWebHistory } from "vue-router";
-import LoginPage from "../pages/LoginPage.vue";
-import SignupPage from "../pages/SignupPage.vue";
-import LandingPage from "../pages/LandingPage.vue";
-import TutorDashboard from "../pages/TutorDashboard.vue";
-import StudentDashboard from "../pages/StudentDashboard.vue";
-import { userStore } from "../store/userStore";
+import { createRouter, createWebHistory } from 'vue-router';
+import LoginPage from '../pages/LoginPage.vue';
+import SignupPage from '../pages/SignupPage.vue';
+import LandingPage from '../pages/LandingPage.vue';
+import TutorDashboard from '../pages/TutorDashboard.vue';
+import StudentDashboard from '../pages/StudentDashboard.vue';
+import ReviewDashboard from '../pages/ReviewPage.vue';
+import { userStore } from '../store/userStore';
 
 const routes = [
   {
-    path: "/login",
+    path: '/login',
     component: LoginPage,
     meta: { requiresGuest: true },
   },
   {
-    path: "/signup",
+    path: '/signup',
     component: SignupPage,
     meta: { requiresGuest: true },
   },
   {
-    path: "/landing",
+    path: '/landing',
     component: LandingPage,
   },
   {
-    path: "/",
+    path: '/',
     component: LandingPage,
   },
   {
-    path: "/tutor-dashboard",
+    path: '/tutor-dashboard',
     component: TutorDashboard,
     meta: {
       requiresAuth: true,
-      role: "tutor",
+      role: 'tutor',
     },
   },
   {
-    path: "/student-dashboard",
+    path: '/reviews',
+    component: ReviewDashboard,
+    meta: {
+      requiresAuth: true,
+      role: 'tutor',
+    },
+  },
+  {
+    path: '/student-dashboard',
     component: StudentDashboard,
     meta: {
       requiresAuth: true,
-      role: "student",
+      role: 'student',
     },
   },
   // {
@@ -65,23 +74,23 @@ router.beforeEach((to, _, next) => {
   const userRole = store.userRole;
 
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next("/login");
+    next('/login');
     return;
   }
 
   if (to.meta.role && userRole !== to.meta.role) {
     if (isAuthenticated) {
-      if (userRole === "tutor") next("/tutor-dashboard");
-      else if (userRole === "student") next("/student-dashboard");
-      else if (userRole === "admin") next("/admin-dashboard");
+      if (userRole === 'tutor') next('/tutor-dashboard');
+      else if (userRole === 'student') next('/student-dashboard');
+      else if (userRole === 'admin') next('/admin-dashboard');
       return;
     }
   }
 
   if (to.meta.requiresGuest && isAuthenticated) {
-    if (userRole === "tutor") next("/tutor-dashboard");
-    else if (userRole === "student") next("/student-dashboard");
-    else if (userRole === "admin") next("/admin-dashboard");
+    if (userRole === 'tutor') next('/tutor-dashboard');
+    else if (userRole === 'student') next('/student-dashboard');
+    else if (userRole === 'admin') next('/admin-dashboard');
     return;
   }
 
