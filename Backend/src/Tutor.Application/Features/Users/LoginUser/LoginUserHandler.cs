@@ -13,13 +13,16 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
 {
     private readonly IGenericRepository<User, int> _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly ITokenService _tokenService;
 
     public LoginUserCommandHandler(
         IGenericRepository<User, int> userRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ITokenService tokenService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _tokenService = tokenService;
     }
 
     public async Task<Result<UserResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -35,6 +38,8 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
             return Result<UserResponseDto>.Error("Invalid Email");
         }
 
+        var token = _tokenService.GenerateToken(existingUser);
+
         if (_passwordHasher.VerifyPassword(loginDto.Password, existingUser.PasswordHash))
         {
             var response = new UserResponseDto
@@ -42,12 +47,7 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
                 Id = existingUser.Id, // auto-assigned by DB
                 Email = existingUser.Email,
                 Username = existingUser.Username,
-                Name = existingUser.FirstName,
-                Surname = existingUser.LastName,
-                PhoneNumber = existingUser.Phone,
-                DateOfBirth = existingUser.Birthdate,
-                Description = existingUser.Bio,
-                LastLoginAt = existingUser.LastLoginAt
+                Token = token,
             };
 
             return Result<UserResponseDto>.Success(response);

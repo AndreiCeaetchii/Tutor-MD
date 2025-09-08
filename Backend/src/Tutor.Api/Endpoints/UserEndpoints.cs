@@ -1,9 +1,12 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Security.Claims;
 using Tutor.Application.Features.Users;
+using Tutor.Application.Features.Users.CreateProfile;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Features.Users.LoginUser;
 using Tutor.Application.Features.Users.RegisterOAuthUser;
@@ -58,7 +61,34 @@ public static class UserEndpoints
             }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterAuthUser");
+
+        group.MapPut("/profile",
+                [Authorize] async (IMediator mediator,[FromBody] CreateProfileDto profileDto, HttpContext httpContext) =>
+                {
+                    // Extract UserId from JWT claims
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+
+                    // Create command
+                    var command = new CreateProfileCommand(userId, profileDto);
+
+                    // Send to MediatR handler
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.NotFound();
+                })
+            .WithName("CreateProfile")
+            .Produces<CreateProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithName("CreateProfile");
     }
+    
         
 
 }

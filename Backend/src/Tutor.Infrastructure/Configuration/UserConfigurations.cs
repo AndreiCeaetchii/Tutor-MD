@@ -12,7 +12,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Username)
-                .IsRequired()
                 .HasMaxLength(50);
 
             builder.HasIndex(x => x.Username)

@@ -32,11 +32,13 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 // Controllers
 builder.AddValidationSetup();
 
-//Repository
+builder.Services.AddHttpClient();
+
+//Services
 builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITokenService, TokenService>(); // If you have this
+builder.Services.AddScoped<ITokenService, TokenService>(); 
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 
 builder.Services.AddAuthentication(options =>

@@ -1,5 +1,6 @@
 ﻿using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tutor.Application.Auth;
@@ -18,6 +19,8 @@ public static class PersistenceSetup
         services.AddDbContextPool<ApplicationDbContext>(o =>
         {
             o.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            o.ConfigureWarnings(warnings => 
+                warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
             o.UseExceptionProcessor();
         });
 

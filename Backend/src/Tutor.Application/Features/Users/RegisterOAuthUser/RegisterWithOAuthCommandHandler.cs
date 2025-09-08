@@ -10,7 +10,7 @@ using Tutor.Domain.Entities;
 namespace Tutor.Application.Features.Users.RegisterOAuthUser;
 
 public class RegisterUserWithOAuthCommandHandler 
-    : IRequestHandler<RegisterUserWithOAuthCommand, Result<AuthResponseDto>>
+    : IRequestHandler<RegisterUserWithOAuthCommand, Result<UserResponseDto>>
 {
     private readonly IUserService _userService;
     private readonly ITokenService _jwtTokenService;
@@ -26,7 +26,7 @@ public class RegisterUserWithOAuthCommandHandler
         _oauthService = oauthService;
     }
 
-    public async Task<Result<AuthResponseDto>> Handle(RegisterUserWithOAuthCommand requestDto, CancellationToken cancellationToken)
+    public async Task<Result<UserResponseDto>> Handle(RegisterUserWithOAuthCommand requestDto, CancellationToken cancellationToken)
     {
         var request=requestDto.registerUserAuthDto;
         // Validate OAuth token
@@ -40,26 +40,26 @@ public class RegisterUserWithOAuthCommandHandler
             };
 
             if (userInfo == null)
-                return Result<AuthResponseDto>.Error($"Unsupported OAuth provider: {request.Provider}");
+                return Result<UserResponseDto>.Error($"Unsupported OAuth provider: {request.Provider}");
         }
         catch (Exception ex)
         {
-            return Result<AuthResponseDto>.Error($"Invalid OAuth token: {ex.Message}");
+            return Result<UserResponseDto>.Error($"Invalid OAuth token: {ex.Message}");
         }
 
         // Verify email matches
         if (userInfo.Email != request.Email)
-            return Result<AuthResponseDto>.Error("Email does not match OAuth account");
+            return Result<UserResponseDto>.Error("Email does not match OAuth account");
 
         // Check if user already exists by provider
         var existingUser = await _userService.GetUserByOAuthIdAsync(request.Provider, userInfo.ProviderId);
         if (existingUser != null)
-            return Result<AuthResponseDto>.Error("User already registered with this OAuth provider");
+            return Result<UserResponseDto>.Error("User already registered with this OAuth provider");
 
         // Check if email already exists
         var existingUserByEmail = await _userService.GetUserByEmailAsync(request.Email);
         if (existingUserByEmail != null)
-            return Result<AuthResponseDto>.Error("Email already registered");
+            return Result<UserResponseDto>.Error("Email already registered");
 
         // Create new user with OAuth data
         var user = await _userService.CreateUserFromOAuthAsync(
@@ -71,10 +71,10 @@ public class RegisterUserWithOAuthCommandHandler
         // Generate JWT token
         var token = _jwtTokenService.GenerateToken(user);
 
-        return Result.Success(new AuthResponseDto
+        return Result.Success(new UserResponseDto
         {
             Token = token,
-            UserId = user.Id,
+            Id = user.Id,
             Email = user.Email,
         });
     }

@@ -38,14 +38,16 @@ public class UserService : IUserService
     public async Task<User> CreateUserFromOAuthAsync(
         string provider, 
         string providerId, 
-        string email)
+        string email
+        )
     {
         var user = new User
         {
             Email = email,
             OAuthProvider = provider,
             OAuthProviderId = providerId,
-            IsActive = true
+            IsActive = true,
+            LastLoginAt =DateTime.UtcNow,
         };
 
         await _userRepository.Create(user);
