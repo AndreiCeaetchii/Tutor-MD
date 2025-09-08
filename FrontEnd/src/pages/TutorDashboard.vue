@@ -141,6 +141,8 @@ const handleDateSelected = (date: Date) => {
                 Save Schedule
               </button>
             </div>
+          </div>
+          
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <TutorCalendar @dateSelected="handleDateSelected" />
             <TutorSlots :date="selectedDate" />
@@ -150,87 +152,8 @@ const handleDateSelected = (date: Date) => {
           <TutorSlotsCards :slot-data="slotData" />
         </div>
         
-        <TutorBookings v-else-if="activeTab === 'Bookings'" />
-        
-        <div 
-          v-else-if="activeTab === 'Reviews'" 
-          class="content-container"
-        >
-          <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
-            <h2 class="mb-4 text-xl font-semibold">Student Reviews</h2>
-            <p class="mb-6">See what your students are saying about your tutoring.</p>
-            
-            <!-- Reviews list would go here -->
-            <div class="space-y-6">
-              <div class="pb-4 border-b border-gray-200">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex text-yellow-400">
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                  </div>
-                  <span class="font-medium">5.0</span>
-                </div>
-                <p class="mb-2 text-gray-700">"Sarah is an amazing math tutor! She explains complex concepts in a way that's easy to understand. I went from struggling with calculus to acing my exams."</p>
-                <p class="text-sm text-gray-500">- Alex Johnson, 3 days ago</p>
-              </div>
-              
-              <div class="pb-4 border-b border-gray-200">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex text-yellow-400">
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star_half</span>
-                  </div>
-                  <span class="font-medium">4.5</span>
-                </div>
-                <p class="mb-2 text-gray-700">"Very patient and knowledgeable. Would recommend to anyone struggling with statistics."</p>
-                <p class="text-sm text-gray-500">- Michael Smith, 1 week ago</p>
-              </div>
-            </div>
-          </div>
         <!-- Bookings Tab -->
-        <div 
-          v-else-if="activeTab === 'Bookings'" 
-          class="content-container"
-        >
-          <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
-            <h2 class="mb-4 text-xl font-semibold">Your Bookings</h2>
-            <p class="mb-6">View and manage your upcoming and past tutoring sessions.</p>
-            
-            <!-- Booking list would go here -->
-            <div class="space-y-4">
-              <div class="flex flex-col items-start justify-between gap-4 p-4 border border-gray-200 rounded-xl md:flex-row md:items-center">
-                <div>
-                  <h3 class="font-medium">Math Tutoring Session</h3>
-                  <p class="text-sm text-gray-600">With Alex Johnson • Monday, Sept 9 • 3:00 PM - 4:00 PM</p>
-                </div>
-                <div class="flex gap-2">
-                  <button class="px-4 py-1 text-sm text-white bg-purple-600 rounded-full">Details</button>
-                  <button class="px-4 py-1 text-sm text-gray-700 border border-gray-300 rounded-full">Cancel</button>
-                </div>
-              </div>
-              
-              <div class="flex flex-col items-start justify-between gap-4 p-4 border border-gray-200 rounded-xl md:flex-row md:items-center">
-                <div>
-                  <h3 class="font-medium">Calculus Review</h3>
-                  <p class="text-sm text-gray-600">With Michael Smith • Wednesday, Sept 11 • 2:00 PM - 3:30 PM</p>
-                </div>
-                <div class="flex gap-2">
-                  <button class="px-4 py-1 text-sm text-white bg-purple-600 rounded-full">Details</button>
-                  <button class="px-4 py-1 text-sm text-gray-700 border border-gray-300 rounded-full">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Statistics Cards for Bookings Tab -->
-          <TutorSlotsCards :slot-data="slotData" />
-        </div>
+        <TutorBookings v-else-if="activeTab === 'Bookings'" />
         
         <!-- Messages Tab -->
         <div 
