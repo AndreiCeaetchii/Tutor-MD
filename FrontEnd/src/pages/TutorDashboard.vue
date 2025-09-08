@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import NavigationBar from "../components/navigation/NavigationBar.vue";
 import TutorProfile from "../components/tutor/TutorProfile.vue";
+import TutorReview from "../components/tutor/TutorReview.vue";
 import { userStore } from "../store/userStore";
 import Footer from "../components/Footer.vue";
 
@@ -45,9 +46,13 @@ const handleTabChange = (tabName: string) => {
       
       <!-- Dynamic content based on active tab -->
       <div class="mt-8">
+        <!-- Profile Tab -->
         <TutorProfile v-if="activeTab === 'Profile'" />
         
-        <!-- Content for other tabs -->
+        <!-- Reviews Tab -->
+        <TutorReview v-else-if="activeTab === 'Reviews'" />
+        
+        <!-- Availability Tab -->
         <div 
           v-else-if="activeTab === 'Availability'" 
           class="content-container"
@@ -80,6 +85,7 @@ const handleTabChange = (tabName: string) => {
           </div>
         </div>
         
+        <!-- Bookings Tab -->
         <div 
           v-else-if="activeTab === 'Bookings'" 
           class="content-container"
@@ -115,49 +121,7 @@ const handleTabChange = (tabName: string) => {
           </div>
         </div>
         
-        <div 
-          v-else-if="activeTab === 'Reviews'" 
-          class="content-container"
-        >
-          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-            <h2 class="text-xl font-semibold mb-4">Student Reviews</h2>
-            <p class="mb-6">See what your students are saying about your tutoring.</p>
-            
-            <!-- Reviews list would go here -->
-            <div class="space-y-6">
-              <div class="border-b border-gray-200 pb-4">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex text-yellow-400">
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                  </div>
-                  <span class="font-medium">5.0</span>
-                </div>
-                <p class="text-gray-700 mb-2">"Sarah is an amazing math tutor! She explains complex concepts in a way that's easy to understand. I went from struggling with calculus to acing my exams."</p>
-                <p class="text-sm text-gray-500">- Alex Johnson, 3 days ago</p>
-              </div>
-              
-              <div class="border-b border-gray-200 pb-4">
-                <div class="flex items-center gap-2 mb-2">
-                  <div class="flex text-yellow-400">
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star</span>
-                    <span class="material-icons">star_half</span>
-                  </div>
-                  <span class="font-medium">4.5</span>
-                </div>
-                <p class="text-gray-700 mb-2">"Very patient and knowledgeable. Would recommend to anyone struggling with statistics."</p>
-                <p class="text-sm text-gray-500">- Michael Smith, 1 week ago</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
+        <!-- Messages Tab -->
         <div 
           v-else-if="activeTab === 'Messages'" 
           class="content-container"
