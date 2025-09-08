@@ -63,7 +63,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark } from '@fortawesome/free-solid-svg-icons';
 library.add(faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark);
