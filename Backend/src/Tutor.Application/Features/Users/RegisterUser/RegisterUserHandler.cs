@@ -11,45 +11,16 @@ namespace Tutor.Application.Features.Users.RegisterUser;
 
 public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<UserResponseDto>>
 {
-    private readonly IGenericRepository<User, int> _userRepository;  
-    private readonly IPasswordHasher _passwordHasher;
-    private readonly ITokenService _tokenService;
+    private readonly IAuthService _authService;
 
-    public RegisterUserCommandHandler(
-        IGenericRepository<User, int> userRepository,
-        IPasswordHasher passwordHasher,
-        ITokenService tokenService)
+    public RegisterUserCommandHandler(IAuthService authService)
     {
-        _userRepository = userRepository;
-        _passwordHasher = passwordHasher;
-        _tokenService = tokenService;
+        _authService = authService;
     }
 
     public async Task<Result<UserResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var registerDto = request.RegisterUserDto;
-
-      
-
-        // Hash password (salt is embedded internally)
-        var hashedPassword = _passwordHasher.HashPassword(registerDto.Password);
-
-        // Map DTO to User entity using the mapper
-        var user = UserMapper.ToEntity(registerDto, hashedPassword);
-
-        // Add user to database
-        await _userRepository.Create(user);
-        
-        var token = _tokenService.GenerateToken(user);
-
-        // Map User entity to response DTO
-        var response = new UserResponseDto
-        {
-            Id = user.Id, // auto-assigned by DB
-            Email = user.Email,
-            Token = token
-        };
-
-        return Result<UserResponseDto>.Success(response);
+        // Delegate the registration process to the service
+        return await _authService.RegisterAsync(request.RegisterUserDto);
     }
 }

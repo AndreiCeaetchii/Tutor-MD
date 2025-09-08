@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Ardalis.Result;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
@@ -52,6 +54,26 @@ public class UserService : IUserService
 
         await _userRepository.Create(user);
         return user;
+    }
+    
+    public async Task<Result<CreateProfileDto>> UpdateProfileAsync(int userId, CreateProfileDto profileDto)
+    {
+        var user = await _userRepository.GetById(userId);
+
+        if (user == null)
+            return Result<CreateProfileDto>.NotFound();
+
+        // Update fields
+        user.Phone = profileDto.Phone;
+        user.FirstName = profileDto.FirstName;
+        user.LastName = profileDto.LastName;
+        user.Bio = profileDto.Bio;
+        user.Birthdate = profileDto.Birthdate;
+        user.Username = profileDto.Username;
+
+        await _userRepository.Update(user);
+
+        return Result.Success(profileDto);
     }
 
     public async Task UpdateLastLoginAsync(int userId)
