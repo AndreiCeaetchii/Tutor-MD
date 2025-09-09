@@ -1,6 +1,10 @@
-﻿namespace Tutor.Application.Features.Tutors.CreateTutor;
+﻿using Ardalis.Result;
+using MediatR;
+using System.Collections.Generic;
+using Tutor.Application.Features.Tutors.Dto;
+using Tutor.Domain.Entities;
 
-public class CreateTutorCommand
-{
-    
-}
+namespace Tutor.Application.Features.Tutors.CreateTutor;
+
+public record CreateTutorCommand(int UserId, CreateTutorProfileDto createTutorProfileDto)
+    : IRequest<Result<TutorProfileDto>>;

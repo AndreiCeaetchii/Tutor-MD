@@ -81,7 +81,9 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await SubjectSeeder.SeedAsync(context);
+    await RoleSeeder.SeedAsync(context);
 }
+
 
 // Configure the HTTP request pipeline.
 app.UseResponseCompression();
@@ -92,6 +94,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapUserEndpoints();
+app.MapTutorEndpoints();
 
 app.UseRouting();
 

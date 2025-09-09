@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
@@ -22,11 +23,17 @@ public static class ApplicationSetup
         services.AddHttpClient();
         
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+        services.AddScoped(typeof(IGenericRepository2<>), typeof(GenericRepository2<>));
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>(); 
         services.AddScoped<IOAuthService, OAuthService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITutorService, TutorService>();
+
+        
+        services.AddAutoMapper(typeof(TutorMappingProfile));
+
 
 
         services.AddAuthentication(options =>

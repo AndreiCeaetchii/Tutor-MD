@@ -23,7 +23,7 @@ public class ApplicationDbContext
     public DbSet<Role> AppRoles { get; set; } = null!;
     public DbSet<UserRole> UserRoles { get; set; } = null!;
     public DbSet<Student> Students { get; set; } = null!;
-    public DbSet<Domain.Entities.Tutor> Tutors { get; set; } = null!;
+    public DbSet<Domain.Entities.TutorProfile> Tutors { get; set; } = null!;
     public DbSet<SubjectCatalog> SubjectCatalog { get; set; } = null!;
     public DbSet<TutorSubject> TutorSubjects { get; set; } = null!;
     public DbSet<TutorAvailabilityRule> TutorAvailabilityRules { get; set; } = null!;

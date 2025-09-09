@@ -13,5 +13,5 @@ public class TutorAvailabilityRule : Entity<int>
     public bool ActiveStatus { get; set; }
 
     // Navigation properties
-    public virtual Tutor Tutor { get; set; }
+    public virtual TutorProfile TutorProfile { get; set; }
 }

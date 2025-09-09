@@ -94,7 +94,7 @@ public static class UserEndpoints
 
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
-                        : Results.NotFound();
+                        : Results.BadRequest(result.Errors);
                 })
             .WithName("CreateProfile")
             .Produces<CreateProfileDto>(StatusCodes.Status200OK)

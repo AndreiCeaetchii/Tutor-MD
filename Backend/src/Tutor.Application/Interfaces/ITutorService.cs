@@ -1,6 +1,10 @@
-﻿namespace Tutor.Application.Interfaces;
+﻿using Ardalis.Result;
+using System.Threading.Tasks;
+using Tutor.Application.Features.Tutors.Dto;
+
+namespace Tutor.Application.Interfaces;
 
 public interface ITutorService
 {
-    
+     Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto, int UserId);
 }

@@ -55,9 +55,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 .WithOne(x => x.User)
                 .HasForeignKey<Student>(x => x.UserId);
 
-            builder.HasOne(x => x.Tutor)
+            builder.HasOne(x => x.TutorProfile)
                 .WithOne(x => x.User)
-                .HasForeignKey<Domain.Entities.Tutor>(x => x.UserId);
+                .HasForeignKey<Domain.Entities.TutorProfile>(x => x.UserId);
 
             builder.HasMany(x => x.ReceivedNotifications)
                 .WithOne(x => x.Recipient)
