@@ -38,5 +38,6 @@ public class SubjectCatalogConfiguration : IEntityTypeConfiguration<SubjectCatal
             .WithOne(x => x.Subject)
             .HasForeignKey(x => x.SubjectId)
             .OnDelete(DeleteBehavior.Restrict);
+        
     }
 }

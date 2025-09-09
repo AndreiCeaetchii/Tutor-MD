@@ -6,6 +6,7 @@ public  class Tutor
 {
     public int UserId { get; set; } // 1:1 with users
     public VerificationStatus VerificationStatus { get; set; }
+    
     public int? ExperienceYears { get; set; }
 
     // Navigation properties

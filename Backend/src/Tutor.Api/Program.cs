@@ -19,6 +19,7 @@ using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Repositories;
+using Tutor.Infrastructure.Seeder;
 using Tutor.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -69,9 +70,18 @@ if (builder.Environment.EnvironmentName != "Testing")
 
     // Add opentelemetry
     builder.AddOpenTemeletrySetup();
+    
 }
 
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await SubjectSeeder.SeedAsync(context);
+}
 
 // Configure the HTTP request pipeline.
 app.UseResponseCompression();

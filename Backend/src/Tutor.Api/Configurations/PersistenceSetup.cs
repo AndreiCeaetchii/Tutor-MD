@@ -22,6 +22,7 @@ public static class PersistenceSetup
             o.ConfigureWarnings(warnings => 
                 warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
             o.UseExceptionProcessor();
+            o.EnableSensitiveDataLogging();;
         });
 
         return services;
