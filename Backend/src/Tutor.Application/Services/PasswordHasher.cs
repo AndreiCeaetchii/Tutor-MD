@@ -6,8 +6,8 @@ namespace Tutor.Application.Services;
 
 public class PasswordHasher : IPasswordHasher
 {
-    private const int SaltSize = 16;   // 128 bit
-    private const int HashSize = 20;   // 160 bit
+    private const int SaltSize = 16; // 128 bit
+    private const int HashSize = 20; // 160 bit
     private const int Iterations = 10000;
 
     public string HashPassword(string password)
@@ -23,7 +23,7 @@ public class PasswordHasher : IPasswordHasher
         using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations, HashAlgorithmName.SHA256))
         {
             byte[] hash = pbkdf2.GetBytes(HashSize);
-            
+
             // Combine salt + hash
             byte[] hashBytes = new byte[SaltSize + HashSize];
             Array.Copy(salt, 0, hashBytes, 0, SaltSize);

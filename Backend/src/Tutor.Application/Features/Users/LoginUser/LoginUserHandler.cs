@@ -12,7 +12,7 @@ namespace Tutor.Application.Features.Users.LoginUser;
 public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<UserResponseDto>>
 {
     private readonly IAuthService _authService;
-    
+
     public LoginUserCommandHandler(IAuthService authService)
     {
         _authService = authService;

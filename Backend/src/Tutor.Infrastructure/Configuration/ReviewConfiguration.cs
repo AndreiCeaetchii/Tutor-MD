@@ -14,9 +14,11 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .IsRequired();
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships

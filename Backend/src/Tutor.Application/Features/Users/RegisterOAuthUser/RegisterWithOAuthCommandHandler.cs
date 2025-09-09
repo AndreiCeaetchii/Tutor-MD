@@ -10,7 +10,7 @@ using Tutor.Domain.Entities;
 
 namespace Tutor.Application.Features.Users.RegisterOAuthUser;
 
-public class RegisterUserWithOAuthCommandHandler 
+public class RegisterUserWithOAuthCommandHandler
     : IRequestHandler<RegisterUserWithOAuthCommand, Result<UserResponseDto>>
 {
     private readonly IUserService _userService;
@@ -27,9 +27,10 @@ public class RegisterUserWithOAuthCommandHandler
         _oauthService = oauthService;
     }
 
-    public async Task<Result<UserResponseDto>> Handle(RegisterUserWithOAuthCommand requestDto, CancellationToken cancellationToken)
+    public async Task<Result<UserResponseDto>> Handle(RegisterUserWithOAuthCommand requestDto,
+        CancellationToken cancellationToken)
     {
-        var request=requestDto.registerUserAuthDto;
+        var request = requestDto.registerUserAuthDto;
         // Validate OAuth token
         OAuthUserInfo? userInfo;
         try
@@ -72,6 +73,6 @@ public class RegisterUserWithOAuthCommandHandler
         // Generate JWT token
         var token = _jwtTokenService.GenerateToken(user);
 
-        return Result.Success( UserMapper.ToResponseDto(user, token));
+        return Result.Success(user.ToResponseDto(token));
     }
 }

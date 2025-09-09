@@ -6,7 +6,6 @@ namespace Tutor.Application.Interfaces;
 
 public interface IAuthService
 {
-    Task<Result<UserResponseDto>> LoginAsync(LoginUserDto loginDto);   
+    Task<Result<UserResponseDto>> LoginAsync(LoginUserDto loginDto);
     Task<Result<UserResponseDto>> RegisterAsync(RegisterUserDto registerDto);
-
 }

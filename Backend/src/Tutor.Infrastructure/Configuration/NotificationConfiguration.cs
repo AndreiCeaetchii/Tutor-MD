@@ -19,9 +19,11 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
             .HasDefaultValue(NotificationStatus.Unread);
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships

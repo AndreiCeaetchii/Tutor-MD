@@ -7,6 +7,5 @@ namespace Tutor.Application.Interfaces;
 public interface IOAuthService
 {
     Task<OAuthUserInfo> ValidateGoogleTokenAsync(string accessToken);
-    string GenerateOAuthState();
-    bool ValidateOAuthState(string state, string storedState);
+
 }

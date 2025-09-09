@@ -1,16 +1,73 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Tutor.Application.Common;
+using Tutor.Application.Interfaces;
+using Tutor.Application.Services;
+using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
+using Tutor.Infrastructure.Repositories;
+using Tutor.Infrastructure.Services;
 
 namespace Tutor.Api.Configurations;
 
 public static class ApplicationSetup
 {
-    public static IServiceCollection AddApplicationSetup(this IServiceCollection services)
+    public static IServiceCollection AddApplicationSetup(this IServiceCollection services,IConfiguration configuration)
     {
         services.AddScoped<IContext, ApplicationDbContext>();
-        return services;
         
+        services.AddHttpClient();
+        
+        services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ITokenService, TokenService>(); 
+        services.AddScoped<IOAuthService, OAuthService>();
+        services.AddScoped<IAuthService, AuthService>();
+
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["Jwt:Issuer"],
+                    ValidAudience = configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]))
+                };
+            })
+            .AddGoogle(options => // Google OAuth
+            {
+                options.ClientId = configuration["OAuth:Google:ClientId"];
+                options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
+                options.CallbackPath = "/api/auth/google-callback";
+                options.SaveTokens = true;
+            });
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
+        return services;
     }
     
     

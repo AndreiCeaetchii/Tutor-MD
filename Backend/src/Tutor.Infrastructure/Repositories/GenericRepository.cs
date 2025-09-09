@@ -9,7 +9,6 @@ using Tutor.Domain.Interfaces;
 
 namespace Tutor.Infrastructure.Repositories;
 
-
 public class GenericRepository<T, TId> : IGenericRepository<T, TId>
     where T : Entity<TId>
 {

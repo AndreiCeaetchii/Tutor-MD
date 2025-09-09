@@ -28,4 +28,9 @@ public class User : Entity<int>
     public virtual Password Password    { get; set; }
     
     public virtual GoogleAuth GoogleAuth { get; set; }
+
+    public User()
+    {
+        IsActive = true;
+    }
 }

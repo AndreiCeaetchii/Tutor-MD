@@ -10,12 +10,13 @@ using Tutor.Domain.Entities;
 
 namespace Tutor.Application.Features.Users.LoginOAuthUser;
 
-public class LoginOAuthUserCommandHandler 
+public class LoginOAuthUserCommandHandler
     : IRequestHandler<LoginOAuthUserCommand, Result<UserResponseDto>>
 {
     private readonly IUserService _userService;
     private readonly ITokenService _jwtTokenService;
     private readonly IOAuthService _oauthService;
+    public const string Google = "google";
 
     public LoginOAuthUserCommandHandler(
         IUserService userService,
@@ -27,17 +28,18 @@ public class LoginOAuthUserCommandHandler
         _oauthService = oauthService;
     }
 
-    public async Task<Result<UserResponseDto>> Handle(LoginOAuthUserCommand requestDto, CancellationToken cancellationToken)
+    public async Task<Result<UserResponseDto>> Handle(LoginOAuthUserCommand requestDto,
+        CancellationToken cancellationToken)
     {
         var request = requestDto.loginUserAuthDto;
-        
+
         // Validate OAuth token
         OAuthUserInfo? userInfo;
         try
         {
             userInfo = request.Provider.ToLower() switch
             {
-                "google" => await _oauthService.ValidateGoogleTokenAsync(request.AccessToken),
+                Google => await _oauthService.ValidateGoogleTokenAsync(request.AccessToken),
                 _ => null
             };
 
@@ -49,22 +51,17 @@ public class LoginOAuthUserCommandHandler
             return Result<UserResponseDto>.Error($"Invalid OAuth token: {ex.Message}");
         }
 
-        // Verify email matches
         if (userInfo.Email != request.Email)
             return Result<UserResponseDto>.Error("Email does not match OAuth account");
 
-        // Try to find user by OAuth provider ID first (most direct way)
         var user = await _userService.GetUserByOAuthIdAsync(request.Provider, userInfo.ProviderId);
-        
+
         if (user != null)
         {
-            // User found with OAuth ID - generate token and login
             var token = _jwtTokenService.GenerateToken(user);
-            return Result.Success( UserMapper.ToResponseDto(user, token));
+            return Result.Success(user.ToResponseDto(token));
         }
-        
+
         return Result<UserResponseDto>.Error("Invalid OAuth user");
     }
-
-    
 }

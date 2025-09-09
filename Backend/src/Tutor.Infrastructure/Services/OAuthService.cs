@@ -24,29 +24,26 @@ public class OAuthService : IOAuthService
     public async Task<OAuthUserInfo> ValidateGoogleTokenAsync(string accessToken)
     {
         var client = _httpClientFactory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+        client.DefaultRequestHeaders.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
 
-        var response = await client.GetAsync("https://www.googleapis.com/oauth2/v3/userinfo");
+        var response = await client.GetAsync(_configuration["OAuth:Google:UserInfoEndpoint"]);
         try
         {
             response.EnsureSuccessStatusCode();
         }
         catch (HttpRequestException ex)
         {
-            var errorMessage = $"OAuth validation failed: Google token validation returned status code {(int)response.StatusCode} ({response.ReasonPhrase}).";
+            var errorMessage =
+                $"OAuth validation failed: Google token validation returned status code {(int)response.StatusCode} ({response.ReasonPhrase}).";
             throw new InvalidOperationException(errorMessage, ex);
         }
 
         var content = await response.Content.ReadFromJsonAsync<GoogleUserInfoResponse>();
-        
-        return new OAuthUserInfo
-        {
-            ProviderId = content.Sub,
-            Email = content.Email,
-            Provider = "google"
-        };
+
+        return new OAuthUserInfo { ProviderId = content.Sub, Email = content.Email, Provider = "google" };
     }
-    
+
 
     public string GenerateOAuthState()
     {

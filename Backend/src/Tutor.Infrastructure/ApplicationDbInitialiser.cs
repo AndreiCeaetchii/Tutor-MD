@@ -18,24 +18,25 @@ public class ApplicationDbInitializer : IHostedService
         _logger = logger;
         _serviceProvider = serviceProvider;
     }
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await using var scope = _serviceProvider.CreateAsyncScope();
-    
+
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    
+
         var strategy = context.Database.CreateExecutionStrategy();
         _logger.LogInformation("Running migrations for {Context}", nameof(ApplicationDbContext));
-    
+
         // Only call MigrateAsync once, inside the execution strategy
-        await strategy.ExecuteAsync(async () => 
+        await strategy.ExecuteAsync(async () =>
         {
             await context.Database.MigrateAsync(cancellationToken: cancellationToken);
         });
-    
+
         _logger.LogInformation("Migrations applied successfully");
     }
+
     public Task StopAsync(CancellationToken cancellationToken) =>
         Task.CompletedTask;
 }

@@ -9,18 +9,19 @@ using Tutor.Domain.Interfaces;
 
 namespace Tutor.Application.Features.Users.CreateProfile;
 
-    public class UpdateProfileCommandHandler : IRequestHandler<CreateProfileCommand, Result<CreateProfileDto>>
+public class UpdateProfileCommandHandler : IRequestHandler<CreateProfileCommand, Result<CreateProfileDto>>
+{
+    private readonly IUserService _userService;
+
+    public UpdateProfileCommandHandler(IUserService userService)
     {
-        private readonly IUserService _userService;
-
-        public UpdateProfileCommandHandler(IUserService userService)
-        {
-            _userService = userService;
-        }
-
-        public async Task<Result<CreateProfileDto>> Handle(CreateProfileCommand request, CancellationToken cancellationToken)
-        {
-            // Delegate profile update to service
-            return await _userService.UpdateProfileAsync(request.UserId, request.ProfileDto);
-        }
+        _userService = userService;
     }
+
+    public async Task<Result<CreateProfileDto>> Handle(CreateProfileCommand request,
+        CancellationToken cancellationToken)
+    {
+        // Delegate profile update to service
+        return await _userService.UpdateProfileAsync(request.UserId, request.ProfileDto);
+    }
+}

@@ -32,7 +32,7 @@ public class AuthService : IAuthService
         var user = await _userRepository.FindAsyncDefault(u => u.Email == loginDto.Email);
         if (user == null) return Result<UserResponseDto>.Error("Invalid Email");
 
-        var password =await  _passwordRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        var password = await _passwordRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (password == null) return Result<UserResponseDto>.Error("No password found for this email ");
 
         if (!_passwordHasher.VerifyPassword(loginDto.Password, password.PasswordHash))
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
 
         var token = _tokenService.GenerateToken(user);
 
-        var response = UserMapper.ToResponseDto(user, token);
+        var response = user.ToResponseDto(token);
 
         return Result<UserResponseDto>.Success(response);
     }
@@ -48,7 +48,7 @@ public class AuthService : IAuthService
     public async Task<Result<UserResponseDto>> RegisterAsync(RegisterUserDto registerDto)
     {
         // Map DTO to User entity
-        var user = UserMapper.ToEntity(registerDto);
+        var user = registerDto.ToEntity();
 
         // Persist user first (to get Id)
         await _userRepository.Create(user);
@@ -57,11 +57,7 @@ public class AuthService : IAuthService
         var hashedPassword = _passwordHasher.HashPassword(registerDto.Password);
 
         // Create Password entity
-        var password = new Password
-        {
-            UserId = user.Id,
-            PasswordHash = hashedPassword
-        };
+        var password = new Password { UserId = user.Id, PasswordHash = hashedPassword };
 
         await _passwordRepository.Create(password);
 
@@ -69,7 +65,7 @@ public class AuthService : IAuthService
         var token = _tokenService.GenerateToken(user);
 
         // Map entity to response DTO
-        var response = UserMapper.ToResponseDto(user, token);
+        var response = user.ToResponseDto(token);
 
         return Result<UserResponseDto>.Success(response);
     }

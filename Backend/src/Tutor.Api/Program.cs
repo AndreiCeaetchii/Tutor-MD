@@ -10,13 +10,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Linq;
 using System.Text;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
-using Tutor.Application.Features.Users.Dtos;
-using Tutor.Application.Features.Users.LoginUser;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
@@ -34,43 +31,6 @@ builder.AddValidationSetup();
 
 builder.Services.AddHttpClient();
 
-//Services
-builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ITokenService, TokenService>(); 
-builder.Services.AddScoped<IOAuthService, OAuthService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-
-
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]))
-        };
-    })
-    .AddGoogle(options => // Google OAuth
-    {
-        options.ClientId = builder.Configuration["OAuth:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["OAuth:Google:ClientSecret"];
-        options.CallbackPath = "/api/auth/google-callback";
-        options.SaveTokens = true;
-    });
-
-builder.Services.AddAuthorization();
 
 // Swagger
 builder.Services.AddSwaggerSetup();
@@ -79,8 +39,9 @@ builder.Services.AddSwaggerSetup();
 builder.Services.AddPersistenceSetup(builder.Configuration);
 
 // Application layer setup
-builder.Services.AddApplicationSetup();
+builder.Services.AddApplicationSetup(builder.Configuration);
 
+builder.Services.AddAuthorization();
 // Add identity stuff
 builder.Services
     .AddIdentityApiEndpoints<ApplicationUser>()
@@ -97,17 +58,7 @@ builder.Services.AddMediatRSetup();
 
 // Exception handler
 builder.Services.AddExceptionHandler<ExceptionHandler>();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        });
-});
+
 
 builder.Logging.ClearProviders();
 
@@ -115,7 +66,7 @@ builder.Logging.ClearProviders();
 if (builder.Environment.EnvironmentName != "Testing")
 {
     builder.Host.UseLoggingSetup(builder.Configuration);
-    
+
     // Add opentelemetry
     builder.AddOpenTemeletrySetup();
 }
@@ -129,6 +80,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
+
 app.MapUserEndpoints();
 
 app.UseRouting();
