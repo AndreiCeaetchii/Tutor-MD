@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "ngrok": "node ngrok.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
@@ -19,14 +20,17 @@
     "axios": "^1.11.0",
     "lucide-vue-next": "^0.359.0",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "quasar": "^2.18.2",
     "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "vue3-google-login": "^2.0.34"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.17",
+    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8.4.35",
     "prettier": "^3.6.2",
     "sass": "^1.92.0",

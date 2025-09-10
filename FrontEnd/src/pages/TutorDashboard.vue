@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+
 import NavigationBar from "../components/navigation/NavigationBar.vue";
 import TutorProfile from "../components/tutor/TutorProfile.vue";
 import TutorBookings from "../components/tutor/TutorBookings.vue";
@@ -9,86 +10,116 @@ import TutorCalendar from "../components/tutor/TutorCalendar.vue";
 import TutorSlots from "../components/tutor/TutorSlots.vue";
 import TutorSlotsCards from "../components/tutor/TutorSlotCards.vue";
 import TutorChat from "../components/tutor/TutorChat.vue";
-import { userStore } from "../store/userStore";
 import Footer from "../components/Footer.vue";
 
-const store = userStore();
+// Store
+import { useUserStore } from "../store/userStore";
+import { userStore } from "../store/userStore";
+
+// Stores and router
+const store = useUserStore();
+const storeFrontend = userStore();
 const router = useRouter();
-const activeTab = ref('Availability');
+
+// Refs
+const activeTab = ref("Availability");
 const selectedDate = ref(new Date());
 
-// Example slot data structure - in a real app, this would come from an API or store
+// Example slot data structure - combină ce era în frontend
 const slotData = ref({
   8: [
-    {
-      id: '1',
-      startTime: '10:00',
-      endTime: '11:00',
-      status: 'booked',
-      studentName: 'Alex Chen'
-    },
-    {
-      id: '2',
-      startTime: '14:00',
-      endTime: '15:00',
-      status: 'available'
-    }
+    { id: "1", startTime: "10:00", endTime: "11:00", status: "booked", studentName: "Alex Chen" },
+    { id: "2", startTime: "14:00", endTime: "15:00", status: "available" }
   ],
   15: [
-    {
-      id: '3',
-      startTime: '09:00',
-      endTime: '10:00',
-      status: 'available'
-    },
-    {
-      id: '4',
-      startTime: '15:00',
-      endTime: '16:30',
-      status: 'booked',
-      studentName: 'Maria Rodriguez'
-    }
+    { id: "3", startTime: "09:00", endTime: "10:00", status: "available" },
+    { id: "4", startTime: "15:00", endTime: "16:30", status: "booked", studentName: "Maria Rodriguez" }
   ],
   16: [
-    {
-      id: '5',
-      startTime: '13:00',
-      endTime: '14:00',
-      status: 'available'
-    }
+    { id: "5", startTime: "13:00", endTime: "14:00", status: "available" }
   ],
   17: [
-    {
-      id: '6',
-      startTime: '13:00',
-      endTime: '14:00',
-      status: 'available'
-    }
+    { id: "6", startTime: "13:00", endTime: "14:00", status: "available" }
   ]
 });
 
-onMounted(() => {
-  if (!store.isAuthenticated) {
-    router.push("/login");
-    return;
-  }
+  const store = useUserStore();
+  const router = useRouter();
+  const activeTab = ref('Availability');
+  const selectedDate = ref(new Date());
 
-  if (store.userRole !== "tutor") {
-    if (store.userRole === "student") {
-      router.push("/student-dashboard");
-    } else if (store.userRole === "admin") {
-      router.push("/admin-dashboard");
+  // Example slot data structure - in a real app, this would come from an API or store
+  const slotData = ref({
+    8: [
+      {
+        id: '1',
+        startTime: '10:00',
+        endTime: '11:00',
+        status: 'booked',
+        studentName: 'Alex Chen',
+      },
+      {
+        id: '2',
+        startTime: '14:00',
+        endTime: '15:00',
+        status: 'available',
+      },
+    ],
+    15: [
+      {
+        id: '3',
+        startTime: '09:00',
+        endTime: '10:00',
+        status: 'available',
+      },
+      {
+        id: '4',
+        startTime: '15:00',
+        endTime: '16:30',
+        status: 'booked',
+        studentName: 'Maria Rodriguez',
+      },
+    ],
+    16: [
+      {
+        id: '5',
+        startTime: '13:00',
+        endTime: '14:00',
+        status: 'available',
+      },
+    ],
+    17: [
+      {
+        id: '6',
+        startTime: '13:00',
+        endTime: '14:00',
+        status: 'available',
+      },
+    ],
+  });
+
+  onMounted(() => {
+    if (!store.isAuthenticated) {
+      router.push('/login');
+      return;
     }
-  }
-});
 
-const handleTabChange = (tabName: string) => {
-  activeTab.value = tabName;
-};
+    if (store.userRole !== 'tutor') {
+      if (store.userRole === 'student') {
+        router.push('/student-dashboard');
+      } else if (store.userRole === 'admin') {
+        router.push('/admin-dashboard');
+      }
+    }
+  });
 
-const handleDateSelected = (date: Date) => {
-  selectedDate.value = date;
-};
+  const handleTabChange = (tabName: string) => {
+    activeTab.value = tabName;
+  };
+
+  const handleDateSelected = (date: Date) => {
+    selectedDate.value = date;
+  };
 </script>
 
 <template>
@@ -97,15 +128,18 @@ const handleDateSelected = (date: Date) => {
       <div class="mb-6">
         <h1 class="mb-2 text-2xl font-bold">Tutor Dashboard</h1>
         <p class="text-gray-600">
-          Welcome to your dashboard! Here you can manage your tutoring sessions,
-          view student progress, and update your profile.
+          Welcome to your dashboard! Here you can manage your tutoring sessions, view student
+          progress, and update your profile.
         </p>
       </div>
-      
+
       <NavigationBar @tabChange="handleTabChange" />
       
+      <!-- Dynamic content based on active tab -->
+
       <div class="mt-8">
         <TutorProfile v-if="activeTab === 'Profile'" />
+
         
         <TutorReview v-else-if="activeTab === 'Reviews'" />
         
@@ -128,19 +162,19 @@ const handleDateSelected = (date: Date) => {
       </div>
     </div>
   </div>
-  <Footer/>
+  <Footer />
 </template>
 
 <style scoped>
-.content-container {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-@media (max-width: 640px) {
   .content-container {
-    padding: 0 0.5rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
   }
-}
+
+  @media (max-width: 640px) {
+    .content-container {
+      padding: 0 0.5rem;
+    }
+  }
 </style>

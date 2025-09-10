@@ -1,67 +1,76 @@
-
-
 <template>
-  <div class="py-16 bg-gray-50 lg:py-24">
-    <div class="relative flex flex-col items-center justify-between px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:flex-row">
-      <div class="mb-12 text-center lg:w-1/2 lg:text-left lg:mb-0">
-        <h1 class="text-4xl font-bold leading-tight sm:text-5xl lg:text-5xl">
+  <div class="bg-gray-50 py-16 lg:py-24">
+    <div
+      class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between"
+    >
+      <div class="lg:w-1/2 text-center lg:text-left mb-12 lg:mb-0">
+        <h1 class="text-4xl sm:text-5xl lg:text-5xl font-bold leading-tight">
           A good <span class="text-[#5f22d9]">#education</span> is always a foundation of
           <br class="hidden lg:inline" />
           <span class="bg-[#5f22d9] text-white px-4 py-2 rounded-lg inline-block mt-4">
             A bright future
           </span>
         </h1>
-        <p class="max-w-lg mx-auto mt-6 text-gray-600 lg:mx-0">
-          Connect with our community of tutors and take control of your academic journey.
+        <p class="mt-6 text-gray-600 max-w-lg mx-auto lg:mx-0">
+          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+          aliqua. Ad minim veniam.
         </p>
-        <div class="flex flex-col items-center justify-center mt-8 space-y-4 sm:flex-row sm:items-start lg:justify-start sm:space-y-0 sm:space-x-4">
-          <button class="w-full px-8 py-3 font-semibold text-white transition-colors bg-orange-500 rounded-full shadow-lg sm:w-auto hover:bg-orange-600" @click="startAsStudent">
+        <div
+          class="mt-8 flex flex-col sm:flex-row items-center sm:items-start justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4"
+        >
+          <button
+            class="relative w-full sm:w-auto px-8 py-3 bg-orange-500 text-white font-semibold rounded-full shadow-lg hover:bg-orange-600 transition-colors"
+            @click="startAsStudent"
+          >
             Start as student
+            <DotLottieVue
+              class="hidden lg:block absolute -top-5 right-52 w-16 h-16 rotate-90"
+              autoplay
+              loop
+              src="https://lottie.host/9592bc01-b3e5-442a-afce-42d3856692e4/50BPVWNyw9.lottie"
+            />
           </button>
-          <button class="w-full px-8 py-3 font-semibold text-gray-800 transition-colors bg-transparent border border-gray-300 rounded-full sm:w-auto hover:bg-gray-100" @click="joinAsInstructor">
+          <button
+            class="w-full sm:w-auto px-8 py-3 bg-transparent border border-gray-300 text-gray-800 font-semibold rounded-full hover:bg-gray-100 transition-colors"
+            @click="joinAsInstructor"
+          >
             Join as Instructor
           </button>
         </div>
         <p class="mt-4 text-sm text-gray-500">
-          A world of knowledge awaits.   <a href="#" class="text-[#5f22d9] underline hover:no-underline">Join our community</a> .
+          A world of knowledge awaits.
+          <a href="#" class="text-[#5f22d9] underline hover:no-underline">Join our community</a>.
         </p>
       </div>
 
       <div class="lg:w-1/2 relative w-full h-96 lg:h-[500px] flex items-center justify-center">
         <div class="relative w-full h-full">
-          <!-- Updated div to use the imported image -->
           <div
-              class="w-full h-full bg-center bg-cover rounded-lg shadow-lg"
-              :style="{ backgroundImage: `url(${hero1_img})` }">
-          </div>
+            class="w-full h-full bg-cover bg-center rounded-lg shadow-lg"
+            :style="{ backgroundImage: `url(${hero1_img})` }"
+          ></div>
         </div>
       </div>
-      <DotLottieVue
-          class="absolute w-16 h-16 rotate-90  lg:block top-88 -left-15"
-          autoplay
-          loop
-          src="https://lottie.host/9592bc01-b3e5-442a-afce-42d3856692e4/50BPVWNyw9.lottie"
-      />
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-  import hero1_img from '../../assets/hero-1-img.png';
-  import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
-  import { useRouter } from 'vue-router';
-  import { useUserStore, type UserRole } from "../../store/landingStore.ts";
+import hero1_img from '../../assets/hero-1-img.png';
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '../../store/userStore.ts';
 
-  const store = useUserStore();
-  const router = useRouter();
+const store = useUserStore();
+const router = useRouter();
 
-  const startAsStudent = () => {
-    store.setSelectedRole("student");
-    router.push('/signup');
-  };
+const startAsStudent = () => {
+  store.updateRole('student');
+  router.push('/signup');
+};
 
-  const joinAsInstructor = () => {
-    store.setSelectedRole("tutor");
-    router.push('/signup');
-  };
-
+const joinAsInstructor = () => {
+  store.updateRole('tutor');
+  router.push('/signup');
+};
 </script>
