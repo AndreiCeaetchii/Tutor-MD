@@ -157,8 +157,19 @@ const sendMessage = () => {
     >
       <div class="p-4 border-b border-gray-200">
         <h2 class="text-xl font-semibold">Conversations</h2>
+        <div class="relative mt-2">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+          </span>
+          <input 
+            type="text" 
+            placeholder="Search conversations..." 
+            class="w-full py-2 pl-10 pr-3 text-sm border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-1 focus:ring-purple-400 focus:border-purple-400"
+          />
+        </div>
       </div>
-      
       <div class="md:h-[calc(100%-64px)] overflow-y-auto">
         <div 
           v-for="conversation in conversations" 
@@ -235,9 +246,9 @@ const sendMessage = () => {
             <div 
               v-for="message in activeConversation.messages" 
               :key="message.id"
-              class="max-w-[75%] p-3 rounded-2xl"
+              class="max-w-[75%] p-3 rounded-2xl text-left"
               :class="message.isCurrentUser 
-                ? 'bg-purple-100 rounded-br-none self-end text-right' 
+                ? 'bg-purple-100 rounded-br-none self-end' 
                 : 'bg-gray-100 rounded-bl-none self-start'"
             >
               <div v-if="message.isFile" class="flex items-center text-purple-700">
@@ -250,54 +261,29 @@ const sendMessage = () => {
             </div>
           </div>
         </div>
-        
         <!-- Message input -->
         <div class="sticky bottom-0 z-10 px-2 py-2 bg-white border-t border-gray-200 sm:px-4 sm:py-3">
-        <div class="flex items-center w-full gap-1 sm:gap-2">
+          <div class="flex items-center w-full gap-1 sm:gap-2">
             <button class="flex items-center justify-center flex-shrink-0 p-1 text-gray-500 sm:p-2 hover:text-purple-600">
-            <span class="material-icons" style="font-size: 20px;">attachment</span>
+              <span class="material-icons" style="font-size: 20px;">attachment</span>
             </button>
             <input 
-            v-model="newMessage"
-            type="text" 
-            placeholder="Type your message..." 
-            class="flex-grow px-3 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-purple-400 max-w-[70%] sm:max-w-none"
-            @keyup.enter="sendMessage"
+              v-model="newMessage"
+              type="text" 
+              placeholder="Type your message..." 
+              class="flex-grow px-3 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-purple-400"
+              @keyup.enter="sendMessage"
             />
             <button 
-            class="flex items-center justify-center flex-shrink-0 text-white bg-purple-600 rounded-full w-9 h-9 sm:w-10 sm:h-10 hover:bg-purple-700"
-            @click="sendMessage"
+              class="flex items-center justify-center flex-shrink-0 text-white bg-purple-600 rounded-full w-9 h-9 sm:w-10 sm:h-10 hover:bg-purple-700"
+              @click="sendMessage"
             >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transform rotate-45">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
+              </svg>
             </button>
-            <!-- Message input -->
-<!-- <div class="sticky bottom-0 z-10 px-2 py-2 bg-white border-t border-gray-200 sm:px-4 sm:py-3">
-  <div class="flex items-center w-full gap-1 sm:gap-2">
-    <button class="items-center justify-center flex-shrink-0 hidden p-1 text-gray-500 sm:flex sm:p-2 hover:text-purple-600">
-      <span class="material-icons" style="font-size: 20px;">attachment</span>
-    </button>
-    <input 
-      v-model="newMessage"
-      type="text" 
-      placeholder="Type your message..." 
-      class="flex-grow px-3 py-2 text-sm border border-gray-300 rounded-full focus:outline-none focus:border-purple-400"
-      @keyup.enter="sendMessage"
-    />
-    <button 
-      class="flex items-center justify-center flex-shrink-0 text-white bg-purple-600 rounded-full w-9 h-9 sm:w-10 sm:h-10 hover:bg-purple-700"
-      @click="sendMessage"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="22" y1="2" x2="11" y2="13"></line>
-        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-      </svg>
-    </button>
-  </div>
-</div> -->
-        </div>
+          </div>
         </div>
       </div>
       
