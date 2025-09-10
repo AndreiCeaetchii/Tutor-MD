@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Tutors.Dto;
@@ -69,6 +70,14 @@ public class TutorService : ITutorService
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
        
         return _mapper.Map<TutorProfileDto>(profile);
+    }
+
+    public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsync()
+    {
+        var profiles = await _tutorProfileRepository.GetAll();
+        if (profiles is null)
+            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
+        return _mapper.Map<List<TutorProfileDto>>(profiles);
     }
 
     
