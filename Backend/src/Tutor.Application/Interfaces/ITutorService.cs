@@ -7,4 +7,6 @@ namespace Tutor.Application.Interfaces;
 public interface ITutorService
 {
      Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto, int UserId);
+
+      Task<Result<TutorProfileDto>> GetTutorProfileAsync(int userId);
 }

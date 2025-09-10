@@ -103,7 +103,7 @@ app.UseHsts();
 
 app.UseResponseCompression();
 app.UseHttpsRedirection();
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,0 +1,41 @@
+﻿using Ardalis.Result;
+using System;
+using System.Threading.Tasks;
+using Tutor.Application.Interfaces;
+using Tutor.Domain.Entities;
+using Tutor.Domain.Interfaces;
+
+namespace Tutor.Application.Services;
+
+public class UserRoleService : IUserRoleService
+{
+    private readonly IGenericRepository2<UserRole> _roleRepository;
+
+    public UserRoleService(IGenericRepository2<UserRole> roleRepository)
+    {
+        _roleRepository = roleRepository;
+    }
+
+    public async Task<Result<bool>> AssignTutorRoleAsync(int userId)
+    {
+        var existingRole = await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId);
+        if (existingRole is not null)
+            return Result<bool>.Error("User already has a role assigned");
+
+        var userRole = new UserRole 
+        { 
+            UserId = userId, 
+            RoleId = 2,
+            AssignedAt = DateTime.UtcNow
+        };
+    
+        await _roleRepository.Create(userRole);
+        return Result<bool>.Success(true);
+    }
+
+    public async Task<bool> HasRoleAsync(int userId, int roleId) =>
+        await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId && ur.RoleId == roleId) != null;
+
+    public async Task<bool> HasAnyRoleAsync(int userId) =>
+        await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId) != null;
+}

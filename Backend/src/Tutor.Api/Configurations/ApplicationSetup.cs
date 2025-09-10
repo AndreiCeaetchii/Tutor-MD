@@ -16,24 +16,37 @@ namespace Tutor.Api.Configurations;
 
 public static class ApplicationSetup
 {
-    public static IServiceCollection AddApplicationSetup(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddApplicationSetup(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IContext, ApplicationDbContext>();
-        
+
         services.AddHttpClient();
-        
+
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         services.AddScoped(typeof(IGenericRepository2<>), typeof(GenericRepository2<>));
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<ITokenService, TokenService>(); 
+        services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IOAuthService, OAuthService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ITutorService, TutorService>();
+        services.AddScoped<ISubjectService, SubjectService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<ITutorSubjectService, TutorSubjectService>();
 
-        
+
         services.AddAutoMapper(typeof(TutorMappingProfile));
-
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend",
+                policy =>
+                {
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
 
 
         services.AddAuthentication(options =>
@@ -62,20 +75,8 @@ public static class ApplicationSetup
                 options.CallbackPath = "/api/auth/google-callback";
                 options.SaveTokens = true;
             });
-        
-        services.AddCors(options =>
-        {
-            options.AddPolicy("AllowFrontend",
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-        });
+
+
         return services;
     }
-    
-    
 }
