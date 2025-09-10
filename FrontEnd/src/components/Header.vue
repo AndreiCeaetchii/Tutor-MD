@@ -1,30 +1,30 @@
 <template>
-  <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
+  <header class="sticky top-0 z-50 bg-white border-b border-gray-100">
+    <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
         <div class="flex items-center">
           <div class="flex-shrink-0">
             <router-link to="/">
-              <img class="h-10 w-auto" :src="logo" alt="TutorConnect Logo" />
+              <img class="w-auto h-10" :src="logo" alt="TutorConnect Logo" />
             </router-link>
           </div>
         </div>
         <nav class="hidden md:block">
-          <div class="ml-10 flex items-baseline space-x-8">
+          <div class="flex items-baseline ml-10 space-x-8">
             <a href="#dashboard" class="text-[#5f22d9] font-medium transition-colors">
               Dashboard
             </a>
-            <a href="#students" class="text-gray-600 hover:text-violet-600 transition-colors">
+            <a href="#students" class="text-gray-600 transition-colors hover:text-violet-600">
               Students
             </a>
-            <a href="#earnings" class="text-gray-600 hover:text-violet-600 transition-colors">
+            <a href="#earnings" class="text-gray-600 transition-colors hover:text-violet-600">
               Earnings
             </a>
-            <a href="#help" class="text-gray-600 hover:text-violet-600 transition-colors"> Help </a>
+            <a href="#help" class="text-gray-600 transition-colors hover:text-violet-600">Help</a>
           </div>
         </nav>
 
-        <div class="hidden md:flex items-center space-x-4">
+        <div class="items-center hidden space-x-4 md:flex">
           <Bell class="w-5 h-5 text-gray-600" />
 
           <div v-if="store.isAuthenticated" class="relative">
@@ -48,11 +48,11 @@
               <div
                 v-if="showProfileMenu"
                 ref="profileMenu"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50"
-              >
+                class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50">
+                
                 <div class="px-4 py-2 border-b border-gray-100">
                   <p class="text-sm font-semibold text-gray-900">{{ userName }}</p>
-                  <p class="text-xs text-gray-500 truncate mt-1">user@example.com</p>
+                  <p class="mt-1 text-xs text-gray-500 truncate">user@example.com</p>
                 </div>
                 <div class="py-1">
                   <a
@@ -76,6 +76,7 @@
                         :icon="['fas', 'cog']"
                         class="w-4 h-4 mr-3 text-gray-500 group-hover:text-violet-600 transition-colors duration-200"
                       />
+
                       Settings
                     </div>
                   </a>
@@ -88,10 +89,12 @@
                         :icon="['fas', 'book']"
                         class="w-4 h-4 mr-3 text-gray-500 group-hover:text-violet-600 transition-colors duration-200"
                       />
+
                       My Courses
                     </div>
                   </a>
                   <a
+
                     href="#billing"
                     class="block text-sm text-gray-700 hover:text-violet-600 transition-colors duration-200 group"
                   >
@@ -100,6 +103,7 @@
                         :icon="['fas', 'credit-card']"
                         class="w-4 h-4 mr-3 text-gray-500 group-hover:text-violet-600 transition-colors duration-200"
                       />
+
                       Billing & Payments
                     </div>
                   </a>
@@ -116,7 +120,7 @@
                     </div>
                   </a>
                 </div>
-                <div class="border-t border-gray-100 mt-2 pt-2">
+                <div class="pt-2 mt-2 border-t border-gray-100">
                   <button
                     @click="handleLogout"
                     class="w-full text-left text-sm text-red-600 hover:text-red-700 transition-colors duration-200 group"
@@ -137,8 +141,7 @@
           <div v-else class="flex space-x-2">
             <router-link
               to="/login"
-              class="text-purple-600 hover:text-purple-800 px-4 py-1 rounded-full text-sm border border-purple-600"
-            >
+              class="text-purple-600 hover:text-purple-800 px-4 py-1 rounded-full text-sm border border-purple-600">
               Login
             </router-link>
             <router-link
@@ -154,16 +157,15 @@
           <button
             @click="toggleMenu"
             aria-label="Toggle menu"
-            class="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
-          >
-            <X v-if="isMenuOpen" class="h-6 w-6" />
-            <Menu v-else class="h-6 w-6" />
+            class="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500">
+            <X v-if="isMenuOpen" class="w-6 h-6" />
+            <Menu v-else class="w-6 h-6" />
           </button>
         </div>
       </div>
 
       <div v-if="isMenuOpen" class="md:hidden">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+        <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 sm:px-3">
           <a
             href="#dashboard"
             class="block px-3 py-2 text-base text-purple-500 font-medium"
@@ -193,13 +195,13 @@
             Help
           </a>
 
-          <div class="border-t border-gray-100 pt-4 pb-3">
+          <div class="pt-4 pb-3 border-t border-gray-100">
             <div class="flex items-center justify-between px-3">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <div class="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
                   <User class="w-4 h-4 text-purple-500" />
                 </div>
-                <span class="text-gray-900 font-medium">{{ userName }}</span>
+                <span class="font-medium text-gray-900">{{ userName }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <Bell class="w-6 h-6 text-gray-600" />
@@ -220,21 +222,24 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount } from 'vue';
-  import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
-  import { useRouter } from 'vue-router';
-  import logo from '../assets/tutor2.png';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { useUserStore } from '../store/userStore.ts';
-  import {
-    faUser,
-    faCog,
-    faBook,
-    faCreditCard,
-    faCircleQuestion,
-    faRightFromBracket,
-  } from '@fortawesome/free-solid-svg-icons';
+import { ref, computed as vueComputed, onMounted, onBeforeUnmount } from 'vue';
+import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
+import { useRouter } from 'vue-router';
+import logo from '../assets/tutor2.png';
+import logoFrontend from '../assets/tutor.png';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faUser,
+  faCog,
+  faBook,
+  faCreditCard,
+  faCircleQuestion,
+  faRightFromBracket,
+} from '@fortawesome/free-solid-svg-icons';
+import { useUserStore } from '../store/userStore.ts';
+import { userStore } from '../store/userStore';
+
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 

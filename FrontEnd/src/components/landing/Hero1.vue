@@ -39,13 +39,12 @@
         </div>
         <p class="mt-4 text-sm text-gray-500">
           A world of knowledge awaits.
-          <a href="#" class="text-[#5f22d9] underline hover:no-underline">Join our community</a> .
+          <a href="#" class="text-[#5f22d9] underline hover:no-underline">Join our community</a>.
         </p>
       </div>
 
       <div class="lg:w-1/2 relative w-full h-96 lg:h-[500px] flex items-center justify-center">
         <div class="relative w-full h-full">
-          <!-- Updated div to use the imported image -->
           <div
             class="w-full h-full bg-cover bg-center rounded-lg shadow-lg"
             :style="{ backgroundImage: `url(${hero1_img})` }"
@@ -55,22 +54,23 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-  import hero1_img from '../../assets/hero-1-img.png';
-  import { DotLottieVue } from '@lottiefiles/dotlottie-vue';
-  import { useRouter } from 'vue-router';
-  import { useUserStore } from '../../store/userStore.ts';
+import hero1_img from '../../assets/hero-1-img.png';
+import { DotLottieVue } from '@lottiefiles/dotlottie-vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '../../store/userStore.ts';
 
-  const store = useUserStore();
-  const router = useRouter();
+const store = useUserStore();
+const router = useRouter();
 
-  const startAsStudent = () => {
-    store.updateRole('student');
-    router.push('/signup');
-  };
+const startAsStudent = () => {
+  store.updateRole('student');
+  router.push('/signup');
+};
 
-  const joinAsInstructor = () => {
-    store.updateRole('tutor');
-    router.push('/signup');
-  };
+const joinAsInstructor = () => {
+  store.updateRole('tutor');
+  router.push('/signup');
+};
 </script>
