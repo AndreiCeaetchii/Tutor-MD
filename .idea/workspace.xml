@@ -6,18 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Application/Features/Users/RegisterUser/RegisterUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Application/Features/Users/RegisterUser/RegisterUserHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/auth/AuthForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/auth/AuthForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/localStorage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/localStorage.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +78,9 @@
       <workItem from="1757315376836" duration="9275000" />
       <workItem from="1757451158203" duration="853000" />
       <workItem from="1757487015380" duration="748000" />
+      <workItem from="1757488098377" duration="7047000" />
+      <workItem from="1757497736290" duration="2047000" />
+      <workItem from="1757500853545" duration="6880000" />
     </task>
     <servers />
   </component>

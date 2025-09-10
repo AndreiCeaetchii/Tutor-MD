@@ -12,7 +12,7 @@ const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
   { path: '/landing', component: LandingPage },
-  { path: '/', component: LandingPage },
+  { path: '/', component: LandingPage, meta: { requiresGuest: true } },
   {
     path: '/tutor-dashboard',
     component: TutorDashboard,
