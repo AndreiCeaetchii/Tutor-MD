@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Tutor.Application.Features.Users.Dtos;
 using Tutor.Domain.Entities;
 
 namespace Tutor.Application.Features.Tutors.Dto;
@@ -9,5 +10,6 @@ public class TutorProfileDto
     public VerificationStatus VerificationStatus { get; set; }
     public int? ExperienceYears { get; set; }
     public List<TutorSubjectDto> TutorSubjects { get; set; } = new List<TutorSubjectDto>();
+    public required CreateProfileDto UserProfile { get; set; }
 }
 
