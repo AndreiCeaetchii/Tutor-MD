@@ -7,7 +7,7 @@ library.add(faArrowRight);
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-purple-50 to-white p-8 flex justify-center items-center h-full overflow-y-auto">
+  <div class="flex items-center justify-center h-full p-8 overflow-y-auto bg-gradient-to-br from-purple-50 to-white">
     <div class="w-full max-w-lg mx-auto">
       <div class="mb-6">
         <svg width="60" height="25" viewBox="0 0 80 30" class="text-orange-500">
@@ -15,15 +15,14 @@ library.add(faArrowRight);
         </svg>
       </div>
       
-      <p class="text-base text-gray-700 font-medium mb-1">Better Learning. Better Results</p>
+      <p class="mb-1 text-base font-medium text-gray-700">Better Learning. Better Results</p>
       
-      <h1 class="text-4xl font-bold text-gray-800 mb-4">
+      <h1 class="mb-4 text-4xl font-bold text-gray-800">
         Online education platform that fits for everyone
       </h1>
       
-      <p class="text-gray-600 mb-8 text-base">
-        Connect with expert tutors or find motivated students. Our platform makes learning and 
-        teaching simple, effective, and tailored to your individual needs.
+      <p class="mb-8 text-base text-gray-600">
+        Connect with expert tutors or find motivated students. Our platform makes learning and teaching simple and tailored to your individual needs.
       </p>
       
       <div>
@@ -32,7 +31,7 @@ library.add(faArrowRight);
           class="w-64 py-3.5 bg-gradient-to-r from-[#5f22d9] to-[#2c016d] text-white font-semibold rounded-full text-center transition-all hover:shadow-lg group flex items-center justify-center gap-2"
         >
           <span>Explore more about us</span>
-          <font-awesome-icon :icon="['fas', 'arrow-right']" class="group-hover:translate-x-1 transition-transform" />
+          <font-awesome-icon :icon="['fas', 'arrow-right']" class="transition-transform group-hover:translate-x-1" />
         </button>
       </div>
     </div>
