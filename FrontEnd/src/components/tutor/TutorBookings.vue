@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 
-// Booking status filter
 const activeFilter = ref('All');
 
-// Mock data for bookings
 const bookings = [
   {
     id: 1,
@@ -32,13 +30,11 @@ const bookings = [
   }
 ];
 
-// Count bookings by status
 const pendingCount = bookings.filter(b => b.status === 'Pending').length;
 const acceptedCount = bookings.filter(b => b.status === 'Accepted').length;
 const completedCount = bookings.filter(b => b.status === 'Completed').length;
 const draftCount = bookings.filter(b => b.status === 'Draft').length;
 
-// Filtered bookings based on active filter
 const filteredBookings = computed(() => {
   if (activeFilter.value === 'All') {
     return bookings;
@@ -46,7 +42,6 @@ const filteredBookings = computed(() => {
   return bookings.filter(booking => booking.status === activeFilter.value);
 });
 
-// Methods
 const setFilter = (filter: string) => {
   activeFilter.value = filter;
 };
@@ -72,41 +67,43 @@ const handleMarkComplete = (bookingId: number) => {
 </script>
 
 <template>
-  <div class="tutor-bookings">
-    <!-- Booking status cards -->
-    <div class="grid grid-cols-4 gap-4 mb-8">
-      <div class="p-4 text-center bg-white rounded-lg shadow-sm">
-        <div class="text-2xl font-bold text-amber-500">{{ pendingCount }}</div>
-        <div class="text-gray-600">Pending</div>
+  <div class="p-4 tutor-bookings">
+    <!-- Booking status cards - make responsive -->
+    <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4 sm:gap-4 sm:mb-8">
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold sm:text-2xl text-amber-500">{{ pendingCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Pending</div>
       </div>
-      <div class="p-4 text-center bg-white rounded-lg shadow-sm">
-        <div class="text-2xl font-bold text-blue-500">{{ acceptedCount }}</div>
-        <div class="text-gray-600">Accepted</div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-blue-500 sm:text-2xl">{{ acceptedCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Accepted</div>
       </div>
-      <div class="p-4 text-center bg-white rounded-lg shadow-sm">
-        <div class="text-2xl font-bold text-green-500">{{ completedCount }}</div>
-        <div class="text-gray-600">Completed</div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-green-500 sm:text-2xl">{{ completedCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Completed</div>
       </div>
-      <div class="p-4 text-center bg-white rounded-lg shadow-sm">
-        <div class="text-2xl font-bold text-gray-500">{{ draftCount }}</div>
-        <div class="text-gray-600">Draft</div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-gray-500 sm:text-2xl">{{ draftCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Draft</div>
       </div>
     </div>
 
     <!-- Booking requests section -->
-    <h2 class="mb-4 text-xl font-semibold">Booking Requests</h2>
+    <h2 class="mb-4 text-lg font-semibold sm:text-xl">Booking Requests</h2>
 
-    <!-- Filter tabs -->
-    <div class="flex p-2 mb-6 bg-gray-100 rounded-full">
-      <button 
-        v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Draft']" 
-        :key="filter"
-        @click="setFilter(filter)"
-        class="flex-1 px-4 py-2 text-center transition-colors rounded-full"
-        :class="activeFilter === filter ? 'bg-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'"
-      >
-        {{ filter }}
-      </button>
+    <!-- Filter tabs - improve mobile display -->
+    <div class="mb-6 overflow-x-auto">
+      <div class="flex p-1 mb-2 bg-gray-100 rounded-full sm:p-2 sm:mb-6 min-w-max">
+        <button 
+          v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Draft']" 
+          :key="filter"
+          @click="setFilter(filter)"
+          class="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-center transition-colors rounded-full whitespace-nowrap"
+          :class="activeFilter === filter ? 'bg-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'"
+        >
+          {{ filter }}
+        </button>
+      </div>
     </div>
 
     <!-- Booking list -->
@@ -114,25 +111,25 @@ const handleMarkComplete = (bookingId: number) => {
       <div 
         v-for="booking in filteredBookings" 
         :key="booking.id"
-        class="p-6 bg-white border border-gray-200 rounded-lg"
+        class="p-4 bg-white border border-gray-200 rounded-lg sm:p-6"
       >
-        <!-- Student info and status -->
-        <div class="flex items-start justify-between mb-4">
+        <!-- Student info and status - improved for mobile -->
+        <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
           <div class="flex items-center gap-3">
-            <div v-if="booking.studentImage" class="w-12 h-12 overflow-hidden rounded-full">
+            <div v-if="booking.studentImage" class="flex-shrink-0 w-10 h-10 overflow-hidden rounded-full sm:w-12 sm:h-12">
               <img :src="booking.studentImage" alt="Student" class="object-cover w-full h-full" />
             </div>
-            <div v-else class="flex items-center justify-center w-12 h-12 bg-gray-200 rounded-full">
-              <span class="text-gray-400 material-icons">person</span>
+            <div v-else class="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full sm:w-12 sm:h-12">
+              <span class="text-sm text-gray-400 material-icons sm:text-base">person</span>
             </div>
             <div>
-              <h3 class="text-lg font-semibold">{{ booking.studentName }}</h3>
-              <p class="text-gray-600">{{ booking.subject }}</p>
+              <h3 class="text-base font-semibold sm:text-lg">{{ booking.studentName }}</h3>
+              <p class="text-sm text-gray-600 sm:text-base">{{ booking.subject }}</p>
             </div>
           </div>
-          <div>
+          <div class="self-start sm:self-auto">
             <span 
-              class="px-3 py-1 text-sm rounded-full"
+              class="px-2 py-1 text-xs rounded-full sm:text-sm"
               :class="{
                 'bg-amber-100 text-amber-800': booking.status === 'Pending',
                 'bg-blue-100 text-blue-800': booking.status === 'Accepted',
@@ -146,40 +143,40 @@ const handleMarkComplete = (bookingId: number) => {
         </div>
 
         <!-- Booking details -->
-        <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+        <div class="grid grid-cols-1 gap-2 mb-3 text-sm sm:gap-4 sm:mb-4 sm:text-base">
           <div class="flex items-center">
-            <span class="mr-2 text-gray-400 material-icons">calendar_today</span>
+            <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">calendar_today</span>
             <span>{{ booking.date }}</span>
           </div>
           <div class="flex items-center">
-            <span class="mr-2 text-gray-400 material-icons">schedule</span>
+            <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">schedule</span>
             <span>{{ booking.time }} ({{ booking.duration }})</span>
           </div>
         </div>
 
         <!-- Booking message -->
-        <p class="py-2 mb-4 text-gray-700 border-gray-100 border-y">
+        <p class="py-2 mb-3 text-sm text-gray-700 border-gray-100 sm:mb-4 sm:text-base border-y">
           {{ booking.message }}
         </p>
 
         <!-- Pricing and actions -->
-        <div class="flex items-center justify-between">
-          <div class="font-semibold text-green-600">${{ booking.hourlyRate }}/hour</div>
-          <div class="flex gap-2">
+        <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
+          <div class="text-sm font-semibold text-green-600 sm:text-base">${{ booking.hourlyRate }}/hour</div>
+          <div class="flex flex-wrap justify-end w-full gap-2 sm:w-auto">
             <!-- Conditional rendering based on booking status -->
             <template v-if="booking.status === 'Pending'">
               <button 
                 @click="handleReject(booking.id)" 
-                class="flex items-center px-4 py-2 text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
               >
-                <span class="mr-1 text-red-500 material-icons">close</span>
+                <span class="mr-1 text-xs text-red-500 material-icons sm:text-sm">close</span>
                 Reject
               </button>
               <button 
                 @click="handleAccept(booking.id)" 
-                class="flex items-center px-4 py-2 text-white bg-green-600 rounded-full hover:bg-green-700"
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-green-600 rounded-full hover:bg-green-700"
               >
-                <span class="mr-1 material-icons">check</span>
+                <span class="mr-1 text-xs material-icons sm:text-sm">check</span>
                 Accept
               </button>
             </template>
@@ -187,15 +184,15 @@ const handleMarkComplete = (bookingId: number) => {
             <template v-if="booking.status === 'Accepted'">
               <button 
                 @click="handleMarkComplete(booking.id)" 
-                class="flex items-center px-4 py-2 text-white bg-blue-600 rounded-full hover:bg-blue-700"
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-blue-600 rounded-full hover:bg-blue-700"
               >
-                <span class="mr-1 material-icons">task_alt</span>
+                <span class="mr-1 text-xs material-icons sm:text-sm">task_alt</span>
                 Mark Complete
               </button>
             </template>
             
-            <button class="p-2 border border-gray-300 rounded-full hover:bg-gray-100">
-              <span class="text-gray-600 material-icons">chat</span>
+            <button class="p-1.5 sm:p-2 border border-gray-300 rounded-full hover:bg-gray-100">
+              <span class="text-xs text-gray-600 material-icons sm:text-sm">chat</span>
             </button>
           </div>
         </div>

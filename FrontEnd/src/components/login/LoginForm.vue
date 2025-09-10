@@ -55,7 +55,7 @@
     subtitle="Please sign in to continue"
     :showRoleSelector="true"
     submitButtonText="Sign in as Tutor"
-    googleButtonText="Log in with Google"
+    googleButtonText="Sign in with Google"
     footerText="Don't have an account?"
     footerLinkText="Sign up"
     footerLinkPath="/signup"
