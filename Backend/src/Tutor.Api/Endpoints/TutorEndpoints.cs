@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Tutor.Application.Features.Tutors.Approve_Tutor;
 using Tutor.Application.Features.Tutors.CreateTutor;
+using Tutor.Application.Features.Tutors.DeclineTutor;
 using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Application.Features.Tutors.GetAllTutors;
 using Tutor.Application.Features.Tutors.GetTutorById;
@@ -72,5 +74,31 @@ public static class TutorEndpoints
                 }).WithName("GetAllTutorProfile")
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapPut("/approve-tutor/{id}",
+                [Authorize] async (IMediator mediator, int id) =>
+                {
+                    var command = new ApproveTutorCommand(id);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess 
+                        ? Results.Ok(result.Value) 
+                        : Results.BadRequest(result.Errors);
+                }).WithName("ApproveTutor")
+            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPut("/decline-tutor/{id}",
+                [Authorize] async (IMediator mediator, int id) =>
+                {
+                    var command = new DeclineTutorCommand(id);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess 
+                        ? Results.Ok(result.Value) 
+                        : Results.BadRequest(result.Errors);
+                }).WithName("DeclineTutor")
+            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
     }
 }

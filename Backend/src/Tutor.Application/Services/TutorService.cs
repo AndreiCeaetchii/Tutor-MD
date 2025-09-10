@@ -31,10 +31,11 @@ public class TutorService : ITutorService
         _mapper = mapper;
     }
 
-    public async Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto, int userId)
+    public async Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto,
+        int userId)
     {
         var user = await _userRepository.GetById(userId);
-        if (user is null) 
+        if (user is null)
             return Result<TutorProfileDto>.NotFound("User not found");
 
         var existingProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
@@ -52,7 +53,7 @@ public class TutorService : ITutorService
         };
 
         await _tutorProfileRepository.Create(tutorProfile);
-        
+
         var roleResult = await _userRoleService.AssignTutorRoleAsync(userId);
         if (!roleResult.IsSuccess)
             return Result<TutorProfileDto>.Error(roleResult.Errors.FirstOrDefault());
@@ -68,7 +69,7 @@ public class TutorService : ITutorService
         var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (profile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
-       
+
         return _mapper.Map<TutorProfileDto>(profile);
     }
 
@@ -77,8 +78,39 @@ public class TutorService : ITutorService
         var profiles = await _tutorProfileRepository.GetAll();
         if (profiles is null)
             return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
-        return _mapper.Map<List<TutorProfileDto>>(profiles);
+        var nonVerifiedProfiles = profiles
+            .Where(profile => profile.VerificationStatus != VerificationStatus.Verified)
+            .ToList();
+
+        if (!nonVerifiedProfiles.Any())
+            return Result<List<TutorProfileDto>>.NotFound("No pending tutor profiles found");
+
+        var result = _mapper.Map<List<TutorProfileDto>>(nonVerifiedProfiles);
+        return Result<List<TutorProfileDto>>.Success(result);
     }
 
-    
+    public async Task<Result<TutorProfileDto>> ApproveTutorAsync(int userId)
+    {
+        var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
+        if (profile is null)
+            return Result<TutorProfileDto>.NotFound("Tutor profile not found");
+        if (profile.VerificationStatus != VerificationStatus.Pending)
+            return Result<TutorProfileDto>.NotFound("Tutor profile already Verified");
+        profile.VerificationStatus = VerificationStatus.Verified;
+        await _tutorProfileRepository.Update(profile);
+
+        return _mapper.Map<TutorProfileDto>(profile);
+    }
+
+    public async Task<Result<TutorProfileDto>> DeclineTutorAsync(int userId)
+    {
+        var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
+        if (profile is null)
+            return Result<TutorProfileDto>.NotFound("Tutor profile not found");
+
+        profile.VerificationStatus = VerificationStatus.Rejected;
+        await _tutorProfileRepository.Update(profile);
+
+        return _mapper.Map<TutorProfileDto>(profile);
+    }
 }
