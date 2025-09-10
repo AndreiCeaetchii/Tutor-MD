@@ -2,6 +2,7 @@
   import { ref, computed } from 'vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
+  import { useUserStore } from '../../store/userStore';
   import {
     faEye,
     faEyeSlash,
@@ -9,7 +10,6 @@
     faUserGraduate,
   } from '@fortawesome/free-solid-svg-icons';
   import logoImage from '../../assets/tutor2.png';
-  import { userStore } from '../../store/userStore';
   import type { UserRole } from '../../store/userStore';
 
   library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
@@ -70,13 +70,13 @@
   const password = ref('');
 
   const showPassword = ref(false);
-  const store = userStore();
+  const store = useUserStore();
 
   const selectRole = (role: UserRole) => {
     selectedRole.value = role;
   };
 
-  const selectedRole = ref<UserRole | null>(null);
+  const selectedRole = ref<UserRole | null>(store.userRole);
 
   const handleSubmit = () => {
     const formData: FormData = {

@@ -1,74 +1,38 @@
-import { createRouter, createWebHistory } from "vue-router";
-import LoginPage from "../pages/LoginPage.vue";
-import SignupPage from "../pages/SignupPage.vue";
-import LandingPage from "../pages/LandingPage.vue";
-import TutorDashboard from "../pages/TutorDashboard.vue";
-import StudentDashboard from "../pages/StudentDashboard.vue";
-import { userStore } from "../store/userStore";
-import TutorProfile from "../components/tutor/TutorProfile.vue";
-import TutorReview from "../components/tutor/TutorReview.vue";
-
+import { createRouter, createWebHistory } from 'vue-router';
+import LoginPage from '../pages/LoginPage.vue';
+import SignupPage from '../pages/SignupPage.vue';
+import LandingPage from '../pages/LandingPage.vue';
+import TutorDashboard from '../pages/TutorDashboard.vue';
+import StudentDashboard from '../pages/StudentDashboard.vue';
+import { useUserStore } from '../store/userStore';
+import TutorProfile from '../components/tutor/TutorProfile.vue';
+import TutorReview from '../components/tutor/TutorReview.vue';
 
 const routes = [
-  {
-    path: '/login',
-    component: LoginPage,
-    meta: { requiresGuest: true },
-  },
-  {
-    path: '/signup',
-    component: SignupPage,
-    meta: { requiresGuest: true },
-  },
-  {
-    path: '/landing',
-    component: LandingPage,
-  },
-  {
-    path: '/',
-    component: LandingPage,
-  },
+  { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
+  { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
+  { path: '/landing', component: LandingPage },
+  { path: '/', component: LandingPage },
   {
     path: '/tutor-dashboard',
     component: TutorDashboard,
-    meta: {
-      requiresAuth: true,
-      role: 'tutor',
-    },
+    meta: { requiresAuth: true, role: 'tutor' },
   },
   {
     path: '/tutor-dashboard-reviews',
     component: TutorReview,
-    meta: {
-      requiresAuth: true,
-      role: 'tutor',
-    },
+    meta: { requiresAuth: true, role: 'tutor' },
   },
   {
-    path: "/tutor-dashboard-profile",
+    path: '/tutor-dashboard-profile',
     component: TutorProfile,
-    meta: {
-      requiresAuth: true,
-      role: "tutor",
-    },
+    meta: { requiresAuth: true, role: 'tutor' },
   },
   {
-    path: "/student-dashboard",
-
+    path: '/student-dashboard',
     component: StudentDashboard,
-    meta: {
-      requiresAuth: true,
-      role: 'student',
-    },
+    meta: { requiresAuth: true, role: 'student' },
   },
-  // {
-  //   path: "/admin-dashboard",
-  //   component: AdminDashboard,
-  //   meta: {
-  //     requiresAuth: true,
-  //     role: 'admin'
-  //   }
-  // }
 ];
 
 const router = createRouter({
@@ -77,31 +41,37 @@ const router = createRouter({
 });
 
 router.beforeEach((to, _, next) => {
-  const store = userStore();
+  const store = useUserStore();
 
-  store.initializeFromStorage();
+  const hasToken = store.isAuthenticated; // există token
+  const userRole = store.role;
+  console.log(userRole);
 
-  const isAuthenticated = store.isAuthenticated;
-  const userRole = store.userRole;
+  // Rute care necesită autentificare
+  if (to.meta.requiresAuth) {
+    if (!hasToken) {
+      next('/login'); // dacă nu e token → login
+      return;
+    }
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
+    if (to.meta.role && to.meta.role !== userRole) {
+      // rol greșit redirecționare către dashboard-ul corect
+      if (userRole === 'tutor') next('/tutor-dashboard');
+      else if (userRole === 'student') next('/student-dashboard');
+      else next('/landing'); // fallback
+      return;
+    }
+    // totul ok
+    next();
     return;
   }
 
-  if (to.meta.role && userRole !== to.meta.role) {
-    if (isAuthenticated) {
-      if (userRole === 'tutor') next('/tutor-dashboard');
-      else if (userRole === 'student') next('/student-dashboard');
-      else if (userRole === 'admin') next('/admin-dashboard');
-      return;
-    }
-  }
-
-  if (to.meta.requiresGuest && isAuthenticated) {
+  // Rute pentru guest (login/signup)
+  if (to.meta.requiresGuest && hasToken) {
+    // deja logat, redirect către dashboard-ul corect
     if (userRole === 'tutor') next('/tutor-dashboard');
     else if (userRole === 'student') next('/student-dashboard');
-    else if (userRole === 'admin') next('/admin-dashboard');
+    else next('/landing'); // fallback
     return;
   }
 

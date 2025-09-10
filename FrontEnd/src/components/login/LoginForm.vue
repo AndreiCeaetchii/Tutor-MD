@@ -2,7 +2,6 @@
   import { useAuth } from '../../services/useAuth.ts';
   import { useRouter } from 'vue-router';
   import BaseAuthForm from '../auth/AuthForm.vue';
-  //import { userStore } from '../../store/userStore';
 
   interface LoginFormData {
     email: string;
@@ -12,7 +11,6 @@
 
   const { login, loginWithGoogle, errorMessage } = useAuth();
   const router = useRouter();
-  //const store = userStore();
 
   const handleSubmit = async (formData: LoginFormData) => {
     const success = await login(formData);

@@ -1,42 +1,52 @@
 import { defineStore } from 'pinia';
-import { localStorageService } from '../services/localStorage';
 
 export type UserRole = 'tutor' | 'student' | 'admin';
 
-export const userStore = defineStore('user', {
-  state: () => ({
-    role: null as UserRole | null,
-    isAuthenticated: false,
+interface UserState {
+  accessToken: string | null;
+  userId: string | null;
+  role: UserRole | null;
+}
+
+// @ts-ignore
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    accessToken: null,
+    userId: null,
+    role: null,
   }),
-
   getters: {
-    isTutor: (state) => state.role === 'tutor',
-    isStudent: (state) => state.role === 'student',
-    isAdmin: (state) => state.role === 'admin',
+    userRole: (state) => state.role,
+    isAuthenticated: (state) => !!state.accessToken,
   },
-
   actions: {
-    login(role: UserRole) {
-      this.role = role;
-      this.isAuthenticated = true;
-      localStorageService.setRole(role);
-      localStorageService.setAuthenticated(true);
-    },
+    setUser(token: string, id: string, role: UserRole) {
+      const isNew = this.accessToken !== token || this.userId !== id || this.role !== role;
 
-    logout() {
-      this.role = null;
-      this.isAuthenticated = false;
-      localStorageService.clearUserData();
-    },
-
-    initializeFromStorage() {
-      const storedRole = localStorageService.getRole();
-      const isAuthenticated = localStorageService.getAuthenticated();
-
-      if (storedRole && isAuthenticated) {
-        this.role = storedRole;
-        this.isAuthenticated = true;
+      if (isNew) {
+        console.log('[Store Debug] Setting new user:');
+        console.log('AccessToken:', token);
+        console.log('UserId:', id);
+        console.log('Role:', role);
+      } else {
+        console.log('[Store Debug] Values are the same, nothing new to set.');
       }
+
+      this.accessToken = token;
+      this.userId = id;
+      this.role = role;
+    },
+    clearUser() {
+      console.log('[Store Debug] Clearing user...');
+      this.accessToken = null;
+      this.userId = null;
+      this.role = null;
+    },
+
+    updateRole(newRole: UserRole) {
+      console.log(`[Store Debug] Updating role from ${this.role} → ${newRole}`);
+      this.role = newRole;
     },
   },
+  persist: true, // activează persistența automată în localStorage
 });

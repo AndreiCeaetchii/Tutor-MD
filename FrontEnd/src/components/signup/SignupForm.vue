@@ -2,7 +2,6 @@
   import { useRouter } from 'vue-router';
   import BaseAuthForm from '../auth/AuthForm.vue';
   import { useAuth } from '../../services/useAuth.ts';
-  import { userStore } from '../../store/userStore';
 
   interface SignupFormData {
     email: string;
@@ -13,34 +12,20 @@
 
   const { signup, loginWithGoogle, errorMessage } = useAuth();
   const router = useRouter();
-  const store = userStore();
 
   const handleSubmit = async (formData: SignupFormData) => {
     console.log('Signup form submitted:', formData);
 
-    try {
-      // Apelăm API-ul real de signup
-      const userData = await signup(formData);
+    const success = await signup(formData);
+    if (!success) return; // pe viitor o sa returneze id
 
-      // Actualizăm store-ul după signup
-      store.currentUser = {
-        id: '123',
-        email: formData.email,
-        role: formData.role as any,
-        token: 'sample-token',
-      };
-      store.isAuthenticated = true;
-
-      // Redirecționare în funcție de rol
-      if (formData.role === 'tutor') {
-        router.push('/tutor-dashboard');
-      } else if (formData.role === 'student') {
-        router.push('/student-dashboard');
-      } else if (formData.role === 'admin') {
-        router.push('/admin-dashboard');
-      }
-    } catch (err) {
-      console.error('Signup error:', err);
+    console.log('debug');
+    if (formData.role === 'tutor') {
+      router.push('/tutor-dashboard');
+    } else if (formData.role === 'student') {
+      router.push('/student-dashboard');
+    } else if (formData.role === 'admin') {
+      router.push('/admin-dashboard');
     }
   };
 
