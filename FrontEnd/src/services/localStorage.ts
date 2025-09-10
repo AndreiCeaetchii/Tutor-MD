@@ -1,26 +1,30 @@
-import type { User } from "../store/userStore";
+import type { UserRole } from '../store/userStore';
 
 export const localStorageService = {
-
-  setUser(userData: User): void {
-    localStorage.setItem("user", JSON.stringify(userData));
+  // setez rolul
+  setRole(role: UserRole): void {
+    localStorage.setItem('role', role);
   },
 
-  getUser(): User | null {
-    const userJson = localStorage.getItem("user");
-    return userJson ? JSON.parse(userJson) : null;
+  // iau rolul
+  getRole(): UserRole | null {
+    const role = localStorage.getItem('role');
+    return role as UserRole | null;
   },
 
+  // setez statusul de autentificare
   setAuthenticated(isAuthenticated: boolean): void {
-    localStorage.setItem("isAuthenticated", isAuthenticated.toString());
+    localStorage.setItem('isAuthenticated', isAuthenticated.toString());
   },
 
+  // verific statusul de autentificare
   getAuthenticated(): boolean {
-    return localStorage.getItem("isAuthenticated") === "true";
+    return localStorage.getItem('isAuthenticated') === 'true';
   },
 
+  // curăț datele din localStorage
   clearUserData(): void {
-    localStorage.removeItem("user");
-    localStorage.removeItem("isAuthenticated");
-  }
+    localStorage.removeItem('role');
+    localStorage.removeItem('isAuthenticated');
+  },
 };

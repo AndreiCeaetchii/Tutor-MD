@@ -45,7 +45,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
         // Create user entity
         var user = new User
         {
-            Id = Guid.NewGuid().ToString().,
+            Id = Guid.NewGuid().ToString(),
             Email = registerDto.Email,
             HashedPassword = hashedPassword,
             SaltPassword = salt,

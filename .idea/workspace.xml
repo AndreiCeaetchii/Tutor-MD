@@ -6,11 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Application/Features/Users/RegisterUser/RegisterUserHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Application/Features/Users/RegisterUser/RegisterUserHandler.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/auth/AuthForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/auth/AuthForm.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/login/LoginForm.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/main.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/localStorage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/localStorage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/vite.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/vite.config.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,22 +47,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feat-login-signup-logic",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat-google-auth&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\landing" />
@@ -81,6 +88,8 @@
       <workItem from="1757158047322" duration="3804000" />
       <workItem from="1757256795418" duration="378000" />
       <workItem from="1757315376836" duration="9275000" />
+      <workItem from="1757451158203" duration="853000" />
+      <workItem from="1757487015380" duration="748000" />
     </task>
     <servers />
   </component>

@@ -1,6 +1,15 @@
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
   plugins: [vue()],
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: [
+      '.ngrok-free.app', // Permite toate subdomeniile ngrok
+      '.ngrok.io', // Pentru cazul în care ai cont plătit
+      'localhost',
+    ],
+  },
 });

@@ -1,55 +1,40 @@
-import { defineStore } from "pinia";
-import { localStorageService } from "../services/localStorage";
+import { defineStore } from 'pinia';
+import { localStorageService } from '../services/localStorage';
 
-export type UserRole = "tutor" | "student" | "admin";
+export type UserRole = 'tutor' | 'student' | 'admin';
 
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  role: UserRole;
-  token?: string;
-}
-
-export const userStore = defineStore("user", {
+export const userStore = defineStore('user', {
   state: () => ({
-    currentUser: null as User | null,
+    role: null as UserRole | null,
     isAuthenticated: false,
-    selectedRole: null as UserRole | null,
   }),
 
   getters: {
-    userRole: (state) => state.currentUser?.role,
-    isTutor: (state) => state.currentUser?.role === "tutor",
-    isStudent: (state) => state.currentUser?.role === "student",
-    isAdmin: (state) => state.currentUser?.role === "admin",
+    isTutor: (state) => state.role === 'tutor',
+    isStudent: (state) => state.role === 'student',
+    isAdmin: (state) => state.role === 'admin',
   },
 
   actions: {
-    setSelectedRole(role: UserRole) {
-      this.selectedRole = role;
-    },
-
-    login(userData: User) {
-      this.currentUser = userData;
+    login(role: UserRole) {
+      this.role = role;
       this.isAuthenticated = true;
-      localStorageService.setUser(userData);
+      localStorageService.setRole(role);
       localStorageService.setAuthenticated(true);
     },
 
     logout() {
-      this.currentUser = null;
+      this.role = null;
       this.isAuthenticated = false;
-      this.selectedRole = null;
       localStorageService.clearUserData();
     },
 
     initializeFromStorage() {
-      const storedUser = localStorageService.getUser();
+      const storedRole = localStorageService.getRole();
       const isAuthenticated = localStorageService.getAuthenticated();
 
-      if (storedUser && isAuthenticated) {
-        this.currentUser = storedUser;
+      if (storedRole && isAuthenticated) {
+        this.role = storedRole;
         this.isAuthenticated = true;
       }
     },
