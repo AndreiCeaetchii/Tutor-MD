@@ -67,7 +67,7 @@ public class TutorService : ITutorService
         var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (profile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
-
+       
         return _mapper.Map<TutorProfileDto>(profile);
     }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
 using Tutor.Application.Features.Tutors.CreateTutor;
 using Tutor.Application.Features.Tutors.Dto;
+using Tutor.Application.Features.Tutors.GetTutorById;
 using Tutor.Application.Features.Users.CreateProfile;
 using Tutor.Application.Features.Users.Dtos;
 
@@ -41,6 +42,19 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("CreateTutorProfile")
+            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapGet("/get-tutor/{id}",
+            [Authorize] async (IMediator mediator,int id) =>
+            {
+                var command = new GetTutorByIdQuery(id);
+                
+                var result = await mediator.Send(command);
+                return result.IsSuccess 
+                    ? Results.Ok(result.Value) 
+                    : Results.BadRequest(result.Errors);
+            }).WithName("GetTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
     }

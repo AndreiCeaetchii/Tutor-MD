@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
     <PackageReference Include="NodaTime" />
     <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
@@ -35,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Tutors\GetAllTutors\" />
     <Folder Include="Models\" />
   </ItemGroup> 
 

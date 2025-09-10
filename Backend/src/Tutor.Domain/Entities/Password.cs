@@ -8,6 +8,6 @@ public class Password:Entity<int>
     public string PasswordHash { get; set; }
     
     //Nav properties
-    public User User { get; set; }
+    public virtual User User { get; set; }
 
 }

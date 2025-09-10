@@ -14,6 +14,6 @@ public class GoogleAuth :Entity<int>
     
     
     //Nav Properties
-    public User User { get; set; }
+    public virtual User User { get; set; }
 
 }

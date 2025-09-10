@@ -11,11 +11,11 @@ public class TutorProfile
     public int? ExperienceYears { get; set; }
 
     // Navigation properties
-    public User User { get; set; }
-    public ICollection<TutorSubject> TutorSubjects { get; set; } = new List<TutorSubject>();
-    public ICollection<TutorAvailabilityRule> AvailabilityRules { get; set; } = new List<TutorAvailabilityRule>();
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public virtual User User { get; set; }
+    public virtual ICollection<TutorSubject> TutorSubjects { get; set; } = new List<TutorSubject>();
+    public virtual ICollection<TutorAvailabilityRule> AvailabilityRules { get; set; } = new List<TutorAvailabilityRule>();
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

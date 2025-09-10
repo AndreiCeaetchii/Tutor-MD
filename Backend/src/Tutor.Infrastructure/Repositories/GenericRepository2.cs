@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
 
 namespace Tutor.Infrastructure.Repositories;
@@ -60,4 +61,5 @@ public class GenericRepository2<T> : IGenericRepository2<T> where T : class
     {
         await _context.SaveChangesAsync();
     }
+    
 }
