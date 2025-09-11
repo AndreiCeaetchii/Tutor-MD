@@ -23,5 +23,10 @@ public class TutorMappingProfile : Profile
                 opt => opt.MapFrom(src => src.Subject.Slug));
 
         CreateMap<User, CreateProfileDto>();
+        
+        
+        CreateMap<TutorSubject, TutorSubjectDto>();
     }
+    
+    
 }

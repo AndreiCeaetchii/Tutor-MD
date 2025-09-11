@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Ardalis.Result;
+using AutoMapper;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Application.Interfaces;
@@ -11,13 +13,16 @@ public class TutorSubjectService : ITutorSubjectService
 {
     private readonly IGenericRepository2<TutorSubject> _tutorSubjectRepository;
     private readonly ISubjectService _subjectService;
+    private readonly IMapper _mapper;
 
     public TutorSubjectService(
+        IMapper mapper,
         IGenericRepository2<TutorSubject> tutorSubjectRepository,
         ISubjectService subjectService)
     {
         _tutorSubjectRepository = tutorSubjectRepository;
         _subjectService = subjectService;
+        _mapper = mapper;
     }
 
     public async Task AddTutorSubjectsAsync(int tutorUserId, List<TutorSubjectRequestDto> subjectDtos)
@@ -25,7 +30,7 @@ public class TutorSubjectService : ITutorSubjectService
         foreach (var subjectDto in subjectDtos)
         {
             var subjectIdResult = await _subjectService.GetOrCreateSubjectIdAsync(
-                subjectDto.SubjectName, 
+                subjectDto.SubjectName,
                 subjectDto.SubjectSlug);
 
             if (subjectIdResult.IsSuccess)
@@ -40,6 +45,33 @@ public class TutorSubjectService : ITutorSubjectService
             }
         }
     }
+
+    public async Task<Result<TutorSubjectDto>> AddTutorSubjectAsync(int tutorUserId, TutorSubjectRequestDto subjectDto)
+    {
+        var subjectIdResult = await _subjectService.GetOrCreateSubjectIdAsync(
+            subjectDto.SubjectName,
+            subjectDto.SubjectSlug);
+
+        if (!subjectIdResult.IsSuccess)
+        {
+            return Result<TutorSubjectDto>.Error("Could not create or find subject");
+        }
+
+        var tutorSubject = new TutorSubject
+        {
+            TutorUserId = tutorUserId,
+            SubjectId = subjectIdResult.Value,
+            Price = subjectDto.PricePerHour,
+            Currency = subjectDto.Currency
+        };
+        await _tutorSubjectRepository.Create(tutorSubject);
+
+        
+        var dto = _mapper.Map<TutorSubjectDto>(tutorSubject);
+
+        return Result<TutorSubjectDto>.Success(dto);
+    }
+
 
     public async Task<List<TutorSubject>> GetTutorSubjectsAsync(int tutorUserId) =>
         await _tutorSubjectRepository.FindAsync(ts => ts.TutorUserId == tutorUserId);

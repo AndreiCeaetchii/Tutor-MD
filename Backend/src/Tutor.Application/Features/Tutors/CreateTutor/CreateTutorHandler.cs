@@ -15,19 +15,17 @@ namespace Tutor.Application.Features.Tutors.CreateTutor;
 
 public class CreateTutorCommandHandler : IRequestHandler<CreateTutorCommand, Result<TutorProfileDto>>
 {
-    private readonly ITutorService  _tutorService;
-   
+    private readonly ITutorService _tutorService;
+
     public CreateTutorCommandHandler(
-       ITutorService tutorService
-        )
+        ITutorService tutorService
+    )
     {
-       _tutorService = tutorService;
+        _tutorService = tutorService;
     }
 
     public async Task<Result<TutorProfileDto>> Handle(CreateTutorCommand request, CancellationToken cancellationToken)
     {
         return await _tutorService.CreateTutorProfileAsync(request.createTutorProfileDto, request.UserId);
     }
-
-    
 }
