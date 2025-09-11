@@ -9,6 +9,7 @@ using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
+using Tutor.Infrastructure.Helpers;
 using Tutor.Infrastructure.Repositories;
 using Tutor.Infrastructure.Services;
 
@@ -33,6 +34,10 @@ public static class ApplicationSetup
         services.AddScoped<ISubjectService, SubjectService>();
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<ITutorSubjectService, TutorSubjectService>();
+        services.AddScoped<IPhotoService, PhotoService>();
+        
+        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));

@@ -12,6 +12,7 @@
     <PackageReference Include="Ardalis.Result.FluentValidation" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
@@ -36,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Photos\Delete-Photo\" />
     <Folder Include="Models\" />
   </ItemGroup> 
 

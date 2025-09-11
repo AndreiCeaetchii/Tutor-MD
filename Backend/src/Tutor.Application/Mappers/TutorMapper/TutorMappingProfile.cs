@@ -1,6 +1,7 @@
 ﻿using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Domain.Entities;
 using AutoMapper;
+using Tutor.Application.Features.Photos.DTOs;
 using Tutor.Application.Features.Users.Dtos;
 
 
@@ -13,7 +14,9 @@ public class TutorMappingProfile : Profile
         // TutorProfile -> TutorProfileDto
         CreateMap<TutorProfile, TutorProfileDto>()
             .ForMember(dest => dest.UserProfile, 
-                opt => opt.MapFrom(src => src.User));;
+                opt => opt.MapFrom(src => src.User))
+            .ForMember(dest => dest.Photo,
+                opt => opt.MapFrom(src => src.User.Photo));
 
         // TutorSubject -> TutorSubjectDto
         CreateMap<TutorSubject, TutorSubjectDto>()
@@ -28,6 +31,7 @@ public class TutorMappingProfile : Profile
         CreateMap<TutorSubject, TutorSubjectDto>();
         
         CreateMap<UpdateTutorProfileDto, CreateProfileDto>();
+        CreateMap<Photo, PhotoDto>();
     }
     
     

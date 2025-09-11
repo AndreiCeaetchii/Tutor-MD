@@ -1,6 +1,5 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +8,8 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
+
+namespace Tutor.Application.Services;
 
 public class TutorService : ITutorService
 {
@@ -120,9 +121,9 @@ public class TutorService : ITutorService
 
     public async Task<Result<TutorProfileDto>> UpdateTutorAsync(int userId, UpdateTutorProfileDto updateTutorProfileDto)
     {
-       var userProfileDto = _mapper.Map<CreateProfileDto>(updateTutorProfileDto);
+        var userProfileDto = _mapper.Map<CreateProfileDto>(updateTutorProfileDto);
        
-      await _userService.UpdateProfileAsync(userId,userProfileDto );
+        await _userService.UpdateProfileAsync(userId,userProfileDto );
         
         var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (tutorProfile is null)

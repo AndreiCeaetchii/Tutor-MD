@@ -32,7 +32,7 @@ builder.AddValidationSetup();
 
 builder.Services.AddHttpClient();
 
-
+// builder.Services.AddAntiforgery();
 // Swagger
 builder.Services.AddSwaggerSetup();
 
@@ -97,7 +97,7 @@ app.MapUserEndpoints();
 app.MapTutorEndpoints();
 
 app.UseRouting();
-
+// app.UseAntiforgery(); 
 app.UseSwaggerSetup();
 app.UseHsts();
 
