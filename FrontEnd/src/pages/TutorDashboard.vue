@@ -1,77 +1,36 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+  import { onMounted, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
-import NavigationBar from "../components/navigation/NavigationBar.vue";
-import TutorProfile from "../components/tutor/TutorProfile.vue";
-import TutorBookings from "../components/tutor/TutorBookings.vue";
-import TutorReview from "../components/tutor/TutorReview.vue";
-import TutorCalendar from "../components/tutor/TutorCalendar.vue";
-import TutorSlots from "../components/tutor/TutorSlots.vue";
-import TutorSlotsCards from "../components/tutor/TutorSlotCards.vue";
-import TutorChat from "../components/tutor/TutorChat.vue";
-import Footer from "../components/Footer.vue";
+  import NavigationBar from '../components/navigation/NavigationBar.vue';
+  import TutorProfile from '../components/tutor/TutorProfile.vue';
+  import TutorBookings from '../components/tutor/TutorBookings.vue';
+  import TutorReview from '../components/tutor/TutorReview.vue';
+  import TutorCalendar from '../components/tutor/TutorCalendar.vue';
+  import TutorSlots from '../components/tutor/TutorSlots.vue';
+  import TutorSlotsCards from '../components/tutor/TutorSlotCards.vue';
+  import TutorChat from '../components/tutor/TutorChat.vue';
+  import Footer from '../components/Footer.vue';
 
-// Store
-import { useUserStore } from "../store/userStore";
-import { userStore } from "../store/userStore";
+  // Store
+  import { useUserStore } from '../store/userStore';
 
-// Stores and router
-const store = useUserStore();
-const storeFrontend = userStore();
-const router = useRouter();
-
-// Refs
-const activeTab = ref("Availability");
-const selectedDate = ref(new Date());
-
-// Example slot data structure - combină ce era în frontend
-const slotData = ref({
-  8: [
-    { id: "1", startTime: "10:00", endTime: "11:00", status: "booked", studentName: "Alex Chen" },
-    { id: "2", startTime: "14:00", endTime: "15:00", status: "available" }
-  ],
-  15: [
-    { id: "3", startTime: "09:00", endTime: "10:00", status: "available" },
-    { id: "4", startTime: "15:00", endTime: "16:30", status: "booked", studentName: "Maria Rodriguez" }
-  ],
-  16: [
-    { id: "5", startTime: "13:00", endTime: "14:00", status: "available" }
-  ],
-  17: [
-    { id: "6", startTime: "13:00", endTime: "14:00", status: "available" }
-  ]
-});
-
+  // Stores and router
   const store = useUserStore();
   const router = useRouter();
+
+  // Refs
   const activeTab = ref('Availability');
   const selectedDate = ref(new Date());
 
-  // Example slot data structure - in a real app, this would come from an API or store
+  // Example slot data structure
   const slotData = ref({
     8: [
-      {
-        id: '1',
-        startTime: '10:00',
-        endTime: '11:00',
-        status: 'booked',
-        studentName: 'Alex Chen',
-      },
-      {
-        id: '2',
-        startTime: '14:00',
-        endTime: '15:00',
-        status: 'available',
-      },
+      { id: '1', startTime: '10:00', endTime: '11:00', status: 'booked', studentName: 'Alex Chen' },
+      { id: '2', startTime: '14:00', endTime: '15:00', status: 'available' },
     ],
     15: [
-      {
-        id: '3',
-        startTime: '09:00',
-        endTime: '10:00',
-        status: 'available',
-      },
+      { id: '3', startTime: '09:00', endTime: '10:00', status: 'available' },
       {
         id: '4',
         startTime: '15:00',
@@ -80,22 +39,8 @@ const slotData = ref({
         studentName: 'Maria Rodriguez',
       },
     ],
-    16: [
-      {
-        id: '5',
-        startTime: '13:00',
-        endTime: '14:00',
-        status: 'available',
-      },
-    ],
-    17: [
-      {
-        id: '6',
-        startTime: '13:00',
-        endTime: '14:00',
-        status: 'available',
-      },
-    ],
+    16: [{ id: '5', startTime: '13:00', endTime: '14:00', status: 'available' }],
+    17: [{ id: '6', startTime: '13:00', endTime: '14:00', status: 'available' }],
   });
 
   onMounted(() => {
@@ -134,30 +79,18 @@ const slotData = ref({
       </div>
 
       <NavigationBar @tabChange="handleTabChange" />
-      
-      <!-- Dynamic content based on active tab -->
 
       <div class="mt-8">
         <TutorProfile v-if="activeTab === 'Profile'" />
-
-        
         <TutorReview v-else-if="activeTab === 'Reviews'" />
-        
-        <div 
-          v-else-if="activeTab === 'Availability'" 
-          class="content-container"
-        >
-          
+        <div v-else-if="activeTab === 'Availability'" class="content-container">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <TutorCalendar @dateSelected="handleDateSelected" />
             <TutorSlots :date="selectedDate" />
           </div>
-          
           <TutorSlotsCards :slot-data="slotData" />
         </div>
-        
         <TutorBookings v-else-if="activeTab === 'Bookings'" />
-        
         <TutorChat v-else-if="activeTab === 'Messages'" />
       </div>
     </div>
