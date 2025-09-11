@@ -4,19 +4,14 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
   plugins: [vue()],
   server: {
-    host: true, // echivalent cu 0.0.0.0
+    host: true,
     port: 5173,
     strictPort: true,
     cors: true,
     hmr: {
-      clientPort: 443,
-      host: '*.ngrok-free.app',
+      host: 'localhost',
+      protocol: 'ws',
     },
-    
-    allowedHosts: [
-      '.ngrok-free.app',
-      '.ngrok.io',
-      'localhost',
-    ],
+    allowedHosts: ['.ngrok-free.app', 'localhost', '.ngrok.io'],
   },
 });
