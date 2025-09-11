@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System;
 using System.Security.Claims;
 using Tutor.Application.Features.Users;
 using Tutor.Application.Features.Users.CreateProfile;
@@ -21,9 +22,6 @@ public static class UserEndpoints
     {
         var group = builder.MapGroup("api/users")
             .WithTags("users");
-
-        group.MapGet("/test", () => Results.Ok("User endpoints are working!"))
-            .WithName("TestEndpoint");
 
         group.MapPost("/register", async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto) =>
             {
@@ -99,5 +97,16 @@ public static class UserEndpoints
             .WithName("CreateProfile")
             .Produces<CreateProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
+        
+        var healthGroup = builder.MapGroup("health")
+            .WithTags("health");
+
+        healthGroup.MapGet("/", () => 
+            Results.Ok(new 
+            { 
+                status = "Healthy", 
+                timestamp = DateTime.UtcNow,
+                service = "User API"
+            }));
     }
 }

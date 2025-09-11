@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
@@ -15,16 +16,16 @@ namespace Tutor.Api.Configurations;
 
 public static class ApplicationSetup
 {
-    public static IServiceCollection AddApplicationSetup(this IServiceCollection services,IConfiguration configuration)
+    public static IServiceCollection AddApplicationSetup(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IContext, ApplicationDbContext>();
-        
+
         services.AddHttpClient();
-        
+
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<ITokenService, TokenService>(); 
+        services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IOAuthService, OAuthService>();
         services.AddScoped<IAuthService, AuthService>();
 
@@ -48,20 +49,23 @@ public static class ApplicationSetup
                         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]))
                 };
             })
-            .AddGoogle(options => // Google OAuth
+            .AddGoogle(options =>
             {
-                options.ClientId = configuration["OAuth:Google:ClientId"];
-                options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
-                options.CallbackPath = "/api/auth/google-callback";
-                options.SaveTokens = true;
+                options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
+                                   ?? configuration["Google:ClientId"];
+                options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")
+                                       ?? configuration["Google:ClientSecret"];
+                options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
             });
-        
+
+        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        var corsPolicyName = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowFrontend",
+            options.AddPolicy(corsPolicyName,
                 policy =>
                 {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                    policy.WithOrigins(allowedOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -69,6 +73,4 @@ public static class ApplicationSetup
         });
         return services;
     }
-    
-    
 }

@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.Result.AspNetCore" />
     <PackageReference Include="Ben.Demystifier" />
+    <PackageReference Include="DotNetEnv" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
