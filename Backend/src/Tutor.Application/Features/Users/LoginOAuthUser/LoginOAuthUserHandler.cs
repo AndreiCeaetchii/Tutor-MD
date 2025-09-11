@@ -16,14 +16,17 @@ public class LoginOAuthUserCommandHandler
     private readonly IUserService _userService;
     private readonly ITokenService _jwtTokenService;
     private readonly IOAuthService _oauthService;
+    private readonly IUserRoleService _roleService;
     public const string Google = "google";
 
     public LoginOAuthUserCommandHandler(
+        IUserRoleService roleService,
         IUserService userService,
         ITokenService jwtTokenService,
         IOAuthService oauthService)
     {
         _userService = userService;
+        _roleService= roleService;
         _jwtTokenService = jwtTokenService;
         _oauthService = oauthService;
     }
@@ -55,10 +58,15 @@ public class LoginOAuthUserCommandHandler
             return Result<UserResponseDto>.Error("Email does not match OAuth account");
 
         var user = await _userService.GetUserByOAuthIdAsync(request.Provider, userInfo.ProviderId);
-
+        
+        
         if (user != null)
         {
+            var role = await _roleService.GetRoleIdAsync(user.Id);
+            if (role == null)
+                return Result<UserResponseDto>.Error($"No role found for user ");
             var token = _jwtTokenService.GenerateToken(user);
+            
             return Result.Success(user.ToResponseDto(token));
         }
 

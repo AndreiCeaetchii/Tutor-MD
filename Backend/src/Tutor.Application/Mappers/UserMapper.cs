@@ -15,4 +15,8 @@ public static class UserMapper
     {
         return new UserResponseDto { Email = user.Email, Token = token, Username = user.Username, Id = user.Id };
     }
+    public static UserResponseDto ToResponseDto(this User user, string token, int roleId)
+    {
+        return new UserResponseDto { Email = user.Email, Token = token, Username = user.Username, Id = user.Id,  RoleId = roleId };
+    }
 }

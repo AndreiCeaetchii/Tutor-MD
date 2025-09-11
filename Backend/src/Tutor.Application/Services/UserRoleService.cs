@@ -38,4 +38,11 @@ public class UserRoleService : IUserRoleService
 
     public async Task<bool> HasAnyRoleAsync(int userId) =>
         await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId) != null;
+    
+    public async Task<int?> GetRoleIdAsync(int userId)
+    {
+        var role = await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId);
+        return role?.RoleId; // returns null if no role found
+    }
+
 }
