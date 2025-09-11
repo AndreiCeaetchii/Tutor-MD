@@ -11,6 +11,7 @@
   import TutorSlotsCards from '../components/tutor/TutorSlotCards.vue';
   import TutorChat from '../components/tutor/TutorChat.vue';
   import Footer from '../components/Footer.vue';
+  import ProfilePage from './ProfilePage.vue';
 
   // Store
   import { useUserStore } from '../store/userStore';
@@ -81,7 +82,7 @@
       <NavigationBar @tabChange="handleTabChange" />
 
       <div class="mt-8">
-        <TutorProfile v-if="activeTab === 'Profile'" />
+        <ProfilePage v-if="activeTab === 'Profile'" />
         <TutorReview v-else-if="activeTab === 'Reviews'" />
         <div v-else-if="activeTab === 'Availability'" class="content-container">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
