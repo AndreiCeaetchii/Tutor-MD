@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Tutors.Dto;
+using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
@@ -15,16 +16,19 @@ public class TutorService : ITutorService
     private readonly IGenericRepository2<TutorProfile> _tutorProfileRepository;
     private readonly IUserRoleService _userRoleService;
     private readonly ITutorSubjectService _tutorSubjectService;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public TutorService(
         IGenericRepository<User, int> userRepository,
+        IUserService userService,
         IGenericRepository2<TutorProfile> tutorProfileRepository,
         IUserRoleService userRoleService,
         ITutorSubjectService tutorSubjectService,
         IMapper mapper)
     {
         _userRepository = userRepository;
+        _userService = userService;
         _tutorProfileRepository = tutorProfileRepository;
         _userRoleService = userRoleService;
         _tutorSubjectService = tutorSubjectService;
@@ -113,4 +117,20 @@ public class TutorService : ITutorService
 
         return _mapper.Map<TutorProfileDto>(profile);
     }
+
+    public async Task<Result<TutorProfileDto>> UpdateTutorAsync(int userId, UpdateTutorProfileDto updateTutorProfileDto)
+    {
+       var userProfileDto = _mapper.Map<CreateProfileDto>(updateTutorProfileDto);
+       
+      await _userService.UpdateProfileAsync(userId,userProfileDto );
+        
+        var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
+        if (tutorProfile is null)
+            return Result<TutorProfileDto>.NotFound("Tutor profile not found");
+        tutorProfile.ExperienceYears = updateTutorProfileDto.ExperienceYears;
+        await _tutorProfileRepository.Update(tutorProfile);
+        
+        return  _mapper.Map<TutorProfileDto>(tutorProfile);
+    }
+    
 }

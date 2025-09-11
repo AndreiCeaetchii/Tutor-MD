@@ -26,6 +26,8 @@ public class TutorMappingProfile : Profile
         
         
         CreateMap<TutorSubject, TutorSubjectDto>();
+        
+        CreateMap<UpdateTutorProfileDto, CreateProfileDto>();
     }
     
     
