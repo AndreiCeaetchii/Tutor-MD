@@ -2,6 +2,7 @@
 
 public class PhotoDto
 {
+    public required int Id { get; set; }
     public required string PublicId { get; set; }
     public required string Url { get; set; }
     public required string MimeType { get; set; }

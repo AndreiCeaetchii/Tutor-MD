@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
 using Tutor.Application.Features.Photos.Add_Photo;
+using Tutor.Application.Features.Photos.Delete_Photo;
 using Tutor.Application.Features.Photos.DTOs;
 using Tutor.Application.Features.Users;
 using Tutor.Application.Features.Users.CreateProfile;
@@ -119,6 +120,25 @@ public static class UserEndpoints
             })
             .WithName("AddPhoto")
             .Produces<PhotoDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .DisableAntiforgery();
+        group.MapDelete("/delete-photo",
+                [Authorize]  async (IMediator mediator, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new DeletePhotoCommand(userId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
+            .WithName("DeletePhoto")
+            .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();
     }

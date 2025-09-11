@@ -25,7 +25,7 @@ public class GenericRepository2<T> : IGenericRepository2<T> where T : class
         return await Table.ToListAsync();
     }
 
-    public async Task<T?> GetById(int id)
+    public async Task<T?> GetById(int? id)
     {
         return await Table.FindAsync(id);
     }

@@ -25,7 +25,7 @@ public class GenericRepository<T, TId> : IGenericRepository<T, TId>
         return await Table.ToListAsync();
     }
 
-    public async Task<T?> GetById(TId id)
+    public async Task<T?> GetById(TId? id)
     {
         return await Table.FindAsync(id);
     }

@@ -58,10 +58,10 @@ public class PhotoService : IPhotoService
     {
         var user = await _userRepository.GetById(userId);
         if (user == null)
-            return  Result<PhotoDto>.Error("Inexistent User");
-        if(user.PhotoId != null)
+            return Result<PhotoDto>.Error("Inexistent User");
+        if (user.PhotoId != null)
             return Result<PhotoDto>.Error("You cannot add more than one photo");
-        
+
         var result = await UploadPhotoAsync(file);
         var photo = new Photo
         {
@@ -74,9 +74,24 @@ public class PhotoService : IPhotoService
             Bytes = result.Bytes,
         };
         await _photoRepository.Create(photo);
-        
+
         user.PhotoId = photo.Id;
         await _userRepository.Update(user);
         return Result<PhotoDto>.Success(_mapper.Map<PhotoDto>(photo));
+    }
+
+    public async Task<Result> DeletePhotoEntityAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("Inexistent User");
+        int photoId = user.PhotoId!.Value;        
+        var photo = await _photoRepository.GetById(photoId);
+        if (photo == null)
+            return Result.Error("Photo not found");
+        await DeletePhotoAsync(photo.PublicId);
+
+        await _photoRepository.Delete(photo);
+        return Result.Success();
     }
 }

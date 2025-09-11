@@ -8,8 +8,7 @@ namespace Tutor.Application.Interfaces;
 
 public interface IPhotoService
 {
-    Task<ImageUploadResult> UploadPhotoAsync(IFormFile file);
-    Task<DeletionResult> DeletePhotoAsync(string publicId);
-
     Task<Result<PhotoDto>> AddPhotoAsync(IFormFile file, int userId);
+
+    Task<Result> DeletePhotoEntityAsync(int photoId);
 }

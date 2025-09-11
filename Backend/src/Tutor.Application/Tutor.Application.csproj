@@ -37,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Photos\Delete-Photo\" />
     <Folder Include="Models\" />
   </ItemGroup> 
 
