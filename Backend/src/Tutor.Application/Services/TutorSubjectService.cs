@@ -86,7 +86,26 @@ public class TutorSubjectService : ITutorSubjectService
        
        return _mapper.Map<List<TutorSubjectDto>>(tutorSubjects);
     }
+    
+    public async Task<Result<TutorSubjectDto>> UpdateTutorSubjectAsync(int userId,TutorSubjectDto tutorSubjectDto)
+    {
+        var tutorSubject =
+            await _tutorSubjectRepository.FindAsyncDefault(sr => sr.SubjectId == tutorSubjectDto.SubjectId && sr.TutorUserId == userId);
 
+        if (tutorSubject is null)
+            return Result<TutorSubjectDto>.Error("Subject not found in tutor subjects");
+        
+        tutorSubject.Price = tutorSubjectDto.Price;
+        tutorSubject.Currency = tutorSubjectDto.Currency;
+        
+
+        await _tutorSubjectRepository.Update(tutorSubject);
+        
+       
+        return _mapper.Map<TutorSubjectDto>(tutorSubject);
+    }
+
+    
     public async Task<List<TutorSubject>> GetTutorSubjectsAsync(int tutorUserId) =>
         await _tutorSubjectRepository.FindAsync(ts => ts.TutorUserId == tutorUserId);
 

@@ -36,7 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Tutors\UpdateTutorSubject\" />
     <Folder Include="Models\" />
   </ItemGroup> 
 
