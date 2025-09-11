@@ -66,12 +66,26 @@ public class TutorSubjectService : ITutorSubjectService
         };
         await _tutorSubjectRepository.Create(tutorSubject);
 
-        
+
         var dto = _mapper.Map<TutorSubjectDto>(tutorSubject);
 
         return Result<TutorSubjectDto>.Success(dto);
     }
 
+    public async Task<Result<List<TutorSubjectDto>>> DeleteTutorSubjectAsync(int userId, int subjectId)
+    {
+        var tutorSubject =
+            await _tutorSubjectRepository.FindAsyncDefault(sr => sr.SubjectId == subjectId && sr.TutorUserId == userId);
+
+        if (tutorSubject is null)
+            return Result<List<TutorSubjectDto>>.Error("Subject not found in tutor subjects");
+
+        await _tutorSubjectRepository.Delete(tutorSubject);
+
+       var tutorSubjects = await _tutorSubjectRepository.FindAsync(sr => sr.TutorUserId == userId );
+       
+       return _mapper.Map<List<TutorSubjectDto>>(tutorSubjects);
+    }
 
     public async Task<List<TutorSubject>> GetTutorSubjectsAsync(int tutorUserId) =>
         await _tutorSubjectRepository.FindAsync(ts => ts.TutorUserId == tutorUserId);

@@ -12,4 +12,5 @@ public interface ITutorSubjectService
     Task<List<TutorSubject>> GetTutorSubjectsAsync(int tutorUserId);
     Task RemoveTutorSubjectsAsync(int tutorUserId);
     Task<Result<TutorSubjectDto>> AddTutorSubjectAsync(int tutorUserId, TutorSubjectRequestDto subjectDto);
+    Task<Result<List<TutorSubjectDto>>> DeleteTutorSubjectAsync(int userId, int subjectId);
 }

@@ -38,6 +38,7 @@ public class SubjectService : ISubjectService
     public async Task<SubjectCatalog?> GetSubjectByIdAsync(int subjectId) =>
         await _subjectRepository.GetById(subjectId);
 
+   
 
     private string GenerateSlug(string name) =>
         name.ToLower().Replace(" ", "-").Replace("--", "-").Trim('-');

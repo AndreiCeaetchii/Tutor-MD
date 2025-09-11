@@ -1,6 +1,8 @@
-﻿namespace Tutor.Application.Features.Tutors.DeleteTutorSubject;
+﻿using Ardalis.Result;
+using MediatR;
+using System.Collections.Generic;
+using Tutor.Application.Features.Tutors.Dto;
 
-public record DeleteTutorSubjectCommand(int userId, string subjectName)
-{
-    
-}
+namespace Tutor.Application.Features.Tutors.DeleteTutorSubject;
+
+public record DeleteTutorSubjectCommand(int userId, int subjectId) : IRequest<Result<List<TutorSubjectDto>>>;

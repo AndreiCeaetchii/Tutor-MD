@@ -10,6 +10,7 @@ using Tutor.Application.Features.Tutors.AddTutorSubject;
 using Tutor.Application.Features.Tutors.Approve_Tutor;
 using Tutor.Application.Features.Tutors.CreateTutor;
 using Tutor.Application.Features.Tutors.DeclineTutor;
+using Tutor.Application.Features.Tutors.DeleteTutorSubject;
 using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Application.Features.Tutors.GetAllTutors;
 using Tutor.Application.Features.Tutors.GetTutorById;
@@ -117,6 +118,26 @@ public static class TutorEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 }).WithName("AddSubject")
+            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapDelete("/delete-subject/{subjectId}",
+                [Authorize]
+                async (IMediator mediator, HttpContext httpContext,  int subjectId) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new DeleteTutorSubjectCommand(userId, subjectId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("DeleteSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
