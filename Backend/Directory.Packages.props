@@ -9,11 +9,15 @@
     <PackageVersion Include="Ardalis.Result.AspNetCore" Version="10.1.0" />
     <PackageVersion Include="Ardalis.Result.FluentValidation" Version="10.1.0" />
     <PackageVersion Include="DotNetEnv" Version="3.1.1" />
+    <PackageVersion Include="AutoMapper" Version="12.0.1" />
+    <PackageVersion Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageVersion Include="CloudinaryDotNet" Version="1.27.7" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.8" />
     <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.1" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Proxies" Version="9.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
     <PackageVersion Include="NodaTime" Version="3.2.2" />
     <PackageVersion Include="NodaTime.EntityFrameworkCore.Conversions" Version="2.0.0" />

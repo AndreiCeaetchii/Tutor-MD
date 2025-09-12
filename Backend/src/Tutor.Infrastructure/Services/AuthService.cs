@@ -14,14 +14,17 @@ public class AuthService : IAuthService
     private readonly IGenericRepository<Password, int> _passwordRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
+    private readonly IGenericRepository2<UserRole>  _userRoleRepository;
 
     public AuthService(
         IGenericRepository<User, int> userRepository,
+        IGenericRepository2<UserRole> userRoleRepository,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
         IGenericRepository<Password, int> passwordRepository)
     {
         _userRepository = userRepository;
+        _userRoleRepository = userRoleRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _passwordRepository = passwordRepository;
@@ -39,8 +42,12 @@ public class AuthService : IAuthService
             return Result<UserResponseDto>.Error("Invalid Password");
 
         var token = _tokenService.GenerateToken(user);
-
-        var response = user.ToResponseDto(token);
+        
+        var usersRole =  await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        if (usersRole == null)
+            return Result<UserResponseDto>.Error("No roles found for this email");
+        var role = usersRole.RoleId;
+        var response = user.ToResponseDto(token,role);
 
         return Result<UserResponseDto>.Success(response);
     }

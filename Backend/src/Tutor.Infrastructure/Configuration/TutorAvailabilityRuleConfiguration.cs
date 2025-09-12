@@ -35,7 +35,7 @@ public class TutorAvailabilityRuleConfiguration : IEntityTypeConfiguration<Tutor
             .IsRequired();
 
         // Relationships
-        builder.HasOne(x => x.Tutor)
+        builder.HasOne(x => x.TutorProfile)
             .WithMany(x => x.AvailabilityRules)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);

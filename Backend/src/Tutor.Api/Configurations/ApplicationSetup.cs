@@ -6,9 +6,11 @@ using System;
 using System.Text;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
+using Tutor.Infrastructure.Helpers;
 using Tutor.Infrastructure.Repositories;
 using Tutor.Infrastructure.Services;
 
@@ -23,12 +25,23 @@ public static class ApplicationSetup
         services.AddHttpClient();
 
         services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+        services.AddScoped(typeof(IGenericRepository2<>), typeof(GenericRepository2<>));
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IOAuthService, OAuthService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ITutorService, TutorService>();
+        services.AddScoped<ISubjectService, SubjectService>();
+        services.AddScoped<IUserRoleService, UserRoleService>();
+        services.AddScoped<ITutorSubjectService, TutorSubjectService>();
+        services.AddScoped<IPhotoService, PhotoService>();
+        
+        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
+
+
+        services.AddAutoMapper(typeof(TutorMappingProfile));
 
         services.AddAuthentication(options =>
             {
@@ -71,6 +84,7 @@ public static class ApplicationSetup
                         .AllowCredentials();
                 });
         });
+
         return services;
     }
 }

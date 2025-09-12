@@ -20,6 +20,7 @@ using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Repositories;
+using Tutor.Infrastructure.Seeder;
 using Tutor.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +33,7 @@ builder.AddValidationSetup();
 
 builder.Services.AddHttpClient();
 
-
+// builder.Services.AddAntiforgery();
 // Swagger
 builder.Services.AddSwaggerSetup();
 
@@ -70,9 +71,20 @@ if (builder.Environment.EnvironmentName != "Testing")
 
     // Add opentelemetry
     builder.AddOpenTemeletrySetup();
+    
 }
 
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await SubjectSeeder.SeedAsync(context);
+    await RoleSeeder.SeedAsync(context);
+}
+
 
 // Configure the HTTP request pipeline.
 app.UseResponseCompression();
@@ -83,15 +95,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapUserEndpoints();
+app.MapTutorEndpoints();
 
 app.UseRouting();
-
+// app.UseAntiforgery(); 
 app.UseSwaggerSetup();
 app.UseHsts();
 
 app.UseResponseCompression();
 app.UseHttpsRedirection();
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -19,9 +19,11 @@ public static class PersistenceSetup
         services.AddDbContextPool<ApplicationDbContext>(o =>
         {
             o.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+            o.UseLazyLoadingProxies();
             o.ConfigureWarnings(warnings => 
                 warnings.Ignore(RelationalEventId.PendingModelChangesWarning));
             o.UseExceptionProcessor();
+            o.EnableSensitiveDataLogging();;
         });
 
         return services;

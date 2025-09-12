@@ -12,6 +12,6 @@ public class Review : Entity<int>
 
     // Navigation properties
     public virtual Booking Booking { get; set; }
-    public virtual Tutor Tutor { get; set; }
+    public virtual TutorProfile TutorProfile { get; set; }
     public virtual Student Student { get; set; }
 }

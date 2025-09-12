@@ -35,7 +35,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .IsRequired();
 
         // Relationships
-        builder.HasOne(x => x.Tutor)
+        builder.HasOne(x => x.TutorProfile)
             .WithMany(x => x.Bookings)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);

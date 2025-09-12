@@ -10,4 +10,6 @@ public record UserResponseDto
     public string? Username { get; set; } = string.Empty;
 
     public required string Token { get; set; }
+    
+    public int?  RoleId { get; set; }
 }

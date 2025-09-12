@@ -21,7 +21,7 @@ public class User : Entity<int>
     public virtual Photo Photo { get; set; }
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public virtual Student Student { get; set; }
-    public virtual Tutor Tutor { get; set; }
+    public virtual TutorProfile TutorProfile { get; set; }
     public virtual ICollection<Notification> ReceivedNotifications { get; set; } = new List<Notification>();
     public virtual ICollection<Notification> SentNotifications { get; set; } = new List<Notification>();
     
