@@ -14,7 +14,7 @@ public class AuthService : IAuthService
     private readonly IGenericRepository<Password, int> _passwordRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
-    private readonly IGenericRepository2<UserRole>  _userRoleRepository;
+    private readonly IGenericRepository2<UserRole> _userRoleRepository;
 
     public AuthService(
         IGenericRepository<User, int> userRepository,
@@ -42,36 +42,42 @@ public class AuthService : IAuthService
             return Result<UserResponseDto>.Error("Invalid Password");
 
         var token = _tokenService.GenerateToken(user);
-        
-        var usersRole =  await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
+
+        var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (usersRole == null)
             return Result<UserResponseDto>.Error("No roles found for this email");
         var role = usersRole.RoleId;
-        var response = user.ToResponseDto(token,role);
+        var response = user.ToResponseDto(token, role);
 
         return Result<UserResponseDto>.Success(response);
     }
 
     public async Task<Result<UserResponseDto>> RegisterAsync(RegisterUserDto registerDto)
     {
-        // Map DTO to User entity
-        var user = registerDto.ToEntity();
+        if (registerDto == null)
+            return Result<UserResponseDto>.Error("Invalid request");
+        if (string.IsNullOrWhiteSpace(registerDto.Email))
+            return Result<UserResponseDto>.Error("Email is required");
+        if (string.IsNullOrWhiteSpace(registerDto.Password))
+            return Result<UserResponseDto>.Error("Password is required");
+        var existingUser = await _userRepository.FindAsyncDefault(u => u.Email == registerDto.Email);
+        if (existingUser != null)
+            return Result<UserResponseDto>.Error("User with this email already exists");
 
-        // Persist user first (to get Id)
+        var user = registerDto.ToEntity();
         await _userRepository.Create(user);
 
-        // Hash password
         var hashedPassword = _passwordHasher.HashPassword(registerDto.Password);
+        if (string.IsNullOrEmpty(hashedPassword))
+            return Result<UserResponseDto>.Error("Password hashing failed");
 
-        // Create Password entity
         var password = new Password { UserId = user.Id, PasswordHash = hashedPassword };
-
         await _passwordRepository.Create(password);
 
-        // Generate token
         var token = _tokenService.GenerateToken(user);
+        if (string.IsNullOrEmpty(token))
+            return Result<UserResponseDto>.Error("Token generation failed");
 
-        // Map entity to response DTO
         var response = user.ToResponseDto(token);
 
         return Result<UserResponseDto>.Success(response);

@@ -33,7 +33,7 @@ public static class UserEndpoints
 
                 return result.IsSuccess
                     ? Results.Ok(result.Value)
-                    : Results.BadRequest("Not success");
+                    : Results.BadRequest(result.Errors);
             })
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -100,29 +100,29 @@ public static class UserEndpoints
             .WithName("CreateProfile")
             .Produces<CreateProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-       
+
 
         group.MapPost("/add-photo",
-            [Authorize]  async (IMediator mediator, [FromForm] IFormFile file, HttpContext httpContext) =>
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Results.Unauthorized();
+                [Authorize] async (IMediator mediator, [FromForm] IFormFile file, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
 
-                if (!int.TryParse(userIdClaim, out var userId))
-                    return Results.BadRequest("Invalid UserId in token");
-                var command = new AddPhotoCommand(userId, file);
-                var result = await mediator.Send(command);
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            })
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new AddPhotoCommand(userId, file);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
             .WithName("AddPhoto")
             .Produces<PhotoDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();
         group.MapDelete("/delete-photo",
-                [Authorize]  async (IMediator mediator, HttpContext httpContext) =>
+                [Authorize] async (IMediator mediator, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -140,17 +140,11 @@ public static class UserEndpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();
-      
-      var healthGroup = builder.MapGroup("health")
+
+        var healthGroup = builder.MapGroup("health")
             .WithTags("health");
 
-        healthGroup.MapGet("/", () => 
-            Results.Ok(new 
-            { 
-                status = "Healthy", 
-                timestamp = DateTime.UtcNow,
-                service = "User API"
-            }));
-
+        healthGroup.MapGet("/", () =>
+            Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow, service = "User API" }));
     }
 }
