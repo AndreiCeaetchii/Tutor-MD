@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers;
 using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
 using Tutor.Domain.Interfaces;
@@ -36,12 +37,15 @@ public static class ApplicationSetup
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<ITutorSubjectService, TutorSubjectService>();
         services.AddScoped<IPhotoService, PhotoService>();
+        services.AddScoped<IStudentService, StudentService>();
         
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));
+        services.AddAutoMapper(typeof(StudentMappingProfile));
+
 
         services.AddAuthentication(options =>
             {

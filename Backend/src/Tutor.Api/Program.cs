@@ -97,6 +97,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapUserEndpoints();
 app.MapTutorEndpoints();
+app.MapStudentEndpoints();
 
 app.UseRouting();
 // app.UseAntiforgery(); 
