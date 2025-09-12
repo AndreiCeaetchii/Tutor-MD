@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+
+    <PackageReference Include="DotNetEnv" />
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="CloudinaryDotNet" />

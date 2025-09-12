@@ -12,6 +12,7 @@
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="Bogus" />
+    <PackageReference Include="DotNetEnv" />
     <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />

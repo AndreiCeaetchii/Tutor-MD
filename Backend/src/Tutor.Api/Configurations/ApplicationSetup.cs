@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
@@ -41,18 +42,6 @@ public static class ApplicationSetup
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));
-        services.AddCors(options =>
-        {
-            options.AddPolicy("AllowFrontend",
-                policy =>
-                {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-        });
-
 
         services.AddAuthentication(options =>
             {
@@ -73,14 +62,28 @@ public static class ApplicationSetup
                         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]))
                 };
             })
-            .AddGoogle(options => // Google OAuth
+            .AddGoogle(options =>
             {
-                options.ClientId = configuration["OAuth:Google:ClientId"];
-                options.ClientSecret = configuration["OAuth:Google:ClientSecret"];
-                options.CallbackPath = "/api/auth/google-callback";
-                options.SaveTokens = true;
+                options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
+                                   ?? configuration["Google:ClientId"];
+                options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")
+                                       ?? configuration["Google:ClientSecret"];
+                options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
             });
 
+        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        var corsPolicyName = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
+        services.AddCors(options =>
+        {
+            options.AddPolicy(corsPolicyName,
+                policy =>
+                {
+                    policy.WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+        });
 
         return services;
     }

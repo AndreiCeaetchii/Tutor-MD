@@ -1,4 +1,5 @@
 using Ardalis.Result;
+using DotNetEnv;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,7 +25,7 @@ using Tutor.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+Env.Load();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 // Controllers

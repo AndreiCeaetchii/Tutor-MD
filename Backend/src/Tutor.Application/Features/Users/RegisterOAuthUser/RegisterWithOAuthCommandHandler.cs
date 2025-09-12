@@ -16,6 +16,7 @@ public class RegisterUserWithOAuthCommandHandler
     private readonly IUserService _userService;
     private readonly ITokenService _jwtTokenService;
     private readonly IOAuthService _oauthService;
+    private const string Google = "google";
 
     public RegisterUserWithOAuthCommandHandler(
         IUserService userService,
@@ -37,7 +38,7 @@ public class RegisterUserWithOAuthCommandHandler
         {
             userInfo = request.Provider.ToLower() switch
             {
-                "google" => await _oauthService.ValidateGoogleTokenAsync(request.AccessToken),
+                Google => await _oauthService.ValidateGoogleTokenAsync(request.AccessToken),
                 _ => null
             };
 

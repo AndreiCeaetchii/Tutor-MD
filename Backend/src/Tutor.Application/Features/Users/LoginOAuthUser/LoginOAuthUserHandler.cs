@@ -17,7 +17,7 @@ public class LoginOAuthUserCommandHandler
     private readonly ITokenService _jwtTokenService;
     private readonly IOAuthService _oauthService;
     private readonly IUserRoleService _roleService;
-    public const string Google = "google";
+    private const string Google = "google";
 
     public LoginOAuthUserCommandHandler(
         IUserRoleService roleService,
