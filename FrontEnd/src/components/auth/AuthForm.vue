@@ -35,6 +35,7 @@
     isLogin: boolean;
     errorMessage?: string;
     fieldErrors?: Record<string, string>;
+    showPhoneNumber?: boolean;
   }
   
   interface FormData {
@@ -53,7 +54,8 @@
     title: 'Tutor',
     isSignupForm: false,
     showRoleSelector: false,
-    fieldErrors: () => ({})
+    fieldErrors: () => ({}),
+    showPhoneNumber: false,
   });
 
   const defaultRoles: Role[] = [
@@ -83,14 +85,13 @@
     emit('fieldInput', 'role', role);
   };
 
-  // Fix - Initialize as empty string instead of null
   const selectedRole = ref<UserRole | string>(store.userRole || '');
 
   const handleSubmit = () => {
     const formData: FormData = {
       email: email.value,
       password: password.value,
-      role: selectedRole.value || '', // Ensure it's always a string
+      role: selectedRole.value || '',
     };
 
     if (props.isSignupForm) {
@@ -102,13 +103,13 @@
 
   const handleSocialLogin = (provider: string): void => {
     if (!selectedRole.value) {
-      emit('fieldBlur', 'role'); // Trigger validation for role
+      emit('fieldBlur', 'role');
       return;
     }
 
     emit('socialLogin', {
       provider,
-      role: selectedRole.value as UserRole, // Type assertion since we know it's not empty
+      role: selectedRole.value as UserRole,
     });
   };
 
@@ -122,7 +123,6 @@
     return `${actionText.value} ${currentRole?.label || 'Tutor or Student'}`;
   });
   
-  // Fix - Type-safe event handlers
   const handleEmailInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
     email.value = target.value;
@@ -206,7 +206,7 @@
       </div>
 
       <!-- Phone number field with error handling - Fixed event handler -->
-      <div v-if="isSignupForm" class="mb-4 sm:mb-5">
+      <div v-if="isSignupForm && showPhoneNumber" class="mb-4 sm:mb-5">
         <label for="phone" class="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
         <div class="flex">
           <div

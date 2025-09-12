@@ -15,7 +15,6 @@
   const { signup, loginWithGoogle, errorMessage } = useAuth();
   const router = useRouter();
 
-  // Form data
   const formData = ref<SignupFormData>({
     email: '',
     password: '',
@@ -23,10 +22,8 @@
     phoneNumber: ''
   });
 
-  // Track which fields have been touched
   const touchedFields = ref<Set<string>>(new Set());
 
-  // Validation rules
   const emailError = computed(() => {
     if (!touchedFields.value.has('email') || !formData.value.email) return '';
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -38,7 +35,6 @@
     return formData.value.role ? '' : 'Please select a role';
   });
 
-  // Password validation with multiple rules
   const passwordRules = {
     minLength: (password: string) => password.length >= 8,
     hasUppercase: (password: string) => /[A-Z]/.test(password),
@@ -72,12 +68,9 @@
     return errors.length ? `Password must contain: ${errors.join(', ')}` : '';
   });
 
-  // Phone number validation
   const phoneNumberError = computed(() => {
     if (!touchedFields.value.has('phoneNumber') || !formData.value.phoneNumber) return '';
-    
-    // Validate the full number with country code
-    // First add the country code if it's not already there
+
     const fullNumber = formData.value.phoneNumber.startsWith('+373') 
       ? formData.value.phoneNumber 
       : `+373${formData.value.phoneNumber}`;
@@ -88,7 +81,6 @@
       : 'Please enter a valid Moldova phone number (+373 followed by 8-9 digits)';
   });
 
-  // Compile all field errors
   const fieldErrors = computed(() => {
     return {
       email: emailError.value,
@@ -98,7 +90,6 @@
     };
   });
 
-  // Handle field events
   const handleFieldBlur = (field: string) => {
     touchedFields.value.add(field);
   };
@@ -110,7 +101,6 @@
     else if (field === 'phoneNumber') formData.value.phoneNumber = value;
   };
 
-  // Success notification
   const showSuccessNotification = ref(false);
   const successMessage = ref('Account created successfully!');
 
@@ -122,28 +112,23 @@
   };
 
   const handleSubmit = async (data: SignupFormData) => {
-    // Mark all fields as touched to trigger validation
     touchedFields.value.add('email');
     touchedFields.value.add('password');
     touchedFields.value.add('role');
     if (data.phoneNumber) touchedFields.value.add('phoneNumber');
     
-    // Update our local data
     formData.value = data;
     
-    // Check for validation errors
     if (emailError.value || roleError.value || passwordError.value || 
         (data.phoneNumber && phoneNumberError.value)) {
-      return; // Don't proceed if there are errors
+      return;
     }
     
     const success = await signup(data);
     if (!success) return;
 
-    // Show success notification
     showSuccess();
 
-    // Navigate based on role
     if (data.role === 'tutor') {
       router.push('/tutor-dashboard');
     } else if (data.role === 'student') {
@@ -159,7 +144,7 @@
     
     if (provider !== 'google') return;
     if (!role) {
-      return; // Role validation will show error
+      return;
     }
     
     const success = await loginWithGoogle(role, true);
@@ -174,7 +159,6 @@
 </script>
 
 <template>
-  <!-- Success notification -->
   <Notification 
     :show="showSuccessNotification"
     :message="successMessage"
@@ -188,6 +172,7 @@
     :showRoleSelector="true"
     :isSignupForm="true"
     :isLogin="false"
+    :showPhoneNumber="false"
     submitButtonText="Sign up as Tutor"
     googleButtonText="Sign up with Google"
     footerText="Already have an account?"
