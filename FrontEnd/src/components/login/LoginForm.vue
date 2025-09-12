@@ -129,10 +129,10 @@
 
   <BaseAuthForm
     title="Tutor.md"
-    subtitle="Please sign in to continue"
+    subtitle="Please log in to continue"
     :showRoleSelector="true"
-    submitButtonText="Sign in as User"
-    googleButtonText="Sign in with Google"
+    submitButtonText="Log in as User"
+    googleButtonText="Log in with Google"
     footerText="Don't have an account?"
     footerLinkText="Sign up"
     footerLinkPath="/signup"

@@ -115,7 +115,7 @@
 
   const actionText = computed(() => {
     if (!props.submitButtonText) return 'Submit';
-    return props.submitButtonText.includes('Sign in') ? 'Sign in as' : 'Sign up as';
+    return props.submitButtonText.includes('Log in') ? 'Log in as' : 'Sign up as';
   });
 
   const dynamicSubmitButtonText = computed(() => {

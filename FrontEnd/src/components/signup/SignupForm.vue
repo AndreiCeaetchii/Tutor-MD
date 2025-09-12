@@ -176,7 +176,7 @@
     submitButtonText="Sign up as Tutor"
     googleButtonText="Sign up with Google"
     footerText="Already have an account?"
-    footerLinkText="Sign in"
+    footerLinkText="Log in"
     footerLinkPath="/login"
     @submit="handleSubmit"
     @socialLogin="handleSocialLogin"

@@ -25,7 +25,71 @@ export function useAuth() {
   const GOOGLE_LOGIN_URL = 'https://localhost:7123/api/users/login-auth';
   const GOOGLE_REGISTER_URL = 'https://localhost:7123/api/users/register-auth';
 
-  // --- Sign up ---
+  const handleAuthError = (err: any, context: 'signup' | 'login' | 'google', isSignup?: boolean): string => {
+  if (axios.isAxiosError(err) && err.response) {
+    const status = err.response.status;
+    const errorData = err.response.data;
+    
+    console.error(`${context} error details:`, { 
+      status, 
+      data: errorData,
+      message: Array.isArray(errorData) ? errorData[0] : (errorData?.error || errorData?.message || 'Unknown error')
+    });
+    
+    let errorMsg = '';
+    if (Array.isArray(errorData)) {
+      errorMsg = errorData[0] || '';
+    } else if (typeof errorData === 'string') {
+      errorMsg = errorData;
+    } else {
+      errorMsg = errorData?.error || errorData?.message || '';
+    }
+    
+    if (errorMsg.toLowerCase().includes('already exists') || 
+        errorMsg.toLowerCase().includes('already registered') ||
+        errorMsg.toLowerCase().includes('email already') ||
+        errorMsg.toLowerCase().includes('user already') ||
+        errorMsg.toLowerCase().includes('oauth provider') ||
+        errorMsg.toLowerCase().includes('unique constraint') ||
+        errorMsg.toLowerCase().includes('uniqueconstraint')) {
+      
+      if (context === 'google') {
+        return isSignup 
+          ? 'An account with this Google email already exists. Please use login instead.' 
+          : 'Authentication failed with this Google account. Please check your credentials.';
+      } else {
+        return isSignup
+          ? 'An account with this email already exists. Please use login instead.'
+          : 'Authentication failed. Please check your email and password.';
+      }
+      }
+      
+      switch (status) {
+        case 400:
+          return errorMsg || `Invalid ${context} data. Please check your details.`;
+        case 401:
+          return context === 'login' 
+            ? 'Incorrect email or password. Please try again.'
+            : 'Authentication failed. Please check your credentials.';
+        case 404:
+          return context === 'login'
+            ? 'Account not found. Please check your email or sign up.'
+            : `${context.charAt(0).toUpperCase() + context.slice(1)} failed: resource not found`;
+        case 409:
+          return context === 'google' 
+            ? 'Google authentication failed. Please try again.'
+            : 'A conflict occurred. Please try again.';
+        case 500:
+          return 'Server error. Please try again later.';
+        default:
+          return errorMsg || `${context.charAt(0).toUpperCase() + context.slice(1)} failed (${status})`;
+      }
+    } else {
+      console.error(`${context} network error:`, err);
+      return err.message || 'Network or server error';
+    }
+  };
+
   const signup = async (formData: AuthFormData): Promise<boolean> => {
     errorMessage.value = null;
 
@@ -52,17 +116,11 @@ export function useAuth() {
       console.log('Signup successful!');
       return true;
     } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response) {
-        errorMessage.value = err.response.data?.error || 'Signup failed';
-      } else {
-        errorMessage.value = err.message || 'Network or server error';
-      }
-      console.error('Signup error:', err);
+      errorMessage.value = handleAuthError(err, 'signup');
       return false;
     }
   };
 
-  // --- Log in ---
   const login = async (formData: AuthFormData): Promise<boolean> => {
     errorMessage.value = null;
 
@@ -89,23 +147,16 @@ export function useAuth() {
       console.log('Login successful!');
       return true;
     } catch (err: any) {
-      if (axios.isAxiosError(err) && err.response) {
-        errorMessage.value = err.response.data?.error || 'Login failed';
-      } else {
-        errorMessage.value = err.message || 'Network or server error';
-      }
-      console.error('Login error:', err);
+      errorMessage.value = handleAuthError(err, 'login');
       return false;
     }
   };
 
-  // --- Logout ---
   const logout = () => {
     store.accessToken = null;
     router.push('/login');
   };
 
-  // --- Login sau Signup cu Google ---
   const loginWithGoogle = async (role: string, isSignup: boolean): Promise<boolean> => {
     const store = useUserStore();
 
@@ -156,12 +207,7 @@ export function useAuth() {
 
             resolve(true);
           } catch (err: any) {
-            if (axios.isAxiosError(err) && err.response) {
-              errorMessage.value = err.response.data?.error || 'Google auth failed';
-            } else {
-              errorMessage.value = err.message || 'Network or server error';
-            }
-            console.error('Google auth error:', err);
+            errorMessage.value = handleAuthError(err, 'google', isSignup);
             resolve(false);
           }
         },
