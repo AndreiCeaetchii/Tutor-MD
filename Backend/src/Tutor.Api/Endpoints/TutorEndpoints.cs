@@ -16,8 +16,6 @@ using Tutor.Application.Features.Tutors.GetAllTutors;
 using Tutor.Application.Features.Tutors.GetTutorById;
 using Tutor.Application.Features.Tutors.UpdateTutorProfile;
 using Tutor.Application.Features.Tutors.UpdateTutorSubject;
-using Tutor.Application.Features.Users.CreateProfile;
-using Tutor.Application.Features.Users.Dtos;
 
 
 namespace Tutor.Api.Endpoints;

@@ -62,12 +62,12 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task<Result<CreateProfileDto>> UpdateProfileAsync(int userId, CreateProfileDto profileDto)
+    public async Task<Result> UpdateProfileAsync(int userId, CreateProfileDto profileDto)
     {
         var user = await _userRepository.GetById(userId);
 
         if (user == null)
-            return Result<CreateProfileDto>.NotFound();
+            return Result.Error("User not found");
 
         // Update fields
         user.Phone = profileDto.Phone;
@@ -79,7 +79,7 @@ public class UserService : IUserService
 
         await _userRepository.Update(user);
 
-        return Result.Success(profileDto);
+        return Result.Success();
     }
 
     public async Task UpdateLastLoginAsync(int userId)
