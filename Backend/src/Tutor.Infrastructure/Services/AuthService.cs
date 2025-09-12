@@ -15,15 +15,18 @@ public class AuthService : IAuthService
     private readonly IPasswordHasher _passwordHasher;
     private readonly ITokenService _tokenService;
     private readonly IGenericRepository2<UserRole> _userRoleRepository;
+    private readonly IGenericRepository<Role, int> _roleRepository;
 
     public AuthService(
         IGenericRepository<User, int> userRepository,
         IGenericRepository2<UserRole> userRoleRepository,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
+        IGenericRepository<Role,int> roleRepository,
         IGenericRepository<Password, int> passwordRepository)
     {
         _userRepository = userRepository;
+        _roleRepository = roleRepository;
         _userRoleRepository = userRoleRepository;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
@@ -41,13 +44,16 @@ public class AuthService : IAuthService
         if (!_passwordHasher.VerifyPassword(loginDto.Password, password.PasswordHash))
             return Result<UserResponseDto>.Error("Invalid Password");
 
-        var token = _tokenService.GenerateToken(user);
+    
 
         var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (usersRole == null)
             return Result<UserResponseDto>.Error("No roles found for this email");
-        var role = usersRole.RoleId;
-        var response = user.ToResponseDto(token, role);
+        
+        var role = await _roleRepository.FindAsyncDefault(u => u.Id == usersRole.RoleId);
+        
+        var token = _tokenService.GenerateToken(user, role);
+        var response = user.ToResponseDto(token);
 
         return Result<UserResponseDto>.Success(response);
     }

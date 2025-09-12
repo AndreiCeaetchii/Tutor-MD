@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Tutor.Api.Filters.Atributes;
 using Tutor.Application.Features.Tutors.AddTutorSubject;
 using Tutor.Application.Features.Tutors.Approve_Tutor;
 using Tutor.Application.Features.Tutors.CreateTutor;
@@ -50,7 +51,8 @@ public static class TutorEndpoints
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPut("/update-tutor",
-                [Authorize] async (IMediator mediator, [FromBody] UpdateTutorProfileDto updateTutorProfileDto,
+                [Authorize]  [AuthorizeRole("tutor")]
+                async (IMediator mediator, [FromBody] UpdateTutorProfileDto updateTutorProfileDto,
                     HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -73,7 +75,8 @@ public static class TutorEndpoints
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutor/{id}",
-                [Authorize] async (IMediator mediator, int id) =>
+                [Authorize]
+                async (IMediator mediator, int id) =>
                 {
                     var command = new GetTutorByIdQuery(id);
 
@@ -86,7 +89,8 @@ public static class TutorEndpoints
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutors",
-                [Authorize] async (IMediator mediator) =>
+               
+                async (IMediator mediator) =>
                 {
                     var command = new GetAllTutorsQuery();
 
@@ -96,6 +100,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetAllTutorProfile")
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/approve-tutor/{id}",

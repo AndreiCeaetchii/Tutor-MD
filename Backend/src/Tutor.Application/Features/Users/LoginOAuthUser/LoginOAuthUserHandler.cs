@@ -7,6 +7,7 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
+using Tutor.Domain.Interfaces;
 
 namespace Tutor.Application.Features.Users.LoginOAuthUser;
 
@@ -18,16 +19,19 @@ public class LoginOAuthUserCommandHandler
     private readonly IOAuthService _oauthService;
     private readonly IUserRoleService _roleService;
     private const string Google = "google";
+    private readonly IGenericRepository<Role, int> _roleRepository;
 
     public LoginOAuthUserCommandHandler(
         IUserRoleService roleService,
         IUserService userService,
         ITokenService jwtTokenService,
+        IGenericRepository<Role, int> roleRepository,
         IOAuthService oauthService)
     {
         _userService = userService;
         _roleService= roleService;
         _jwtTokenService = jwtTokenService;
+        _roleRepository = roleRepository;
         _oauthService = oauthService;
     }
 
@@ -62,10 +66,12 @@ public class LoginOAuthUserCommandHandler
         
         if (user != null)
         {
-            var role = await _roleService.GetRoleIdAsync(user.Id);
-            if (role == null)
+            var usersRole = await _roleService.GetRoleIdAsync(user.Id);
+            if (usersRole == null)
                 return Result<UserResponseDto>.Error($"No role found for user ");
-            var token = _jwtTokenService.GenerateToken(user);
+            var role = await _roleRepository.FindAsyncDefault(u => u.Id == usersRole);
+        
+            var token = _jwtTokenService.GenerateToken(user, role);
             
             return Result.Success(user.ToResponseDto(token));
         }

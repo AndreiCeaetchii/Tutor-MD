@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Tutor.Application.Features.Students.CreateStudent;
 using Tutor.Application.Features.Students.DTOs;
 using Tutor.Application.Features.Students.GetStudent;
+using Tutor.Application.Features.Students.UpdateStudent;
 using Tutor.Application.Features.Tutors.Dto;
 
 namespace Tutor.Api.Endpoints;
@@ -57,6 +58,27 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("GetStudentProfile")
+            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPut("/update-profile",
+                [Authorize] async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new UpdateStudentCommand(userId, updateStudentProfileDto);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
+            .WithName("UpdateStudentProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);

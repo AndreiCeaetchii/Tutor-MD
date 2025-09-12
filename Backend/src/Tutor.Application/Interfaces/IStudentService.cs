@@ -8,4 +8,6 @@ public interface IStudentService
 {
     Task<Result<StudentDto>> CreateStudentAsync(CreateStudentDto createStudentDto, int userId);
     Task<Result<StudentDto>> GetStudentAsync(int userId);
+
+    Task<Result<StudentDto>> UpdateStudentAsync(int userId, UpdateStudentProfileDto updateStudentProfileDto);
 }

@@ -44,7 +44,17 @@ builder.Services.AddPersistenceSetup(builder.Configuration);
 // Application layer setup
 builder.Services.AddApplicationSetup(builder.Configuration);
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("StudentPolicy", policy => 
+        policy.RequireAuthenticatedUser().RequireRole("Student"));
+    
+    options.AddPolicy("TutorPolicy", policy => 
+        policy.RequireAuthenticatedUser().RequireRole("Tutor"));
+    
+    options.AddPolicy("AdminPolicy", policy => 
+        policy.RequireAuthenticatedUser().RequireRole("Admin"));
+});
 // Add identity stuff
 builder.Services
     .AddIdentityApiEndpoints<ApplicationUser>()

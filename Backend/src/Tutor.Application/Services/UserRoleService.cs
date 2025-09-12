@@ -35,7 +35,7 @@ public class UserRoleService : IUserRoleService
         var userRole = new UserRole 
         { 
             UserId = userId, 
-            RoleId = 1,
+            RoleId = 3,
             AssignedAt = DateTime.UtcNow
         };
     

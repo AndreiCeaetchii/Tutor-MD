@@ -10,7 +10,6 @@ public class TutorProfileDto
     public int UserId { get; set; }
     public VerificationStatus VerificationStatus { get; set; }
     public int? ExperienceYears { get; set; }
-    public int role {get; set;} = 2;
     public List<TutorSubjectDto> TutorSubjects { get; set; } = new List<TutorSubjectDto>();
     public required CreateProfileDto UserProfile { get; set; }
     

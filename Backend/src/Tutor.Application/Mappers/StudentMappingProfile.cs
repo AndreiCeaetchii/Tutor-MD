@@ -22,6 +22,7 @@ public class StudentMappingProfile : Profile
         CreateMap<User, CreateProfileDto>();
         
         CreateMap<Photo, PhotoDto>();
+        CreateMap<UpdateStudentProfileDto, CreateProfileDto>();
     }
     
     

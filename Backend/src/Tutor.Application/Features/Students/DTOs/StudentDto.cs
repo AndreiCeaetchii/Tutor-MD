@@ -6,11 +6,10 @@ namespace Tutor.Application.Features.Students.DTOs;
 public class StudentDto
 {
     public int? Grade { get; set; }
-    
+
     public int? Class { get; set; }
-    public int role { get; set; } = 1;
-    
     public required CreateProfileDto UserProfile { get; set; }
-    
-    public PhotoDto? Photo {get; set;}
+
+    public required string Token { get; set; }
+    public PhotoDto? Photo { get; set; }
 }

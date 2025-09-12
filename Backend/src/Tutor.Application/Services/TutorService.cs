@@ -131,7 +131,7 @@ public class TutorService : ITutorService
         tutorProfile.ExperienceYears = updateTutorProfileDto.ExperienceYears;
         await _tutorProfileRepository.Update(tutorProfile);
         
-        return  _mapper.Map<TutorProfileDto>(tutorProfile);
+        return  Result<TutorProfileDto>.Success(_mapper.Map<TutorProfileDto>(tutorProfile));
     }
     
 }
