@@ -44,7 +44,7 @@ router.beforeEach((to, _, next) => {
   const store = useUserStore();
 
   const hasToken = store.isAuthenticated; // există token
-  const userRole = store.role;
+  const userRole = store.userRole;
   console.log(userRole);
 
   // Rute care necesită autentificare

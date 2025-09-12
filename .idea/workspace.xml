@@ -6,7 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/TutorDashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/TutorDashboard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,22 +41,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#26 on feat-google-auth",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier",
-    "settings.editor.selected.configurable": "settings.javascript.prettier",
-    "ts.external.directory.path": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat__profile__page&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.prettier&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\landing" />
@@ -82,7 +87,9 @@
       <workItem from="1757488098377" duration="7047000" />
       <workItem from="1757497736290" duration="2047000" />
       <workItem from="1757500853545" duration="10091000" />
-      <workItem from="1757576015940" duration="610000" />
+      <workItem from="1757576015940" duration="2445000" />
+      <workItem from="1757579462376" duration="10782000" />
+      <workItem from="1757662514407" duration="15234000" />
     </task>
     <servers />
   </component>
