@@ -4,6 +4,7 @@ using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Photos.DTOs;
 using Tutor.Application.Interfaces;
@@ -24,6 +25,8 @@ public class PhotoService : IPhotoService
         IGenericRepository<User, int> userRepository, IMapper mapper)
     {
         var account = new Account(config.Value.CloudName, config.Value.ApiKey, config.Value.ApiSecret);
+    
+        Console.WriteLine(config.Value.CloudName);
 
         _cloudinary = new Cloudinary(account);
         _photoRepository = photoRepository;
@@ -61,8 +64,13 @@ public class PhotoService : IPhotoService
             return Result<PhotoDto>.Error("Inexistent User");
         if (user.PhotoId != null)
             return Result<PhotoDto>.Error("You cannot add more than one photo");
-
         var result = await UploadPhotoAsync(file);
+        if (result.Error != null)
+            return Result<PhotoDto>.Error($"Cloudinary error: {result.Error.Message}");
+
+        if (result.SecureUrl == null)
+            return Result<PhotoDto>.Error("Upload failed: no SecureUrl returned");
+
         var photo = new Photo
         {
             Url = result.SecureUrl.AbsoluteUri,
