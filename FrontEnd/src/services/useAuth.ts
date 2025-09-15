@@ -86,7 +86,7 @@ export function useAuth() {
       }
     } else {
       console.error(`${context} network error:`, err);
-      return err.message || 'Network or server error';
+      return err.message || 'Temporary server issue. Please retry.';
     }
   };
 
