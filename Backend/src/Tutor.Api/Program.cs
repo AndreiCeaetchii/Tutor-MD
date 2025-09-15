@@ -46,14 +46,16 @@ builder.Services.AddApplicationSetup(builder.Configuration);
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("StudentPolicy", policy => 
+    options.AddPolicy("StudentPolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("Student"));
-    
-    options.AddPolicy("TutorPolicy", policy => 
+
+    options.AddPolicy("TutorPolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("Tutor"));
-    
-    options.AddPolicy("AdminPolicy", policy => 
+
+    options.AddPolicy("AdminPolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("Admin"));
+    options.AddPolicy("TutorOrStudentPolicy", policy =>
+        policy.RequireRole("Tutor", "Student"));
 });
 // Add identity stuff
 builder.Services
@@ -82,9 +84,7 @@ if (builder.Environment.EnvironmentName != "Testing")
 
     // Add opentelemetry
     builder.AddOpenTemeletrySetup();
-    
 }
-
 
 
 var app = builder.Build();

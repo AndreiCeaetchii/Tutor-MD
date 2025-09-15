@@ -29,7 +29,7 @@ public static class TutorEndpoints
             .WithTags("tutors");
 
         group.MapPost("/create-tutor",
-                [Authorize] async (IMediator mediator, [FromBody] CreateTutorProfileDto createTutorProfileDto,
+                 async (IMediator mediator, [FromBody] CreateTutorProfileDto createTutorProfileDto,
                     HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -49,9 +49,10 @@ public static class TutorEndpoints
                 })
             .WithName("CreateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapPut("/update-tutor",
-                [Authorize]  [AuthorizeRole("tutor")]
                 async (IMediator mediator, [FromBody] UpdateTutorProfileDto updateTutorProfileDto,
                     HttpContext httpContext) =>
                 {
@@ -72,10 +73,10 @@ public static class TutorEndpoints
                 })
             .WithName("UpdateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutor/{id}",
-                [Authorize]
                 async (IMediator mediator, int id) =>
                 {
                     var command = new GetTutorByIdQuery(id);
@@ -86,6 +87,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy")
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutors",
@@ -130,7 +132,6 @@ public static class TutorEndpoints
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/add-subject",
-                [Authorize]
                 async (IMediator mediator, HttpContext httpContext, [FromBody] TutorSubjectRequestDto tutorSubjectRequestDto) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -147,10 +148,10 @@ public static class TutorEndpoints
                 }).WithName("AddSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
         
         group.MapDelete("/delete-subject/{subjectId}",
-                [Authorize]
                 async (IMediator mediator, HttpContext httpContext,  int subjectId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -166,11 +167,11 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeleteSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
         group.MapPut("/update-subject",
-                [Authorize]
                 async (IMediator mediator, HttpContext httpContext, [FromBody] TutorSubjectDto tutorSubjectDto) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -186,6 +187,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("UpdateSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
     }

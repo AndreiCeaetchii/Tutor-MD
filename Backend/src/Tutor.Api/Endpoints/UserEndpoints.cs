@@ -15,6 +15,7 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Features.Users.LoginOAuthUser;
 using Tutor.Application.Features.Users.LoginUser;
 using Tutor.Application.Features.Users.RegisterOAuthUser;
+using Tutor.Application.Features.Users.RegisterUser;
 
 namespace Tutor.Api.Endpoints;
 
@@ -58,7 +59,7 @@ public static class UserEndpoints
 
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
-                        : Results.BadRequest("Not success");
+                        : Results.BadRequest(result.Errors);
                 }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterAuthUser");
@@ -93,6 +94,7 @@ public static class UserEndpoints
                 })
             .WithName("AddPhoto")
             .Produces<PhotoDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy") 
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();
         group.MapDelete("/delete-photo",
@@ -111,6 +113,7 @@ public static class UserEndpoints
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("DeletePhoto")
+            .RequireAuthorization("TutorOrStudentPolicy") 
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();

@@ -46,9 +46,7 @@ public class TutorService : ITutorService
         var existingProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (existingProfile is not null)
             return Result<TutorProfileDto>.Error("Tutor profile already exists");
-
-        if (await _userRoleService.HasAnyRoleAsync(userId))
-            return Result<TutorProfileDto>.Error("User already has a role assigned");
+        
 
         var tutorProfile = new TutorProfile
         {
@@ -58,10 +56,7 @@ public class TutorService : ITutorService
         };
 
         await _tutorProfileRepository.Create(tutorProfile);
-
-        var roleResult = await _userRoleService.AssignTutorRoleAsync(userId);
-        if (!roleResult.IsSuccess)
-            return Result<TutorProfileDto>.Error(roleResult.Errors.FirstOrDefault());
+        
 
         await _tutorSubjectService.AddTutorSubjectsAsync(userId, createTutorProfileDto.Subjects);
 

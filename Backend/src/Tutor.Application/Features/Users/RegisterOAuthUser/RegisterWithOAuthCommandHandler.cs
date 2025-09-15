@@ -7,6 +7,7 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
+using Tutor.Domain.Interfaces;
 
 namespace Tutor.Application.Features.Users.RegisterOAuthUser;
 
@@ -16,16 +17,22 @@ public class RegisterUserWithOAuthCommandHandler
     private readonly IUserService _userService;
     private readonly ITokenService _jwtTokenService;
     private readonly IOAuthService _oauthService;
+    private readonly IGenericRepository2<UserRole> _userRoleRepository;
+    private readonly IGenericRepository<Role, int> _roleRepository;
     private const string Google = "google";
 
     public RegisterUserWithOAuthCommandHandler(
         IUserService userService,
         ITokenService jwtTokenService,
-        IOAuthService oauthService)
+        IOAuthService oauthService,
+        IGenericRepository2<UserRole> userRoleRepository,
+        IGenericRepository<Role, int> roleRepository)
     {
         _userService = userService;
+        _userRoleRepository = userRoleRepository;
         _jwtTokenService = jwtTokenService;
         _oauthService = oauthService;
+        _roleRepository = roleRepository;
     }
 
     public async Task<Result<UserResponseDto>> Handle(RegisterUserWithOAuthCommand requestDto,
@@ -71,8 +78,21 @@ public class RegisterUserWithOAuthCommandHandler
             email: request.Email
         );
 
-        // Generate JWT token
-        var token = _jwtTokenService.GenerateToken(user);
+        var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        if (usersRole != null)
+            return Result<UserResponseDto>.Error("User already has an role");
+        var currentUserRole = new UserRole
+        {
+            UserId = user.Id,
+            RoleId = requestDto.registerUserAuthDto.RoleId
+        };
+        await _userRoleRepository.Create(currentUserRole);
+        
+        var role = await _roleRepository.FindAsyncDefault(u => u.Id == currentUserRole.RoleId);
+        
+        var token = _jwtTokenService.GenerateToken(user, role);
+        if (string.IsNullOrEmpty(token))
+            return Result<UserResponseDto>.Error("Token generation failed");
 
         return Result.Success(user.ToResponseDto(token));
     }

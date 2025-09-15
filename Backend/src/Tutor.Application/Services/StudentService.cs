@@ -47,20 +47,12 @@ public class StudentService : IStudentService
         var existingProfile = await _studentRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (existingProfile is not null)
             return Result<StudentDto>.Error("Student profile already exists");
-
-        if (await _userRoleService.HasAnyRoleAsync(userId))
-            return Result<StudentDto>.Error("User already has a role assigned");
-
         var studentProfile = new Student
         {
             UserId = userId, Grade = createStudentDto.Grade, Class = createStudentDto.Class,
         };
 
         await _studentRepository.Create(studentProfile);
-
-        var roleResult = await _userRoleService.AssignStudentRoleAsync(userId);
-        if (!roleResult.IsSuccess)
-            return Result<StudentDto>.Error(roleResult.Errors.FirstOrDefault());
         return await GetStudentAsync(userId);
     }
 

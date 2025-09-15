@@ -37,6 +37,7 @@ public static class StudentEndpoints
                     : Results.BadRequest(result.Errors);
             })
             .WithName("CreateStudentProfile")
+            .RequireAuthorization("StudentPolicy") 
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -59,10 +60,11 @@ public static class StudentEndpoints
                 })
             .WithName("GetStudentProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPut("/update-profile",
-                [Authorize] async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,HttpContext httpContext) =>
+                 async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -80,6 +82,7 @@ public static class StudentEndpoints
                 })
             .WithName("UpdateStudentProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
            

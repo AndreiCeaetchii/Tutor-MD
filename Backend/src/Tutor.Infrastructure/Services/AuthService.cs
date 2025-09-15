@@ -4,6 +4,7 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Mappers;
 using Tutor.Domain.Entities;
+using Tutor.Domain.Entities.Common;
 using Tutor.Domain.Interfaces;
 
 namespace Tutor.Infrastructure.Services;
@@ -80,7 +81,19 @@ public class AuthService : IAuthService
         var password = new Password { UserId = user.Id, PasswordHash = hashedPassword };
         await _passwordRepository.Create(password);
 
-        var token = _tokenService.GenerateToken(user);
+        var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        if (usersRole != null)
+            return Result<UserResponseDto>.Error("User already has an role");
+        var currentUserRole = new UserRole
+        {
+            UserId = user.Id,
+            RoleId = registerDto.RoleId
+        };
+        await _userRoleRepository.Create(currentUserRole);
+        
+        var role = await _roleRepository.FindAsyncDefault(u => u.Id == currentUserRole.RoleId);
+        
+        var token = _tokenService.GenerateToken(user, role);
         if (string.IsNullOrEmpty(token))
             return Result<UserResponseDto>.Error("Token generation failed");
 
