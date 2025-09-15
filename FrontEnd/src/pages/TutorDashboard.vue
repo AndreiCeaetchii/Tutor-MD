@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router';
 
   import NavigationBar from '../components/navigation/NavigationBar.vue';
-  import TutorProfile from '../components/tutor/TutorProfile.vue';
+  // import TutorProfile from '../components/tutor/TutorProfile.vue';
   import TutorBookings from '../components/tutor/TutorBookings.vue';
   import TutorReview from '../components/tutor/TutorReview.vue';
   import TutorCalendar from '../components/tutor/TutorCalendar.vue';
