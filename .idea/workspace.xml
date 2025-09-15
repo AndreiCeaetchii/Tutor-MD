@@ -6,6 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/userStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +46,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feat-google-auth&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat__profile__page&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
@@ -80,7 +86,10 @@
       <workItem from="1757487015380" duration="748000" />
       <workItem from="1757488098377" duration="7047000" />
       <workItem from="1757497736290" duration="2047000" />
-      <workItem from="1757500853545" duration="6880000" />
+      <workItem from="1757500853545" duration="10091000" />
+      <workItem from="1757576015940" duration="2445000" />
+      <workItem from="1757579462376" duration="10782000" />
+      <workItem from="1757662514407" duration="15234000" />
     </task>
     <servers />
   </component>
