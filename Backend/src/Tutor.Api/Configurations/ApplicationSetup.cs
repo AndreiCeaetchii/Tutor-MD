@@ -38,13 +38,14 @@ public static class ApplicationSetup
         services.AddScoped<ITutorSubjectService, TutorSubjectService>();
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<IStudentService, StudentService>();
-        
-        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+        services.AddScoped<IAvailabilityService, AvailabilityService>();
 
+        services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));
         services.AddAutoMapper(typeof(StudentMappingProfile));
+        services.AddAutoMapper(typeof(AvailabilityMappingProfile));
 
 
         services.AddAuthentication(options =>
@@ -65,24 +66,31 @@ public static class ApplicationSetup
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]))
                 };
-            })
-            .AddGoogle(options =>
-            {
-                options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
-                                   ?? configuration["Google:ClientId"];
-                options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")
-                                       ?? configuration["Google:ClientSecret"];
-                options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
             });
+        var googleClientId = configuration["Google:ClientId"];
+        var googleClientSecret = configuration["Google:ClientSecret"];
 
-        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
-        var corsPolicyName = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
+        if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+        {
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = googleClientId;
+                    options.ClientSecret = googleClientSecret;
+                    options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
+                });
+        }
+        else
+        {
+            Console.WriteLine("Google authentication not configured. ClientId or ClientSecret missing.");
+        }
+
         services.AddCors(options =>
         {
-            options.AddPolicy(corsPolicyName,
+            options.AddPolicy("AllowFrontend",
                 policy =>
                 {
-                    policy.WithOrigins(allowedOrigins)
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

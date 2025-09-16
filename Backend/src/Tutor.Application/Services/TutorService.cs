@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -118,8 +119,9 @@ public class TutorService : ITutorService
     {
         var userProfileDto = _mapper.Map<CreateProfileDto>(updateTutorProfileDto);
        
-        await _userService.UpdateProfileAsync(userId,userProfileDto );
-        
+        var result = await _userService.UpdateProfileAsync(userId,userProfileDto );
+        if (result.Errors.Any())
+            return Result<TutorProfileDto>.Error(result.Errors.ToString());
         var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (tutorProfile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");

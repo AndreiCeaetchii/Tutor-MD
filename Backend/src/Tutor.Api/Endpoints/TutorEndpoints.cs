@@ -9,12 +9,16 @@ using System.Security.Claims;
 using Tutor.Api.Filters.Atributes;
 using Tutor.Application.Features.Tutors.AddTutorSubject;
 using Tutor.Application.Features.Tutors.Approve_Tutor;
+using Tutor.Application.Features.Tutors.CreateAvailability;
 using Tutor.Application.Features.Tutors.CreateTutor;
 using Tutor.Application.Features.Tutors.DeclineTutor;
+using Tutor.Application.Features.Tutors.DeleteAvilability;
 using Tutor.Application.Features.Tutors.DeleteTutorSubject;
 using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Application.Features.Tutors.GetAllTutors;
+using Tutor.Application.Features.Tutors.GetTutorAvailability;
 using Tutor.Application.Features.Tutors.GetTutorById;
+using Tutor.Application.Features.Tutors.UpdateAvailability;
 using Tutor.Application.Features.Tutors.UpdateTutorProfile;
 using Tutor.Application.Features.Tutors.UpdateTutorSubject;
 
@@ -190,6 +194,77 @@ public static class TutorEndpoints
             .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPost("availability/create",
+            async (IMediator mediator, [FromBody] CreateAvailabilityDto createAvailabilityDto, HttpContext httpContext) =>
+            {
+                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userIdClaim))
+                    return Results.Unauthorized();
+
+                if (!int.TryParse(userIdClaim, out var userId))
+                    return Results.BadRequest("Invalid UserId in token");
+                var command = new CreateAvailabilityCommand(userId, createAvailabilityDto);
+                var result = await mediator.Send(command);
+                return result.IsSuccess
+                    ? Results.Ok(result.Value)
+                    : Results.BadRequest(result.Errors);
+            }).WithName("CreateAvailability")
+            .Produces<AvailabilityDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPut("availability/update",
+                async (IMediator mediator, [FromBody] AvailabilityDto availabilityDto, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new UpdateAvailabilityCommand(userId, availabilityDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("UpdateAvailability")
+            .Produces<AvailabilityDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapDelete("availability/delete/{id}",
+                async (IMediator mediator, HttpContext httpContext, int id) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new DeleteAvailabilityCommand(userId, id);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("DeleteAvailability")
+            .Produces(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapGet("availability/{userId}",
+                async (IMediator mediator, int userId) =>
+                {
+                    var command = new GetTutorAvailabilityCommand(userId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("GetTutorAvailability")
+            .Produces<List<AvailabilityDto>>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorPolicy")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+
     }
     
    

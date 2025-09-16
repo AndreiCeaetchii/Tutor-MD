@@ -10,6 +10,8 @@ public class UpdateStudentProfileDto
     public string? LastName { get; set; }
     public string? Bio { get; set; }
     public DateTime? Birthdate { get; set; }
+    public string? City { get; set; }
+    public string? Country { get; set; }
     public int? Grade { get; set; }
     public int? Class { get; set; }
 }

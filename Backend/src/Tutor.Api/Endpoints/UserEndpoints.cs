@@ -65,9 +65,9 @@ public static class UserEndpoints
             .WithName("RegisterAuthUser");
 
         group.MapPost("/login-auth",
-                async (IMediator mediator, [FromBody] RegisterUserAuthDto registerUserAuthDto) =>
+                async (IMediator mediator, [FromBody] LoginUserAuthDto loginUserAuthDto) =>
                 {
-                    var command = new LoginOAuthUserCommand(registerUserAuthDto);
+                    var command = new LoginOAuthUserCommand(loginUserAuthDto);
                     var result = await mediator.Send(command);
 
                     return result.IsSuccess

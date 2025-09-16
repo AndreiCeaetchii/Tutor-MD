@@ -69,18 +69,34 @@ public class UserService : IUserService
         if (user == null)
             return Result.Error("User not found");
 
-        // Update fields
+        if (!string.IsNullOrWhiteSpace(profileDto.Username))
+        {
+            var existingUser = await _userRepository.FindAsync(u => u.Username == profileDto.Username);
+            if (existingUser != null && existingUser.Any())
+            {
+                var differentUser = existingUser.FirstOrDefault(u => u.Id != userId);
+                if (differentUser != null)
+                {
+                    return Result.Error("Username is already taken");
+                }
+            }
+        }
+        Console.WriteLine(profileDto.Username);
+
         user.Phone = profileDto.Phone;
         user.FirstName = profileDto.FirstName;
         user.LastName = profileDto.LastName;
         user.Bio = profileDto.Bio;
         user.Birthdate = profileDto.Birthdate;
         user.Username = profileDto.Username;
+        user.City = profileDto.City;
+        user.Country = profileDto.Country;
 
         await _userRepository.Update(user);
 
         return Result.Success();
     }
+
 
     public async Task UpdateLastLoginAsync(int userId)
     {
