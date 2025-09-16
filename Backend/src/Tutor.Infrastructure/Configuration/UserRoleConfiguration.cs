@@ -11,9 +11,8 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.HasKey(x => new { x.UserId, x.RoleId });
 
         builder.Property(x => x.AssignedAt)
-            .IsRequired()
-            .HasDefaultValueSql("GETUTCDATE()");
-
+            .IsRequired();
+        
         // Relationships
         builder.HasOne(x => x.User)
             .WithMany(x => x.UserRoles)

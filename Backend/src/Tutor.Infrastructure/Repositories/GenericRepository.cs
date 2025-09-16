@@ -9,7 +9,6 @@ using Tutor.Domain.Interfaces;
 
 namespace Tutor.Infrastructure.Repositories;
 
-
 public class GenericRepository<T, TId> : IGenericRepository<T, TId>
     where T : Entity<TId>
 {
@@ -21,12 +20,12 @@ public class GenericRepository<T, TId> : IGenericRepository<T, TId>
         _context = context;
     }
 
-    public async Task<IEnumerable<T>> GetAll()
+    public async Task<List<T>> GetAll()
     {
         return await Table.ToListAsync();
     }
 
-    public async Task<T?> GetById(TId id)
+    public async Task<T?> GetById(TId? id)
     {
         return await Table.FindAsync(id);
     }
