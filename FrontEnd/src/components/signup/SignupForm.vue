@@ -19,7 +19,7 @@
     email: '',
     password: '',
     role: '',
-    phoneNumber: ''
+    phoneNumber: '',
   });
 
   const touchedFields = ref<Set<string>>(new Set());
@@ -40,7 +40,7 @@
     hasUppercase: (password: string) => /[A-Z]/.test(password),
     hasLowercase: (password: string) => /[a-z]/.test(password),
     hasNumber: (password: string) => /\d/.test(password),
-    hasSpecialChar: (password: string) => /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    hasSpecialChar: (password: string) => /[!@#$%^&*(),.?":{}|<>]/.test(password),
   };
 
   const passwordError = computed(() => {
@@ -71,13 +71,13 @@
   const phoneNumberError = computed(() => {
     if (!touchedFields.value.has('phoneNumber') || !formData.value.phoneNumber) return '';
 
-    const fullNumber = formData.value.phoneNumber.startsWith('+373') 
-      ? formData.value.phoneNumber 
+    const fullNumber = formData.value.phoneNumber.startsWith('+373')
+      ? formData.value.phoneNumber
       : `+373${formData.value.phoneNumber}`;
-      
+
     const phoneRegex = /^\+373[0-9]{8,9}$/;
-    return phoneRegex.test(fullNumber) 
-      ? '' 
+    return phoneRegex.test(fullNumber)
+      ? ''
       : 'Please enter a valid Moldova phone number (+373 followed by 8-9 digits)';
   });
 
@@ -86,7 +86,7 @@
       email: emailError.value,
       role: roleError.value,
       password: passwordError.value,
-      phoneNumber: phoneNumberError.value
+      phoneNumber: phoneNumberError.value,
     };
   });
 
@@ -116,21 +116,25 @@
     touchedFields.value.add('password');
     touchedFields.value.add('role');
     if (data.phoneNumber) touchedFields.value.add('phoneNumber');
-    
+
     formData.value = data;
-    
-    if (emailError.value || roleError.value || passwordError.value || 
-        (data.phoneNumber && phoneNumberError.value)) {
+
+    if (
+      emailError.value ||
+      roleError.value ||
+      passwordError.value ||
+      (data.phoneNumber && phoneNumberError.value)
+    ) {
       return;
     }
-    
+
     const success = await signup(data);
     if (!success) return;
 
     showSuccess();
 
     if (data.role === 'tutor') {
-      router.push('/tutor-dashboard');
+      router.push('/create-profile');
     } else if (data.role === 'student') {
       router.push('/student-dashboard');
     } else if (data.role === 'admin') {
@@ -141,25 +145,25 @@
   const handleSocialLogin = async ({ provider, role }: { provider: string; role: string }) => {
     touchedFields.value.add('role');
     formData.value.role = role;
-    
+
     if (provider !== 'google') return;
     if (!role) {
       return;
     }
-    
+
     const success = await loginWithGoogle(role, true);
     if (!success) return;
 
     showSuccess();
-    
-    if (role === 'tutor') router.push('/tutor-dashboard');
+
+    if (role === 'tutor') router.push('/create-profile');
     else if (role === 'student') router.push('/student-dashboard');
     else if (role === 'admin') router.push('/admin-dashboard');
   };
 </script>
 
 <template>
-  <Notification 
+  <Notification
     :show="showSuccessNotification"
     :message="successMessage"
     type="success"

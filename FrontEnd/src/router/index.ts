@@ -28,7 +28,7 @@ const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
   { path: '/landing', component: LandingPage },
-  { path: '/createProfile', component: CreateProfile },
+  { path: '/create-profile', component: CreateProfile },
   { path: '/', component: LandingPage, meta: { requiresGuest: true } },
 
   {
