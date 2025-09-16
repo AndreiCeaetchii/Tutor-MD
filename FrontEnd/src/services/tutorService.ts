@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useUserStore } from '../store/userStore';
 
 export interface Subject {
   subjectName: string;
@@ -25,17 +26,24 @@ export interface TutorProfileData {
   createProfileDto: CreateProfileDto;
 }
 
-const API_URL = 'http://localhost:7122/api/tutors';
+const API_URL = 'https://localhost:7123/api/tutors';
 
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
+    // 📌 Apelează store-ul doar când funcția este folosită
+    const store = useUserStore();
+    const token = store.accessToken;
+
     const response = await axios.post(`${API_URL}/create-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
+      withCredentials: true,
     });
+
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       'Eroare la crearea profilului de tutore:',
       error.response ? error.response.data : error.message,

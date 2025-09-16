@@ -11,6 +11,12 @@ interface AuthFormData {
   role?: string;
 }
 
+const getRoleId = (role?: string): number => {
+  if (role === 'tutor') return 2;
+  if (role === 'student') return 3;
+  return 1;
+};
+
 export function useAuth() {
   const router = useRouter();
   const accessToken = ref<string | null>(null);
@@ -101,13 +107,14 @@ export function useAuth() {
 
   const signup = async (formData: AuthFormData): Promise<boolean> => {
     errorMessage.value = null;
-
+    const roleId = getRoleId(formData.role);
     try {
       const response = await axios.post(
         SIGNUP_URL,
         {
           Email: formData.email,
           Password: formData.password,
+          roleId: roleId,
         },
         {
           withCredentials: true,
@@ -197,6 +204,7 @@ export function useAuth() {
                 email: email,
                 accessToken: AccessToken,
                 provider: 'google',
+                roleId: getRoleId(role),
               },
               { withCredentials: true },
             );
