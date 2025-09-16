@@ -20,6 +20,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
     public async Task<Result<UserResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+
         // Delegate the registration process to the service
         return await _authService.RegisterAsync(request.RegisterUserDto);
     }
