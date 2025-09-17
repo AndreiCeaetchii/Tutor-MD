@@ -12,28 +12,13 @@
     'Music',
     'Foreign languages',
     'Computer science',
-    // ...alte categorii
   ];
-
-  const tags = ref([
-    'Pre-School',
-    'Middle Class 6-10',
-    'Intermediate',
-    '5.0 Stars',
-    'Online bookings',
-    'Male only',
-    // ...alte tag-uri
-  ]);
 
   const showDropdown = ref(false);
   const categoryBtnRef = ref<HTMLElement | null>(null);
 
   function onSearch() {
     // Emit event sau logica de search
-  }
-
-  function removeTag(tag: string) {
-    tags.value = tags.value.filter((t) => t !== tag);
   }
 
   function selectCategory(cat: string) {
@@ -139,25 +124,13 @@
           </div>
           <!-- Search Button -->
           <button
-            class="px-5 py-1 font-semibold text-white transition bg-orange-500 rounded hover:bg-orange-600"
+            class="px-5 py-1 text-white transition bg-orange-500 rounded hover:bg-orange-600"
             @click="onSearch"
           >
             Search now
           </button>
         </div>
       </div>
-    </div>
-    <div class="flex flex-wrap gap-2 mt-4">
-      <span
-        v-for="tag in tags"
-        :key="tag"
-        class="flex items-center gap-1 px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded-full"
-      >
-        {{ tag }}
-        <button class="ml-1 text-gray-400 hover:text-gray-600" @click="removeTag(tag)">
-          &times;
-        </button>
-      </span>
     </div>
   </div>
 </template>

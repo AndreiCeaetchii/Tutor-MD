@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import NavigationBar from '../components/navigation/NavigationBar.vue';
 import { useUserStore } from '../store/userStore';
 import SearchBar from '../components/student/FindTutor/SearchBar.vue';
+import TutorFilters from '../components/student/FindTutor/TutorFilters.vue';
+import TutorList from '../components/student/FindTutor/TutorList.vue';
 
 const store = useUserStore();
 const router = useRouter();
@@ -36,9 +38,17 @@ onMounted(() => {
 
       <NavigationBar />
 
-      <div class="mt-8">
+      <div class="w-full mt-8 mb-6">
         <SearchBar />
-        <!-- Aici poți adăuga TutorList, filtre, etc. -->
+      </div>
+
+      <div class="flex flex-col gap-8 md:flex-row">
+        <div class="w-full md:w-1/4">
+          <TutorFilters />
+        </div>
+        <div class="w-full md:w-3/4">
+          <TutorList />
+        </div>
       </div>
     </div>
   </div>
