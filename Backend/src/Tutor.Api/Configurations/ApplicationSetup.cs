@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Hangfire;
+using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +11,7 @@ using Tutor.Application.Interfaces;
 using Tutor.Application.Mappers;
 using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
+using Tutor.Application.Services.Background;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Helpers;
@@ -40,8 +43,11 @@ public static class ApplicationSetup
         services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<IAvailabilityService, AvailabilityService>();
         services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IBookingNotificationService ,BookingNotificationService>();
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+        services.AddTransient<JobSchedulerService>();
+
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));

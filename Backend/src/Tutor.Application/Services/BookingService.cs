@@ -20,6 +20,8 @@ public class BookingService : IBookingService
     private readonly IGenericRepository2<TutorSubject> _tutorSubjectRepository;
     private readonly IGenericRepository2<TutorProfile> _tutorProfileRepository;
     private readonly IGenericRepository2<Student> _studentRepository;
+    private readonly IGenericRepository<Notification,int> _notificationRepository;
+    private readonly IBookingNotificationService _bookingNotificationService;
     private readonly IMapper _mapper;
 
     public BookingService(IGenericRepository<Booking, int> bookingRepository,
@@ -29,6 +31,8 @@ public class BookingService : IBookingService
         IGenericRepository2<TutorSubject> tutorSubjectRepository,
         IGenericRepository2<TutorProfile> tutorProfileRepository,
         IGenericRepository2<Student> studentRepository,
+        IGenericRepository<Notification,int> notificationRepository,
+        IBookingNotificationService bookingNotificationService,
         IMapper mapper)
     {
         _bookingRepository = bookingRepository;
@@ -38,6 +42,8 @@ public class BookingService : IBookingService
         _tutorSubjectRepository = tutorSubjectRepository;
         _tutorProfileRepository = tutorProfileRepository;
         _studentRepository = studentRepository;
+        _notificationRepository = notificationRepository;
+        _bookingNotificationService = bookingNotificationService;
         _mapper = mapper;
     }
 
@@ -172,11 +178,14 @@ public class BookingService : IBookingService
         if (!IsValidStatusTransition(booking.Status, newStatus))
             return Result.Error("Invalid status transition");
         
-        if(booking.Status == BookingStatus.Confirmed && booking.TutorUserId != userId)
+        if(newStatus == BookingStatus.Confirmed && booking.TutorUserId != userId)
             return Result.Error("Just Tutors can accept booking");
         booking.Status = newStatus;
         await _bookingRepository.Update(booking);
         var bookingDto = await GetBookingDtoWithDetails(booking);
+        
+        await _bookingNotificationService.CreateBookingChangeNotification(booking);
+        
         return Result<BookingDto>.Success(bookingDto);
     }
 
@@ -191,5 +200,29 @@ public class BookingService : IBookingService
         };
 
         return validTransitions[current].Contains(next);
+    }
+    
+    
+    public async Task<List<Booking>> GetBookingsStartingBetweenAsync(DateTime startWindow, DateTime endWindow, BookingStatus status)
+    {
+        return await _bookingRepository.FindAsync(b =>
+            b.StartTime >= startWindow &&
+            b.StartTime <= endWindow &&
+            b.Status == status );
+    }
+
+    public async Task<bool> NotificationExistsAsync(int bookingId, string notificationType, int recipientUserId)
+    {
+        var notifications = await _notificationRepository.FindAsync(n =>
+            n.Payload.Contains($"\"BookingId\":{bookingId}") &&
+            n.Type == notificationType &&
+            n.RecipientUserId == recipientUserId);
+    
+        return notifications.Any();
+    }
+
+    public async Task CreateNotificationAsync(Notification notification)
+    {
+        await _notificationRepository.Create(notification);
     }
 }

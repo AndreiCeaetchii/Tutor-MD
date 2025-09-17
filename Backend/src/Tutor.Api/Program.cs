@@ -1,28 +1,18 @@
-using Ardalis.Result;
 using DotNetEnv;
-using MediatR;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Text;
+using System.Threading;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
-using Tutor.Application.Interfaces;
-using Tutor.Application.Services;
-using Tutor.Domain.Interfaces;
+using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
-using Tutor.Infrastructure.Repositories;
 using Tutor.Infrastructure.Seeder;
-using Tutor.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,9 +30,14 @@ builder.Services.AddSwaggerSetup();
 
 // Persistence
 builder.Services.AddPersistenceSetup(builder.Configuration);
+//Hangfire
+builder.Services.AddHangfire(config =>
+    config.UseMemoryStorage());
+builder.Services.AddHangfireServer();
 
 // Application layer setup
 builder.Services.AddApplicationSetup(builder.Configuration);
+
 
 builder.Services.AddAuthorization(options =>
 {
@@ -94,6 +89,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await SubjectSeeder.SeedAsync(context);
     await RoleSeeder.SeedAsync(context);
+    var scheduler = scope.ServiceProvider.GetRequiredService<JobSchedulerService>();
+    await scheduler.StartAsync(CancellationToken.None);
 }
 
 
@@ -113,7 +110,7 @@ app.UseRouting();
 // app.UseAntiforgery(); 
 app.UseSwaggerSetup();
 app.UseHsts();
-
+app.UseHangfireDashboard(); 
 app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
