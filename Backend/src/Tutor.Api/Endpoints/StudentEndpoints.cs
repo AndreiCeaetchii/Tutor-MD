@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
 using Tutor.Application.Features.Booking.CreateBooking;
 using Tutor.Application.Features.Booking.Dto;
+using Tutor.Application.Features.Booking.GetBooking;
+using Tutor.Application.Features.Booking.GetBookingsByUser;
 using Tutor.Application.Features.Booking.UpdateBookingStatus;
 using Tutor.Application.Features.Students.CreateStudent;
 using Tutor.Application.Features.Students.DTOs;
@@ -129,6 +131,50 @@ public static class StudentEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 }).WithName("UpdateBookingStatus")
+            .Produces<BookingDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapGet("/booking/{bookingId}",
+                async (IMediator mediator,int bookingId ,HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new GetBookingCommand(userId, bookingId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("GetBooking")
+            .Produces<BookingDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapGet("/bookings",
+                async (IMediator mediator,HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new GetBookingsByUserCommand(userId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("GetBookingsByTutor")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
             .Produces(StatusCodes.Status400BadRequest)

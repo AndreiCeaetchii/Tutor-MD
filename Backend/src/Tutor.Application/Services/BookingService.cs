@@ -145,6 +145,21 @@ public class BookingService : IBookingService
         return Result<BookingDto>.Success(bookingDto);
     }
 
+    public async Task<Result<List<BookingDto>>> GetBookingsByUSer(int userId)
+    {
+        var bookings = await _bookingRepository.FindAsync(b => b.StudentUserId == userId || b.TutorUserId == userId);
+        if (bookings.Count == 0)
+            return Result<List<BookingDto>>.Error("Bookings not found");
+        var bookingDtos = new List<BookingDto>();
+        foreach (var booking in bookings)
+        {
+            var bookingDto = await GetBookingDtoWithDetails(booking);
+           bookingDtos.Add(bookingDto);
+        }
+        return Result<List<BookingDto>>.Success(bookingDtos);
+        
+    }
+
     public async Task<Result<BookingDto>> UpdateBookingStatus(int bookingId, int userId, BookingStatus newStatus)
     {
         var booking = await _bookingRepository.GetById(bookingId);
