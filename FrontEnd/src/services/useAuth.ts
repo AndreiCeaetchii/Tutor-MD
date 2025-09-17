@@ -127,7 +127,7 @@ export function useAuth() {
       const data = response.data;
 
       // @ts-ignore
-      store.setUser(data.token, data.id, formData.role);
+      store.setUser(data.token, data.id, formData.role, formData.email);
 
       console.log('Signup successful!');
       return true;
@@ -158,7 +158,7 @@ export function useAuth() {
       const data = response.data;
 
       // @ts-ignore
-      store.setUser(data.token, data.id, formData.role);
+      store.setUser(data.token, data.id, formData.role, formData.email);
 
       console.log('Login successful!');
       return true;
@@ -210,10 +210,9 @@ export function useAuth() {
             );
 
             const data = res.data;
-
-            // Salvăm token, id și rol în store
             // @ts-ignore
-            store.setUser(data.token, data.id, role);
+            console.log('Google auth response data:', data);
+            store.setUser(data.token, data.id, role, email);
 
             console.log(`${isSignup ? 'Signup' : 'Login'} cu Google reușit!`, data);
 

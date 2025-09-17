@@ -48,8 +48,8 @@
               <div
                 v-if="showProfileMenu"
                 ref="profileMenu"
-                class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50">
-                
+                class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50"
+              >
                 <div class="px-4 py-2 border-b border-gray-100">
                   <p class="text-sm font-semibold text-gray-900">{{ userName }}</p>
                   <p class="mt-1 text-xs text-gray-500 truncate">user@example.com</p>
@@ -94,7 +94,6 @@
                     </div>
                   </a>
                   <a
-
                     href="#billing"
                     class="block text-sm text-gray-700 hover:text-violet-600 transition-colors duration-200 group"
                   >
@@ -141,7 +140,8 @@
           <div v-else class="flex space-x-2">
             <router-link
               to="/login"
-              class="text-purple-600 hover:text-purple-800 px-4 py-1 rounded-full text-sm border border-purple-600">
+              class="text-purple-600 hover:text-purple-800 px-4 py-1 rounded-full text-sm border border-purple-600"
+            >
               Login
             </router-link>
             <router-link
@@ -157,7 +157,8 @@
           <button
             @click="toggleMenu"
             aria-label="Toggle menu"
-            class="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500">
+            class="p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+          >
             <X v-if="isMenuOpen" class="w-6 h-6" />
             <Menu v-else class="w-6 h-6" />
           </button>
@@ -222,24 +223,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed as vueComputed, onMounted, onBeforeUnmount } from 'vue';
-import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
-import logo from '../assets/tutor2.png';
-import logoFrontend from '../assets/tutor.png';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faUser,
-  faCog,
-  faBook,
-  faCreditCard,
-  faCircleQuestion,
-  faRightFromBracket,
-} from '@fortawesome/free-solid-svg-icons';
-import { useUserStore } from '../store/userStore.ts';
-import { userStore } from '../store/userStore';
-
+  import { ref, computed as vueComputed, onMounted, onBeforeUnmount } from 'vue';
+  import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
+  import { useRouter } from 'vue-router';
+  import logo from '../assets/tutor2.png';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import {
+    faUser,
+    faCog,
+    faBook,
+    faCreditCard,
+    faCircleQuestion,
+    faRightFromBracket,
+  } from '@fortawesome/free-solid-svg-icons';
+  import { useUserStore } from '../store/userStore.ts';
+  import { useProfileStore } from '../store/profileStore.ts';
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 
@@ -253,6 +252,7 @@ import { userStore } from '../store/userStore';
 
   const router = useRouter();
   const store = useUserStore();
+  const profileStore = useProfileStore();
   const isMenuOpen = ref(false);
   const showProfileMenu = ref(false);
 
@@ -274,6 +274,7 @@ import { userStore } from '../store/userStore';
 
   function handleLogout() {
     store.clearUser();
+    profileStore.clearProfile();
     router.push('/landing');
     showProfileMenu.value = false;
   }

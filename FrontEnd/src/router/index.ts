@@ -6,7 +6,7 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-import TutorProfile from '../components/tutor/TutorProfile.vue';
+//import TutorProfile from '../components/tutor/TutorProfile.vue';
 import TutorReview from '../components/tutor/TutorReview.vue';
 import TutorBookings from '../components/tutor/TutorBookings.vue';
 import TutorChat from '../components/tutor/TutorChat.vue';
@@ -51,7 +51,7 @@ const routes = [
     meta: { requiresAuth: true, role: 'tutor' },
     children: [
       { path: '', redirect: '/tutor-dashboard/profile' },
-      { path: 'profile', component: TutorProfile },
+      { path: 'profile', component: ProfilePage },
       { path: 'reviews', component: TutorReview },
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },

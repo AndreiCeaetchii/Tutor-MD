@@ -20,7 +20,7 @@ export interface CreateProfileDto {
 }
 
 export interface TutorProfileData {
-  verificationStatus: 'Pending';
+  verificationStatus: 'verified';
   experienceYears: number;
   subjects: Subject[];
   createProfileDto: CreateProfileDto;
@@ -30,7 +30,6 @@ const API_URL = 'https://localhost:7123/api/tutors';
 
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
-    // 📌 Apelează store-ul doar când funcția este folosită
     const store = useUserStore();
     const token = store.accessToken;
 
@@ -48,6 +47,29 @@ export const createTutorProfile = async (profileData: TutorProfileData) => {
       'Eroare la crearea profilului de tutore:',
       error.response ? error.response.data : error.message,
     );
+    throw error;
+  }
+};
+
+export const getTutorProfile = async (userId: number) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    const response = await axios.get(`${API_URL}/get-tutor/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      // Profilul nu există
+      return null;
+    }
+    console.error('Eroare la preluarea profilului tutorului:', error.message);
     throw error;
   }
 };
