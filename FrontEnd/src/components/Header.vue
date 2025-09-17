@@ -223,7 +223,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, computed as vueComputed, onMounted, onBeforeUnmount } from 'vue';
+  import { ref, onMounted, onBeforeUnmount } from 'vue';
   import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
   import { useRouter } from 'vue-router';
   import logo from '../assets/tutor2.png';
@@ -279,7 +279,7 @@
     showProfileMenu.value = false;
   }
 
-  const userName = 'Sarah Johnson';
+  const userName = profileStore.userName;
 
   // Funcția care verifică dacă click-ul a avut loc în afara meniului
   function handleClickOutside(event: MouseEvent) {

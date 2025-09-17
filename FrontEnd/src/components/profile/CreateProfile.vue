@@ -500,7 +500,6 @@
     };
 
     try {
-      console.log(payload);
       const response = await createTutorProfile(payload);
       console.log('Profil creat cu succes:', response);
       router.push('/tutor-dashboard');

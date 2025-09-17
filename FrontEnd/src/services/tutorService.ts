@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
+import { useProfileStore } from '../store/profileStore';
 
 export interface Subject {
   subjectName: string;
@@ -31,6 +32,7 @@ const API_URL = 'https://localhost:7123/api/tutors';
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
     const store = useUserStore();
+    const profileStore = useProfileStore();
     const token = store.accessToken;
 
     const response = await axios.post(`${API_URL}/create-tutor`, profileData, {
@@ -40,6 +42,8 @@ export const createTutorProfile = async (profileData: TutorProfileData) => {
       },
       withCredentials: true,
     });
+
+    profileStore.userName = profileData.createProfileDto.username;
 
     return response.data;
   } catch (error: any) {
