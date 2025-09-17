@@ -10,7 +10,8 @@ public class Booking : Entity<int>
     public int SubjectId { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public decimal PriceSnapshot { get; set; }
+    
+    public string? Description { get; set; }
     public BookingStatus Status { get; set; }
 
     // Navigation properties
@@ -25,5 +26,6 @@ public enum BookingStatus
     Pending,
     Confirmed,
     Cancelled,
-    Completed
+    Completed,
+    Finished
 }

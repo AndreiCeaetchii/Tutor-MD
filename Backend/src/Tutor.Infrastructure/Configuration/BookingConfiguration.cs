@@ -18,10 +18,6 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .IsRequired()
             .HasColumnType("timestamp with time zone");
 
-        builder.Property(x => x.PriceSnapshot)
-            .IsRequired()
-            .HasColumnType("decimal(8,2)");
-
         builder.Property(x => x.Status)
             .IsRequired()
             .HasDefaultValue(BookingStatus.Pending);

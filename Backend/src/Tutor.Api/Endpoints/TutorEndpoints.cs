@@ -251,6 +251,7 @@ public static class TutorEndpoints
             .RequireAuthorization("TutorPolicy")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapGet("availability/{userId}",
                 async (IMediator mediator, int userId) =>
                 {
@@ -261,7 +262,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetTutorAvailability")
             .Produces<List<AvailabilityDto>>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorPolicy")
+            .RequireAuthorization("TutorOrStudentPolicy")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 

@@ -39,6 +39,7 @@ public static class ApplicationSetup
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<IStudentService, StudentService>();
         services.AddScoped<IAvailabilityService, AvailabilityService>();
+        services.AddScoped<IBookingService, BookingService>();
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
 
@@ -46,6 +47,7 @@ public static class ApplicationSetup
         services.AddAutoMapper(typeof(TutorMappingProfile));
         services.AddAutoMapper(typeof(StudentMappingProfile));
         services.AddAutoMapper(typeof(AvailabilityMappingProfile));
+        services.AddAutoMapper(typeof(BookingMappingProfile));
 
 
         services.AddAuthentication(options =>
