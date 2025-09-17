@@ -11,7 +11,7 @@ public class Photo : Entity<int>
     public int? Width { get; set; }
     public int? Height { get; set; }
     public string MimeType { get; set; }
-    public int? Bytes { get; set; }
+    public long? Bytes { get; set; }
 
     // Navigation properties
     public virtual ICollection<User> Users { get; set; } = new List<User>();

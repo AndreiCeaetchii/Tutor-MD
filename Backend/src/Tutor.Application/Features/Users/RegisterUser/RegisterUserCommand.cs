@@ -2,6 +2,8 @@
 using MediatR;
 using Tutor.Application.Features.Users.Dtos;
 
-namespace Tutor.Application.Features.Users;
+namespace Tutor.Application.Features.Users.RegisterUser;
 
-public record RegisterUserCommand(RegisterUserDto RegisterUserDto) : IRequest<Result<UserResponseDto>>;
+public record RegisterUserCommand(RegisterUserDto RegisterUserDto) : IRequest<Result<UserResponseDto>>
+{
+};

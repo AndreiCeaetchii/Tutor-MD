@@ -4,9 +4,9 @@ using Tutor.Domain.Entities;
 
 namespace Tutor.Infrastructure.Configuration;
 
-public class TutorConfiguration : IEntityTypeConfiguration<Domain.Entities.Tutor>
+public class TutorConfiguration : IEntityTypeConfiguration<Domain.Entities.TutorProfile>
 {
-    public void Configure(EntityTypeBuilder<Domain.Entities.Tutor> builder)
+    public void Configure(EntityTypeBuilder<Domain.Entities.TutorProfile> builder)
     {
         builder.HasKey(x => x.UserId);
 
@@ -17,27 +17,27 @@ public class TutorConfiguration : IEntityTypeConfiguration<Domain.Entities.Tutor
 
         // Relationships
         builder.HasOne(x => x.User)
-            .WithOne(x => x.Tutor)
-            .HasForeignKey<Domain.Entities.Tutor>(x => x.UserId)
+            .WithOne(x => x.TutorProfile)
+            .HasForeignKey<Domain.Entities.TutorProfile>(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.TutorSubjects)
-            .WithOne(x => x.Tutor)
+            .WithOne(x => x.TutorProfile)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.AvailabilityRules)
-            .WithOne(x => x.Tutor)
+            .WithOne(x => x.TutorProfile)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Bookings)
-            .WithOne(x => x.Tutor)
+            .WithOne(x => x.TutorProfile)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(x => x.Reviews)
-            .WithOne(x => x.Tutor)
+            .WithOne(x => x.TutorProfile)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);
     }

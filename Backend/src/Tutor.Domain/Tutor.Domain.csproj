@@ -8,9 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+
+    <PackageReference Include="DotNetEnv" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="CloudinaryDotNet" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="StronglyTypedId" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="StronglyTypedId.Templates" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
   
 

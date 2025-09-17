@@ -88,4 +88,5 @@ export const useProfileStore = defineStore('profile', {
       Object.assign(this, newDetails);
     },
   },
+  persist: true,
 });

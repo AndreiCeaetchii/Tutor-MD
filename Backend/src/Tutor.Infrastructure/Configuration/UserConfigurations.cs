@@ -12,7 +12,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             builder.HasKey(x => x.Id);
 
             builder.Property(x => x.Username)
-                .IsRequired()
                 .HasMaxLength(50);
 
             builder.HasIndex(x => x.Username)
@@ -24,10 +23,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
             builder.HasIndex(x => x.Email)
                 .IsUnique();
-
-            builder.Property(x => x.PasswordHash)
-                .IsRequired()
-                .HasMaxLength(255);
+            
 
             builder.Property(x => x.Phone)
                 .HasMaxLength(20);
@@ -43,9 +39,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 .HasDefaultValue(true);
 
             builder.Property(x => x.CreatedAt)
+                .HasColumnType("timestamp without time zone")
                 .IsRequired();
 
             builder.Property(x => x.UpdatedAt)
+                .HasColumnType("timestamp without time zone")
                 .IsRequired();
 
             // Relationships
@@ -57,9 +55,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
                 .WithOne(x => x.User)
                 .HasForeignKey<Student>(x => x.UserId);
 
-            builder.HasOne(x => x.Tutor)
+            builder.HasOne(x => x.TutorProfile)
                 .WithOne(x => x.User)
-                .HasForeignKey<Domain.Entities.Tutor>(x => x.UserId);
+                .HasForeignKey<Domain.Entities.TutorProfile>(x => x.UserId);
 
             builder.HasMany(x => x.ReceivedNotifications)
                 .WithOne(x => x.Recipient)
