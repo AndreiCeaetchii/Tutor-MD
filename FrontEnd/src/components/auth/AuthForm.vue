@@ -47,7 +47,7 @@
 
   interface SocialLoginPayload {
     provider: string;
-    role: UserRole;
+    role?: UserRole;
   }
 
   const props = withDefaults(defineProps<AuthFormProps>(), {
@@ -102,6 +102,11 @@
   };
 
   const handleSocialLogin = (provider: string): void => {
+    if (!props.showRoleSelector) {
+      emit('socialLogin', { provider });
+      return;
+    }
+    
     if (!selectedRole.value) {
       emit('fieldBlur', 'role');
       return;

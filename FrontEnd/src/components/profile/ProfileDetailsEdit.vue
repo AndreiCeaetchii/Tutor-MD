@@ -1,14 +1,14 @@
 <template>
   <div class="p-6 lg:p-8 bg-gray-50 rounded-2xl">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <div class="lg:col-span-2">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">About Me</h2>
+        <h2 class="mb-2 text-2xl font-bold text-gray-800">About Me</h2>
         <textarea
           v-model="editedProfile.bio"
           class="resize-none w-full h-32 p-4 text-sm text-gray-800 bg-gray-100 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#5f22d9]"
         ></textarea>
 
-        <h2 class="text-2xl font-bold text-gray-800 mt-6 mb-4">Subjects & Pricing</h2>
+        <h2 class="mt-6 mb-4 text-2xl font-bold text-gray-800">Subjects & Pricing</h2>
         <div class="space-y-4">
           <EditableSubjectCard
             v-for="(subject, index) in editedProfile.subjects"
@@ -27,10 +27,10 @@
         </div>
       </div>
 
-      <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white p-4 rounded-lg shadow-md">
+      <div class="space-y-6 lg:col-span-1">
+        <div class="p-4 bg-white rounded-lg shadow-md">
           <h3 class="font-bold text-gray-800">Contact Information</h3>
-          <div class="text-sm text-gray-600 mt-2 space-y-3">
+          <div class="mt-2 space-y-3 text-sm text-gray-600">
             <div class="flex items-center space-x-2">
               <font-awesome-icon :icon="['fas', 'phone']" class="text-gray-400" />
               <div class="flex-1">
@@ -45,7 +45,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-4 rounded-lg shadow-md">
+        <div class="p-4 bg-white rounded-lg shadow-md">
           <h3 class="font-bold text-gray-800">Languages</h3>
           <div class="flex flex-wrap gap-2 mt-2 text-sm">
             <div
@@ -56,11 +56,11 @@
               <input
                 v-model="editedProfile.languages[index]"
                 type="text"
-                class="bg-transparent text-sm font-medium w-24 focus:outline-none"
+                class="w-24 text-sm font-medium bg-transparent focus:outline-none"
               />
               <button
                 @click.prevent="removeLanguage(index)"
-                class="absolute right-2 text-xs text-red-500 hover:text-red-700"
+                class="absolute text-xs text-red-500 right-2 hover:text-red-700"
               >
                 <font-awesome-icon :icon="['fas', 'times']" />
               </button>
@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-  import { defineProps, ref, computed } from 'vue';
+  import { ref } from 'vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faPhone, faEnvelope, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
