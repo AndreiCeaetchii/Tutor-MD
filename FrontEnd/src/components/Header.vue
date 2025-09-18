@@ -52,7 +52,7 @@
               >
                 <div class="px-4 py-2 border-b border-gray-100">
                   <p class="text-sm font-semibold text-gray-900">{{ userName }}</p>
-                  <p class="mt-1 text-xs text-gray-500 truncate">user@example.com</p>
+                  <p class="mt-1 text-xs text-gray-500 truncate">{{ profileStore.email }}</p>
                 </div>
                 <div class="py-1">
                   <a
@@ -142,7 +142,6 @@
               to="/login"
               class="text-purple-600 hover:text-purple-800 px-4 py-1 rounded-full text-sm border border-purple-600"
             >
-
               Login
             </router-link>
             <router-link
@@ -240,7 +239,6 @@
   } from '@fortawesome/free-solid-svg-icons';
   import { useUserStore } from '../store/userStore.ts';
   import { useProfileStore } from '../store/profileStore.ts';
-
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 
