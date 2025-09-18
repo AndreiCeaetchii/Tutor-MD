@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import defaultProfileImage from '../assets/DefaultImg.png';
 
 interface Subject {
   name: string;
@@ -45,7 +46,7 @@ export const useProfileStore = defineStore('profile', {
     country: '',
     city: '',
     location: '',
-    profileImage: '',
+    profileImage: defaultProfileImage,
     rating: 0,
     reviews: 0,
     students: 0,

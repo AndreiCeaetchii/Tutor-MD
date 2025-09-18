@@ -29,6 +29,9 @@
   import { useUserStore } from '../store/userStore.ts';
   import { useRouter } from 'vue-router';
 
+  // ✅ Import imagine default
+  import defaultProfileImage from '../assets/DefaultImg.png';
+
   const router = useRouter();
   const profileStore = useProfileStore();
   const userStore = useUserStore();
@@ -45,7 +48,7 @@
     country: '',
     city: '',
     location: '',
-    profileImage: '',
+    profileImage: defaultProfileImage, // inițial default
     rating: 0,
     reviews: 0,
     students: 0,
@@ -90,7 +93,7 @@
         country: serverData.userProfile.country || '',
         city: serverData.userProfile.city || '',
         location: `${serverData.userProfile.city || ''}, ${serverData.userProfile.country || ''}`,
-        profileImage: serverData.photo || '',
+        profileImage: serverData.photo || defaultProfileImage, // fallback imagine default
         rating: 0,
         reviews: 0,
         students: 0,
@@ -98,7 +101,7 @@
         subjects: serverData.tutorSubjects.map((s: any) => ({
           name: s.subjectName || '',
           price: s.price || 0,
-          currency: s.currency || 'MDL',
+          currency: s.currency || 'mdl',
           subjectId: s.subjectId,
           isNew: false,
           isModified: false,
@@ -127,9 +130,6 @@
 
   const saveChanges = async () => {
     try {
-      // console.log('Starting saveChanges process...');
-      // console.log('Current editedProfile state:', editedProfile.value);
-
       const profileDataToUpdate = {
         userProfile: {
           username: editedProfile.value.userName,
@@ -142,19 +142,16 @@
           city: editedProfile.value.city,
           experienceYears: editedProfile.value.experience,
         },
-
         tutorSubjects: editedProfile.value.subjects.map((s: any) => ({
           subjectId: s.subjectId || 0,
           subjectName: s.name,
           subjectSlug: s.name.toLowerCase().replace(/\s+/g, '-'),
           price: s.price,
-          currency: s.currency,
+          currency: s.currency.toLowerCase(),
         })),
       };
 
-      // console.log('Data being sent to the server for update:', profileDataToUpdate);
       await editTutorProfile(profileDataToUpdate.userProfile);
-      // console.log('Profile update successful on the server.');
 
       for (const subject of editedProfile.value.subjects) {
         if (subject.isNew) {
@@ -164,7 +161,7 @@
             pricePerHour: subject.price,
             currency: subject.currency.toLowerCase(),
           });
-          subject.isNew = false; // resetăm flag-ul după ce s-a salvat
+          subject.isNew = false;
         } else if (subject.isModified) {
           await updateSubject({
             subjectId: subject.subjectId,
@@ -173,15 +170,12 @@
             price: subject.price,
             currency: subject.currency.toLowerCase(),
           });
-          subject.isModified = false; // resetăm flag-ul
+          subject.isModified = false;
         }
       }
 
       profileStore.setProfileDetails(editedProfile.value);
-      // console.log('Pinia store updated with edited data.');
-
       profileStore.toggleEditing();
-      // console.log('Exiting edit mode. isEditing is now:', profileStore.isEditing);
     } catch (error) {
       console.error('Eroare la salvarea modificărilor profilului:', error);
     }
