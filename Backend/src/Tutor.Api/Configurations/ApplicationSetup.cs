@@ -44,6 +44,7 @@ public static class ApplicationSetup
         services.AddScoped<IAvailabilityService, AvailabilityService>();
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IBookingNotificationService ,BookingNotificationService>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
         services.AddTransient<JobSchedulerService>();
@@ -54,6 +55,7 @@ public static class ApplicationSetup
         services.AddAutoMapper(typeof(StudentMappingProfile));
         services.AddAutoMapper(typeof(AvailabilityMappingProfile));
         services.AddAutoMapper(typeof(BookingMappingProfile));
+        services.AddAutoMapper(typeof(NotificationMappingProfile));
 
 
         services.AddAuthentication(options =>

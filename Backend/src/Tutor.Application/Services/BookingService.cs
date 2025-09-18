@@ -71,6 +71,7 @@ public class BookingService : IBookingService
             var booking = _mapper.Map<Booking>(createBookingDto);
             booking.StudentUserId = userId;
             await _bookingRepository.Create(booking);
+            await _bookingNotificationService.NewBookingNotification(booking);
             var bookingDto = await GetBookingDtoWithDetails(booking);
             return Result<BookingDto>.Success(bookingDto);
         }

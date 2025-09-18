@@ -8,4 +8,5 @@ public interface IBookingNotificationService
     Task CreateBookingChangeNotification(Booking booking);
 
     Task CheckUpcomingBookings();
+    Task NewBookingNotification(Booking booking);
 }

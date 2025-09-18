@@ -153,4 +153,35 @@ public class BookingNotificationService:IBookingNotificationService
             _logger.LogError(ex, "Error creating notification for booking {BookingId}", booking.Id);
         }
     }
+    public async Task NewBookingNotification(Booking booking)
+    {
+        try
+        {
+                
+                var tutorNotification = new Notification
+                {
+                    RecipientUserId = booking.TutorUserId,
+                    ActorUserId = booking.StudentUserId,
+                    Type = "NewBooking",
+                    Payload = System.Text.Json.JsonSerializer.Serialize(new
+                    {
+                        BookingId = booking.Id,
+                        StartTime = booking.StartTime,
+                        EndTime = booking.EndTime,
+                        Subject = booking.Subject?.Name,
+                        StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
+                        Status = booking.Status
+                    }),
+                    Status = NotificationStatus.Unread,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _notificationRepository.Create(tutorNotification);
+
+                _logger.LogInformation("Created reminder notifications for booking {BookingId}", booking.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating notification for booking {BookingId}", booking.Id);
+        }
+    }
 }
