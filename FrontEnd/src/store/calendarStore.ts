@@ -6,10 +6,12 @@ interface TimeSlot {
   endTime: string;
   status: 'available' | 'booked';
   studentName?: string;
+  isEditedPastSlot?: boolean;
 }
 
 interface MonthData {
   daysWithSlots: number[];
+  daysWithEditedPastSlots?: number[];
   slotData: Record<number, TimeSlot[]>;
 }
 
@@ -53,12 +55,31 @@ export const useCalendarStore = defineStore('calendar', {
       return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`;
     },
     
+    isPastDate(): boolean {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const selectedDate = this.selectedDate instanceof Date ?
+        this.selectedDate : new Date(this.selectedDate);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      return selectedDate < today;
+    },
+    
     currentMonthData(): MonthData {
-      return this.slotsByMonth[this.currentMonthKey] || { daysWithSlots: [], slotData: {} };
+      return this.slotsByMonth[this.currentMonthKey] || { 
+        daysWithSlots: [], 
+        daysWithEditedPastSlots: [],
+        slotData: {} 
+      };
     },
     
     daysWithSlots(): number[] {
       return this.currentMonthData.daysWithSlots || [];
+    },
+    
+    daysWithEditedSlots(): number[] {
+      return this.currentMonthData.daysWithEditedPastSlots || [];
     },
     
     slotData(): Record<number, TimeSlot[]> {
@@ -89,6 +110,7 @@ export const useCalendarStore = defineStore('calendar', {
       if (!this.slotsByMonth[this.currentMonthKey]) {
         this.slotsByMonth[this.currentMonthKey] = {
           daysWithSlots: [],
+          daysWithEditedPastSlots: [],
           slotData: {}
         };
       }
@@ -125,7 +147,7 @@ export const useCalendarStore = defineStore('calendar', {
       this.selectedDate = typeof date === 'string' ? new Date(date) : date;
     },
     
-    // Modified addSlot to check for overlaps
+    // Modified addSlot to check for overlaps and handle past dates
     addSlot(newSlotData: { startTime: string, endTime: string }) {
       // Check for overlaps first
       if (this.checkOverlap(newSlotData)) {
@@ -141,11 +163,20 @@ export const useCalendarStore = defineStore('calendar', {
         id: `${Date.now()}`,
         startTime: newSlotData.startTime,
         endTime: newSlotData.endTime,
-        status: 'available'
+        status: 'available',
+        isEditedPastSlot: this.isPastDate
       };
       
       if (!monthData.daysWithSlots.includes(day)) {
         monthData.daysWithSlots.push(day);
+      }
+      
+      // If this is a past date, add it to daysWithEditedPastSlots
+      if (this.isPastDate && !monthData.daysWithEditedPastSlots?.includes(day)) {
+        if (!monthData.daysWithEditedPastSlots) {
+          monthData.daysWithEditedPastSlots = [];
+        }
+        monthData.daysWithEditedPastSlots.push(day);
       }
       
       if (!monthData.slotData[day]) {
@@ -155,7 +186,7 @@ export const useCalendarStore = defineStore('calendar', {
       monthData.slotData[day].push(newSlot);
     },
     
-    // Modified editSlot to check for overlaps
+    // Modified editSlot to check for overlaps and handle past dates
     editSlot(id: string, updatedData: { startTime?: string, endTime?: string }) {
       const day = this.currentDay;
       const monthData = this.currentMonthData;
@@ -179,6 +210,19 @@ export const useCalendarStore = defineStore('calendar', {
         // If no overlaps, update the slot
         if (updatedData.startTime) slot.startTime = updatedData.startTime;
         if (updatedData.endTime) slot.endTime = updatedData.endTime;
+        
+        // Mark as edited past slot if applicable
+        if (this.isPastDate) {
+          slot.isEditedPastSlot = true;
+          
+          // Add to daysWithEditedPastSlots if not already there
+          if (!monthData.daysWithEditedPastSlots) {
+            monthData.daysWithEditedPastSlots = [];
+          }
+          if (!monthData.daysWithEditedPastSlots.includes(day)) {
+            monthData.daysWithEditedPastSlots.push(day);
+          }
+        }
       }
     },
     
@@ -198,6 +242,15 @@ export const useCalendarStore = defineStore('calendar', {
           if (dayIndex !== -1) {
             monthData.daysWithSlots.splice(dayIndex, 1);
           }
+          
+          // If this was a past date, remove from daysWithEditedPastSlots as well
+          if (monthData.daysWithEditedPastSlots) {
+            const editedDayIndex = monthData.daysWithEditedPastSlots.indexOf(day);
+            if (editedDayIndex !== -1) {
+              monthData.daysWithEditedPastSlots.splice(editedDayIndex, 1);
+            }
+          }
+          
           delete monthData.slotData[day];
         }
       }

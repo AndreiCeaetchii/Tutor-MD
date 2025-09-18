@@ -14,9 +14,7 @@
     'July', 'August', 'September', 'October', 'November', 'December',
   ];
 
-  // Actualizează data selectată în store când se schimbă luna în calendar
   watch([currentMonth, currentYear], () => {
-    // Păstrăm ziua selectată dar actualizăm luna și anul
     const selectedDay = store.currentDay;
     const newDate = new Date(currentYear.value, currentMonth.value, selectedDay);
     store.setSelectedDate(newDate);
@@ -56,11 +54,9 @@
   const getPreviousMonthDays = () => {
     const lastDayOfPreviousMonth = new Date(currentYear.value, currentMonth.value, 0).getDate();
     const days = [];
-
     for (let i = startDay.value - 1; i >= 0; i--) {
       days.push(lastDayOfPreviousMonth - i);
     }
-
     return days;
   };
 
@@ -68,11 +64,9 @@
     const days = [];
     const totalCells = Math.ceil((daysInMonth.value + startDay.value) / 7) * 7;
     const nextMonthDays = totalCells - (daysInMonth.value + startDay.value);
-
     for (let i = 1; i <= nextMonthDays; i++) {
       days.push(i);
     }
-
     return days;
   };
 
@@ -92,10 +86,8 @@
   };
 
   const isSelectedDate = (day: number) => {
-    // Asigură-te că selectedDate este un obiect Date
     const selectedDate = store.selectedDate instanceof Date ? 
       store.selectedDate : new Date(store.selectedDate);
-    
     return (
       day === selectedDate.getDate() &&
       currentMonth.value === selectedDate.getMonth() &&
@@ -111,11 +103,10 @@
     return store.slotData[day]?.length || 0;
   };
 
-  const isDateInPast = (day: number) => {
-    const checkDate = new Date(currentYear.value, currentMonth.value, day);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return checkDate < today;
+
+  // True dacă ziua are sloturi din trecut care au fost editate
+  const isEditedPastSlotDay = (day: number) => {
+    return store.daysWithEditedSlots?.includes(day);
   };
 </script>
 
@@ -171,15 +162,18 @@
               'h-10 w-10 rounded-full text-sm flex items-center justify-center relative mx-auto transition-colors',
               isCurrentMonth(day) ? 'bg-gray-100' : '',
               isSelectedDate(day) ? 'bg-indigo-500 text-white' : '',
-              hasSlots(day) && !isSelectedDate(day) ? 'bg-orange-100 text-gray-800' : '',
-              !hasSlots(day) && !isSelectedDate(day) ? 'hover:bg-gray-100' : '',
+              isEditedPastSlotDay(day) && !isSelectedDate(day) ? 'bg-red-100 text-gray-800' : '',
+              hasSlots(day) && !isSelectedDate(day) && !isEditedPastSlotDay(day) ? 'bg-orange-100 text-gray-800' : '',
+              !hasSlots(day) && !isSelectedDate(day) && !isEditedPastSlotDay(day) ? 'hover:bg-gray-100' : '',
             ]"
-            :disabled="isDateInPast(day)"
           >
             {{ day }}
             <span 
-              v-if="getSlotCount(day) > 0 && !isSelectedDate(day)" 
-              class="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-orange-500 rounded-full -top-1 -right-1"
+              v-if="getSlotCount(day) > 0 && !isSelectedDate(day)"
+              :class="[
+                'absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-1 -right-1',
+                isEditedPastSlotDay(day) ? 'bg-red-500' : 'bg-orange-500'
+              ]"
             >
               {{ getSlotCount(day) }}
             </span>
@@ -195,9 +189,15 @@
         </div>
       </div>
 
-      <div class="flex items-center justify-center mt-4 text-xs text-gray-500">
-        <span class="inline-block w-2 h-2 mr-1 bg-orange-200 rounded-full"></span>
-        Days highlighted in orange have available time slots
+      <div class="flex flex-col items-center justify-center mt-6 space-y-2 text-xs text-gray-500">
+        <div class="flex items-center">
+          <span class="inline-block w-3 h-3 mr-2 bg-orange-200 rounded-full"></span>
+          Days highlighted in orange have available time slots
+        </div>
+        <div class="flex items-center">
+          <span class="inline-block w-3 h-3 mr-2 bg-red-200 rounded-full"></span>
+          Days highlighted in red have edited past slots
+        </div>
       </div>
     </div>
   </div>
