@@ -4,16 +4,14 @@
 
     <form @submit.prevent="$emit('save-profile', editedProfile)" class="relative z-10">
       <div class="relative flex flex-col lg:flex-row items-center justify-between z-10">
-        <div class="flex flex-col items-center mb-6 lg:mb-0 lg:mr-8">
-          <div
-            class="relative w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-lg cursor-pointer"
+        <div class="relative flex flex-col items-center mb-6 lg:mb-0 lg:mr-8">
+          <ProfileImageUploader v-model="editedProfile.profileImage" />
+          <button
+            @click.prevent=""
+            class="absolute bottom-[4rem] right-2 flex justify-center items-center rounded-full w-8 h-8 shadow-lg cursor-pointer text-purple-600 bg-white"
           >
-            <img
-              :src="profileStore.profileImage"
-              :alt="profileStore.getName"
-              class="w-full h-full object-cover"
-            />
-          </div>
+            <font-awesome-icon :icon="['fas', 'pencil-alt']" />
+          </button>
           <div class="mt-2 text-white text-center">
             <div class="flex items-center justify-center space-x-1 text-yellow-400 text-lg">
               <font-awesome-icon :icon="['fas', 'star']" />
@@ -29,7 +27,7 @@
           <div class="text-center lg:text-left w-full">
             <div class="flex flex-col sm:flex-row space-x-0 sm:space-x-4 mb-4 lg:mb-0">
               <div class="flex-1">
-                <span class="text-xs text-gray-300">Your First Name</span>
+                <span class="text-xs text-gray-300">First Name</span>
                 <input
                   v-model="editedProfile.firstName"
                   type="text"
@@ -37,7 +35,7 @@
                 />
               </div>
               <div class="flex-1 mt-2 sm:mt-0">
-                <span class="text-xs text-gray-300">Your Last Name</span>
+                <span class="text-xs text-gray-300">Last Name</span>
                 <input
                   v-model="editedProfile.lastName"
                   type="text"
@@ -54,7 +52,7 @@
                     v-model.number="editedProfile.experience"
                     type="number"
                     min="0"
-                    class="w-full text-base font-bold text-center bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
+                    class="w-full text-base font-bold text-left bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
                   />
                 </div>
               </div>
@@ -89,11 +87,12 @@
 <script setup lang="ts">
   import { defineProps, defineEmits } from 'vue';
   import { useProfileStore } from '../../store/profileStore.ts';
-  import { faStar } from '@fortawesome/free-solid-svg-icons';
+  import { faStar, faTrophy, faMapMarkerAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import ProfileImageUploader from './ProfileImageUploader.vue';
 
-  library.add(faStar);
+  library.add(faStar, faTrophy, faMapMarkerAlt, faPencilAlt);
 
   const profileStore = useProfileStore();
 

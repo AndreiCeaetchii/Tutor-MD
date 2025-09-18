@@ -11,10 +11,12 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.StartTime)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(x => x.EndTime)
-            .IsRequired();
+            .IsRequired()
+            .HasColumnType("timestamp with time zone");
 
         builder.Property(x => x.PriceSnapshot)
             .IsRequired()
@@ -25,13 +27,15 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
             .HasDefaultValue(BookingStatus.Pending);
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships
-        builder.HasOne(x => x.Tutor)
+        builder.HasOne(x => x.TutorProfile)
             .WithMany(x => x.Bookings)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);

@@ -21,9 +21,11 @@ public class SubjectCatalogConfiguration : IEntityTypeConfiguration<SubjectCatal
             .HasMaxLength(120);
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships
@@ -36,5 +38,6 @@ public class SubjectCatalogConfiguration : IEntityTypeConfiguration<SubjectCatal
             .WithOne(x => x.Subject)
             .HasForeignKey(x => x.SubjectId)
             .OnDelete(DeleteBehavior.Restrict);
+        
     }
 }

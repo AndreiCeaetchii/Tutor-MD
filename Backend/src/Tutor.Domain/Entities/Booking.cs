@@ -14,7 +14,7 @@ public class Booking : Entity<int>
     public BookingStatus Status { get; set; }
 
     // Navigation properties
-    public virtual Tutor Tutor { get; set; }
+    public virtual TutorProfile TutorProfile { get; set; }
     public virtual Student Student { get; set; }
     public virtual SubjectCatalog Subject { get; set; }
     public virtual Review Review { get; set; }

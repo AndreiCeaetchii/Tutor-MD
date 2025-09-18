@@ -1,49 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+  import { computed, watch } from 'vue';
+  import { useCalendarStore } from '../../store/calendarStore';
 
-const props = defineProps<{
-  slotData?: Record<number, any[]>;
-}>();
+  const store = useCalendarStore();
 
-// Calculate statistics based on slot data
-const statistics = computed(() => {
-  if (!props.slotData) {
-    return {
-      availableSlots: 0,
-      bookedSlots: 0,
-      activeDays: 0
-    };
-  }
-
-  let availableSlots = 0;
-  let bookedSlots = 0;
-  let activeDays = 0;
-
-  // Count the number of active days (days with slots)
-  activeDays = Object.keys(props.slotData).length;
-
-  // Count available and booked slots
-  Object.values(props.slotData).forEach(daySlots => {
-    daySlots.forEach(slot => {
-      if (slot.status === 'available') {
-        availableSlots++;
-      } else if (slot.status === 'booked') {
-        bookedSlots++;
-      }
-    });
+  // Folosim statisticile specifice lunii curente
+  const statistics = computed(() => {
+    return store.getCurrentMonthStatistics();
   });
 
-  return {
-    availableSlots,
-    bookedSlots,
-    activeDays
-  };
-});
+  // Re-calculăm statisticile când se schimbă luna selectată
+  watch(() => store.currentMonthKey, () => {
+    // Statisticile se vor actualiza automat prin computed
+  });
 </script>
 
 <template>
   <div class="grid grid-cols-1 gap-4 mt-8 md:grid-cols-3">
-    <!-- Available Slots Card -->
     <div class="p-6 bg-white shadow-lg rounded-2xl">
       <div class="flex flex-col items-center">
         <span class="text-4xl font-bold text-orange-500">{{ statistics.availableSlots }}</span>
@@ -51,7 +24,6 @@ const statistics = computed(() => {
       </div>
     </div>
 
-    <!-- Booked Slots Card -->
     <div class="p-6 bg-white shadow-lg rounded-2xl">
       <div class="flex flex-col items-center">
         <span class="text-4xl font-bold text-teal-500">{{ statistics.bookedSlots }}</span>
@@ -59,7 +31,6 @@ const statistics = computed(() => {
       </div>
     </div>
 
-    <!-- Active Days Card -->
     <div class="p-6 bg-white shadow-lg rounded-2xl">
       <div class="flex flex-col items-center">
         <span class="text-4xl font-bold text-purple-500">{{ statistics.activeDays }}</span>
@@ -68,7 +39,3 @@ const statistics = computed(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-/* Add any specific styles here if needed */
-</style>

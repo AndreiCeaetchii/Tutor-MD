@@ -9,7 +9,7 @@
     </button>
     <div
       v-if="showDropdown"
-      class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+      class="absolute z-50 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
     >
       <div
         v-for="option in options"

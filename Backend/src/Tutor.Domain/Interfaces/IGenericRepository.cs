@@ -11,7 +11,7 @@ public interface IGenericRepository<T, TId> where T : Entity<TId>
 {
     DbSet<T> Table { get; }
 
-    Task<IEnumerable<T>> GetAll();
+    Task<List<T>> GetAll();
     Task<T?> GetById(TId id);
     Task Create(T entity);
     Task Update(T entity);

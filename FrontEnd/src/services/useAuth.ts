@@ -1,7 +1,7 @@
 import { ref } from 'vue';
+import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/userStore';
-import axios from 'axios';
 
 declare const google: any;
 
@@ -9,6 +9,22 @@ interface AuthFormData {
   email: string;
   password: string;
   role?: string;
+}
+
+// Helper function to decode JWT tokens
+function decodeJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error('Error decoding JWT token:', error);
+    return null;
+  }
 }
 
 export function useAuth() {
@@ -19,100 +35,70 @@ export function useAuth() {
 
   const store = useUserStore();
 
-  // --- URL-urile  ---
+  // --- API Endpoints ---
   const SIGNUP_URL = 'https://localhost:7123/api/users/register';
   const LOGIN_URL = 'https://localhost:7123/api/users/login';
   const GOOGLE_LOGIN_URL = 'https://localhost:7123/api/users/login-auth';
   const GOOGLE_REGISTER_URL = 'https://localhost:7123/api/users/register-auth';
 
-  const handleAuthError = (err: any, context: 'signup' | 'login' | 'google', isSignup?: boolean): string => {
-  if (axios.isAxiosError(err) && err.response) {
-    const status = err.response.status;
-    const errorData = err.response.data;
+  const handleAuthError = (
+    err: any,
+    context: 'signup' | 'login' | 'google',
+    isSignup?: boolean,
+  ): string => {
+    console.error(`${context} error:`, err);
     
-    console.error(`${context} error details:`, { 
-      status, 
-      data: errorData,
-      message: Array.isArray(errorData) ? errorData[0] : (errorData?.error || errorData?.message || 'Unknown error')
-    });
-    
-    let errorMsg = '';
-    if (Array.isArray(errorData)) {
-      errorMsg = errorData[0] || '';
-    } else if (typeof errorData === 'string') {
-      errorMsg = errorData;
-    } else {
-      errorMsg = errorData?.error || errorData?.message || '';
+    if (err.response) {
+      const status = err.response.status;
+      const data = err.response.data;
+      
+      if (status === 401) {
+        return 'Invalid email or password';
+      } else if (status === 409) {
+        return 'Email already in use';
+      } else if (data && typeof data === 'string') {
+        return data;
+      } else if (data && typeof data.message === 'string') {
+        return data.message;
+      }
     }
     
-    if (errorMsg.toLowerCase().includes('already exists') || 
-        errorMsg.toLowerCase().includes('already registered') ||
-        errorMsg.toLowerCase().includes('email already') ||
-        errorMsg.toLowerCase().includes('user already') ||
-        errorMsg.toLowerCase().includes('oauth provider') ||
-        errorMsg.toLowerCase().includes('unique constraint') ||
-        errorMsg.toLowerCase().includes('uniqueconstraint')) {
-      
-      if (context === 'google') {
-        return isSignup 
-          ? 'An account with this Google email already exists. Please use login instead.' 
-          : 'Authentication failed with this Google account. Please check your credentials.';
-      } else {
-        return isSignup
-          ? 'An account with this email already exists. Please use login instead.'
-          : 'Authentication failed. Please check your email and password.';
-      }
-      }
-      
-      switch (status) {
-        case 400:
-          return errorMsg || `Invalid ${context} data. Please check your details.`;
-        case 401:
-          return context === 'login' 
-            ? 'Incorrect email or password. Please try again.'
-            : 'Authentication failed. Please check your credentials.';
-        case 404:
-          return context === 'login'
-            ? 'Account not found. Please check your email or sign up.'
-            : `${context.charAt(0).toUpperCase() + context.slice(1)} failed: resource not found`;
-        case 409:
-          return context === 'google' 
-            ? 'Google authentication failed. Please try again.'
-            : 'A conflict occurred. Please try again.';
-        case 500:
-          return 'Server error. Please try again later.';
-        default:
-          return errorMsg || `${context.charAt(0).toUpperCase() + context.slice(1)} failed (${status})`;
-      }
-    } else {
-      console.error(`${context} network error:`, err);
-      return err.message || 'Temporary server issue. Please retry.';
+    if (context === 'signup') {
+      return 'Failed to create account. Please try again.';
+    } else if (context === 'login') {
+      return 'Failed to log in. Please check your credentials.';
+    } else if (context === 'google') {
+      return isSignup 
+        ? 'Failed to sign up with Google. Please try again.' 
+        : 'Failed to log in with Google. Please try again.';
     }
+    
+    return 'An unexpected error occurred. Please try again.';
   };
 
   const signup = async (formData: AuthFormData): Promise<boolean> => {
     errorMessage.value = null;
-
+    
     try {
       const response = await axios.post(
         SIGNUP_URL,
         {
           Email: formData.email,
           Password: formData.password,
+          RoleId: formData.role === 'tutor' ? 2 : 3, // 2 for tutor, 3 for student
         },
         {
           withCredentials: true,
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
-
+      
       const data = response.data;
-
       // @ts-ignore
-      store.setUser(data.token, data.id, formData.role);
-
+      store.setUser(data.token, data.id, formData.role || 'student');
+      
       console.log('Signup successful!');
       return true;
     } catch (err: any) {
@@ -121,7 +107,7 @@ export function useAuth() {
     }
   };
 
-  const login = async (formData: AuthFormData): Promise<boolean> => {
+  const login = async (formData: { email: string; password: string }): Promise<{ success: boolean, role?: string }> => {
     errorMessage.value = null;
 
     try {
@@ -140,26 +126,45 @@ export function useAuth() {
       );
 
       const data = response.data;
+      
+      const decoded = decodeJwt(data.token);
+      const userRole = decoded?.role?.toLowerCase() || 'student';
+      
+      console.log('Login response data:', data);
+      console.log('JWT decoded:', decoded);
+      console.log('User role from token:', userRole);
 
       // @ts-ignore
-      store.setUser(data.token, data.id, formData.role);
-
+      store.setUser(data.token, data.id, userRole);
+      
+      console.log('Store user role after setting:', store.userRole);
       console.log('Login successful!');
-      return true;
+      return { success: true, role: userRole };
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'login');
-      return false;
+      return { success: false };
     }
   };
 
   const logout = () => {
-    store.accessToken = null;
+    store.clearUser();
+    accessToken.value = null;
+    currentUser.value = null;
     router.push('/login');
   };
 
-  const loginWithGoogle = async (role: string, isSignup: boolean): Promise<boolean> => {
+  const loginWithGoogle = async (isSignup: boolean, role?: string): Promise<{ success: boolean, role?: string }> => {
     const store = useUserStore();
-
+  
+    const getRoleId = (role: string): number => {
+      switch (role?.toLowerCase()) {
+        case 'admin': return 1;
+        case 'tutor': return 2;
+        case 'student': return 3;
+        default: return 3; // Default to student if unknown
+      }
+    };
+  
     return new Promise((resolve) => {
       const tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
@@ -167,52 +172,63 @@ export function useAuth() {
         callback: async (response: any) => {
           if (!response.access_token) {
             errorMessage.value = 'Google authentication failed: no access token';
-            return resolve(false);
+            return resolve({ success: false });
           }
-
+  
           try {
-            // Obținem user info de la Google
+            // Get user info from Google
             const googleUserRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
               headers: { Authorization: `Bearer ${response.access_token}` },
             });
             const googleUser = googleUserRes.data;
             const email = googleUser.email;
             const AccessToken = response.access_token;
-
-            // Alegem endpoint-ul (signup vs login)
+  
+            // Choose the endpoint (signup vs login)
             const endpoint = isSignup ? GOOGLE_REGISTER_URL : GOOGLE_LOGIN_URL;
-
+  
+            // Prepare request data
+            const requestData: any = {
+              email: email,
+              accessToken: AccessToken,
+              provider: 'google',
+            };
+            
+            // Only include roleId if it's a signup request
+            if (isSignup && role) {
+              requestData.roleId = getRoleId(role);
+            }
+  
             const res = await axios.post(
               endpoint,
-              {
-                email: email,
-                accessToken: AccessToken,
-                provider: 'google',
-              },
+              requestData,
               { withCredentials: true },
             );
-
+  
             const data = res.data;
-
-            // Salvăm token, id și rol în store
+            console.log('Google auth response data:', data);
+            
+            // Extract role from JWT token
+            const decoded = decodeJwt(data.token);
+            const userRole = decoded?.role?.toLowerCase() || (role?.toLowerCase() || 'student');
+            
+            console.log('JWT decoded:', decoded);
+            console.log('User role from token:', userRole);
+  
             // @ts-ignore
-            store.setUser(data.token, data.id, role);
-
-            console.log(`${isSignup ? 'Signup' : 'Login'} cu Google reușit!`, data);
-
-            // Redirect după rol
-            if (role === 'tutor') router.push('/tutor-dashboard');
-            else if (role === 'student') router.push('/student-dashboard');
-            else if (role === 'admin') router.push('/admin-dashboard');
-
-            resolve(true);
+            store.setUser(data.token, data.id, userRole);
+            
+            console.log('Store user role after Google login:', store.userRole);
+            console.log(`${isSignup ? 'Signup' : 'Login'} with Google successful!`);
+            
+            resolve({ success: true, role: userRole });
           } catch (err: any) {
             errorMessage.value = handleAuthError(err, 'google', isSignup);
-            resolve(false);
+            resolve({ success: false });
           }
         },
       });
-
+  
       tokenClient.requestAccessToken();
     });
   };
