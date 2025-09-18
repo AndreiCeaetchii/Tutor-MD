@@ -4,9 +4,13 @@ interface Subject {
   name: string;
   price: number;
   currency: string;
+  subjectId?: number;
+  isNew?: boolean;
+  isModified?: boolean;
 }
 
-interface ProfileState {
+export interface ProfileState {
+  birthdate?: string;
   userName?: string;
   firstName: string;
   lastName: string;
@@ -29,6 +33,7 @@ interface ProfileState {
 
 export const useProfileStore = defineStore('profile', {
   state: (): ProfileState => ({
+    birthdate: '',
     userName: '',
     firstName: '',
     lastName: '',
@@ -50,6 +55,8 @@ export const useProfileStore = defineStore('profile', {
   }),
 
   getters: {
+    getFullLocation: (state) =>
+      state.city && state.country ? `${state.city}, ${state.country}` : state.location,
     getContactInfo: (state) => `${state.email} | ${state.phone}`,
     getName: (state) => `${state.firstName} ${state.lastName}`,
     getSubjectPrices: (state) =>
@@ -64,7 +71,9 @@ export const useProfileStore = defineStore('profile', {
     },
 
     setProfileDetails(newDetails: Partial<ProfileState>) {
-      Object.assign(this, newDetails);
+      const { getFullLocation, getContactInfo, getName, getSubjectPrices, ...stateData } =
+        newDetails as any;
+      Object.assign(this, stateData);
     },
 
     clearProfile() {

@@ -1,3 +1,4 @@
+// tutorService.ts
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
@@ -6,7 +7,15 @@ export interface Subject {
   subjectName: string;
   subjectSlug: string;
   pricePerHour: number;
-  currency: 'mdl';
+  currency: string;
+}
+
+export interface UpdateSubject {
+  subjectId: number;
+  subjectName: string;
+  subjectSlug: string;
+  price: number;
+  currency: string;
 }
 
 export interface CreateProfileDto {
@@ -44,6 +53,7 @@ export const createTutorProfile = async (profileData: TutorProfileData) => {
     });
 
     profileStore.userName = profileData.createProfileDto.username;
+    profileStore.birthdate = profileData.createProfileDto.birthdate;
 
     return response.data;
   } catch (error: any) {
@@ -74,6 +84,103 @@ export const getTutorProfile = async (userId: number) => {
       return null;
     }
     console.error('Eroare la preluarea profilului tutorului:', error.message);
+    throw error;
+  }
+};
+
+export const editTutorProfile = async (profileData: any) => {
+  try {
+    const store = useUserStore();
+    const profileStore = useProfileStore();
+    const token = store.accessToken;
+
+    // Asigură-te că profileData are structura corectă înainte de a fi trimisă
+    const response = await axios.put(`${API_URL}/update-tutor`, profileData, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    if (response.data.userProfile?.username) {
+      profileStore.userName = response.data.userProfile.username;
+    }
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      'Eroare la editarea profilului de tutore:',
+      error.response ? error.response.data : error.message,
+    );
+    throw error;
+  }
+};
+
+export const addSubject = async (subjectData: Subject) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    const response = await axios.post(`${API_URL}/add-subject`, subjectData, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      'Eroare la adăugarea subiectului:',
+      error.response ? error.response.data : error.message,
+    );
+    throw error;
+  }
+};
+
+export const deleteSubject = async (subjectId: number) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    const response = await axios.delete(`${API_URL}/delete-subject/${subjectId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `Eroare la ștergerea subiectului cu id ${subjectId}:`,
+      error.response ? error.response.data : error.message,
+    );
+    throw error;
+  }
+};
+
+export const updateSubject = async (subjectData: UpdateSubject) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    const response = await axios.put(`${API_URL}/update-subject`, subjectData, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `Eroare la actualizarea subiectului cu id ${subjectData.subjectId}:`,
+      error.response ? error.response.data : error.message,
+    );
     throw error;
   }
 };

@@ -43,7 +43,7 @@
             </div>
             <div class="flex items-center space-x-2">
               <font-awesome-icon :icon="['fas', 'map-marker-alt']" />
-              <span>{{ profileStore.location }}</span>
+              <span>{{ profileStore.getFullLocation }}</span>
             </div>
           </div>
         </div>

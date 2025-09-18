@@ -52,7 +52,7 @@
               >
                 <div class="px-4 py-2 border-b border-gray-100">
                   <p class="text-sm font-semibold text-gray-900">{{ userName }}</p>
-                  <p class="mt-1 text-xs text-gray-500 truncate">{{ profileStore.email }}</p>
+                  <p class="mt-1 text-xs text-gray-500 truncate">{{ email }}</p>
                 </div>
                 <div class="py-1">
                   <a
@@ -239,6 +239,7 @@
   } from '@fortawesome/free-solid-svg-icons';
   import { useUserStore } from '../store/userStore.ts';
   import { useProfileStore } from '../store/profileStore.ts';
+  import { computed } from 'vue';
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 
@@ -279,7 +280,8 @@
     showProfileMenu.value = false;
   }
 
-  const userName = profileStore.userName;
+  const userName = computed(() => profileStore.userName);
+  const email = computed(() => profileStore.email);
 
   // Funcția care verifică dacă click-ul a avut loc în afara meniului
   function handleClickOutside(event: MouseEvent) {
