@@ -1,20 +1,33 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useCalendarStore } from '../../store/calendarStore';
 
 const props = defineProps<{
   isOpen: boolean;
+  editingSlot?: {
+    id: string;
+    startTime: string;
+    endTime: string;
+  } | null;
 }>();
 
 const emit = defineEmits(['close', 'save']);
+const store = useCalendarStore();
 
-// Time options for dropdown
-const timeOptions = [
-  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
-  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
-  '20:00', '20:30', '21:00'
-];
+// Generate all time options in 30 minute increments (00:00 - 23:30)
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const formattedHour = hour.toString().padStart(2, '0');
+      const formattedMinute = minute.toString().padStart(2, '0');
+      options.push(`${formattedHour}:${formattedMinute}`);
+    }
+  }
+  return options;
+};
+
+const timeOptions = generateTimeOptions();
 
 const showStartTimeDropdown = ref(false);
 const showEndTimeDropdown = ref(false);
@@ -22,6 +35,26 @@ const startTime = ref('');
 const endTime = ref('');
 const startTimeText = ref('Select start time');
 const endTimeText = ref('Select end time');
+const errorMessage = ref('');
+
+// Reset values when modal is opened
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    errorMessage.value = '';
+    
+    if (props.editingSlot) {
+      startTime.value = props.editingSlot.startTime;
+      startTimeText.value = props.editingSlot.startTime;
+      endTime.value = props.editingSlot.endTime;
+      endTimeText.value = props.editingSlot.endTime;
+    } else {
+      startTime.value = '08:00';
+      startTimeText.value = '08:00';
+      endTime.value = '09:00';
+      endTimeText.value = '09:00';
+    }
+  }
+}, { immediate: true });
 
 const closeModal = () => {
   emit('close');
@@ -29,28 +62,76 @@ const closeModal = () => {
 };
 
 const saveTimeSlot = () => {
-  if (startTime.value && endTime.value) {
-    emit('save', {
-      startTime: startTime.value,
-      endTime: endTime.value
-    });
+  errorMessage.value = '';
+  
+  // Basic validation
+  if (!startTime.value || !endTime.value) {
+    errorMessage.value = 'Please select both start and end times';
+    return;
+  }
+  
+  // Verify that end time is after start time
+  const startMinutes = store.timeToMinutes(startTime.value);
+  const endMinutes = store.timeToMinutes(endTime.value);
+  
+  if (endMinutes <= startMinutes) {
+    errorMessage.value = 'End time must be after start time';
+    return;
+  }
+  
+  // Check for overlaps
+  try {
+    const slotData = { startTime: startTime.value, endTime: endTime.value };
+    
+    if (props.editingSlot) {
+      // Check if editing would create an overlap
+      if (store.checkOverlap(slotData, props.editingSlot.id)) {
+        errorMessage.value = 'This time slot would overlap with another existing slot';
+        return;
+      }
+    } else {
+      // Check if new slot would create an overlap
+      if (store.checkOverlap(slotData)) {
+        errorMessage.value = 'This time slot overlaps with an existing slot';
+        return;
+      }
+    }
+    
+    emit('save', slotData);
     resetForm();
+  } catch (error) {
+    if (error instanceof Error) {
+      errorMessage.value = error.message;
+    } else {
+      errorMessage.value = 'An error occurred while saving the time slot';
+    }
   }
 };
 
 const resetForm = () => {
-  startTime.value = '';
-  endTime.value = '';
-  startTimeText.value = 'Select start time';
-  endTimeText.value = 'Select end time';
+  startTime.value = '08:00';
+  endTime.value = '09:00';
+  startTimeText.value = '08:00';
+  endTimeText.value = '09:00';
   showStartTimeDropdown.value = false;
   showEndTimeDropdown.value = false;
+  errorMessage.value = '';
 };
 
 const selectStartTime = (time: string) => {
   startTime.value = time;
   startTimeText.value = time;
   showStartTimeDropdown.value = false;
+  
+  // If end time is not set or is earlier than start time, adjust it
+  if (!endTime.value || store.timeToMinutes(endTime.value) <= store.timeToMinutes(time)) {
+    // Find next valid end time
+    const startIndex = timeOptions.findIndex(t => t === time);
+    if (startIndex < timeOptions.length - 1) {
+      endTime.value = timeOptions[startIndex + 1];
+      endTimeText.value = endTime.value;
+    }
+  }
 };
 
 const selectEndTime = (time: string) => {
@@ -103,6 +184,19 @@ const handleClickOutside = (event: MouseEvent) => {
     showEndTimeDropdown.value = false;
   }
 };
+
+const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
+  // Skip overlap check when editing to allow selecting the same times
+  if (props.editingSlot) {
+    return false;
+  }
+  
+  const tempSlot = isStartTime
+    ? { startTime: time, endTime: endTime.value || timeOptions[timeOptions.indexOf(time) + 1] }
+    : { startTime: startTime.value, endTime: time };
+    
+  return store.checkOverlap(tempSlot);
+};
 </script>
 
 <template>
@@ -118,7 +212,14 @@ const handleClickOutside = (event: MouseEvent) => {
       </button>
       
       <!-- Modal Header -->
-      <h2 class="mb-6 text-xl font-semibold text-gray-800">Add Time Slot</h2>
+      <h2 class="mb-6 text-xl font-semibold text-gray-800">
+        {{ props.editingSlot ? 'Edit Time Slot' : 'Add Time Slot' }}
+      </h2>
+      
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="p-3 mb-4 text-sm text-red-600 bg-red-100 rounded-md">
+        {{ errorMessage }}
+      </div>
       
       <!-- Start Time Dropdown -->
       <div class="mb-6">
@@ -143,8 +244,18 @@ const handleClickOutside = (event: MouseEvent) => {
                 v-for="time in timeOptions" 
                 :key="`start-${time}`"
                 @click="selectStartTime(time)"
-                class="px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                :class="[
+                  'px-4 py-2 text-sm cursor-pointer flex items-center',
+                  time === startTime ? 'bg-gray-100 font-medium text-gray-800' : 'text-gray-600 hover:bg-gray-50',
+                  wouldCauseOverlap(time, true) ? 'opacity-50 cursor-not-allowed' : ''
+                ]"
+                :style="{ pointerEvents: wouldCauseOverlap(time, true) ? 'none' : 'auto' }"
               >
+                <span class="w-4 mr-2">
+                  <svg v-if="time === startTime" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
                 {{ time }}
               </li>
             </ul>
@@ -175,8 +286,18 @@ const handleClickOutside = (event: MouseEvent) => {
                 v-for="time in filteredEndTimes" 
                 :key="`end-${time}`"
                 @click="selectEndTime(time)"
-                class="px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-100"
+                :class="[
+                  'px-4 py-2 text-sm cursor-pointer flex items-center',
+                  time === endTime ? 'bg-gray-100 font-medium text-gray-800' : 'text-gray-600 hover:bg-gray-50',
+                  wouldCauseOverlap(time, false) ? 'opacity-50 cursor-not-allowed' : ''
+                ]"
+                :style="{ pointerEvents: wouldCauseOverlap(time, false) ? 'none' : 'auto' }"
               >
+                <span class="w-4 mr-2">
+                  <svg v-if="time === endTime" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
                 {{ time }}
               </li>
             </ul>
@@ -184,13 +305,13 @@ const handleClickOutside = (event: MouseEvent) => {
         </div>
       </div>
       
-      <!-- Add Time Slot Button -->
+      <!-- Add/Edit Time Slot Button -->
       <button 
         @click="saveTimeSlot"
         :disabled="!startTime || !endTime"
         class="w-full py-3 text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Add Time Slot
+        {{ props.editingSlot ? 'Save Changes' : 'Add Time Slot' }}
       </button>
     </div>
   </div>
@@ -199,5 +320,21 @@ const handleClickOutside = (event: MouseEvent) => {
 <style scoped>
 .max-h-60 {
   max-height: 15rem;
+}
+
+/* Scrollbar pentru tema deschisă */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
 }
 </style>
