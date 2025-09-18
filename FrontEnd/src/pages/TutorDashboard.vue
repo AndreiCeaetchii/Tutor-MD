@@ -1,19 +1,18 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '../store/userStore.ts';
   import NavigationBar from '../components/navigation/NavigationBar.vue';
-  // import TutorProfile from '../components/tutor/TutorProfile.vue';
-  import TutorBookings from '../components/tutor/TutorBookings.vue';
-  import TutorReview from '../components/tutor/TutorReview.vue';
-  import TutorCalendar from '../components/tutor/TutorCalendar.vue';
-  import TutorSlots from '../components/tutor/TutorSlots.vue';
-  import TutorSlotsCards from '../components/tutor/TutorSlotCards.vue';
-  import TutorChat from '../components/tutor/TutorChat.vue';
   import Footer from '../components/Footer.vue';
 
   const store = useUserStore();
   const router = useRouter();
+  const activeTab = ref('calendar');
+
+  // Handle tab changes from the navigation bar
+  const handleTabChange = (tab: string) => {
+    activeTab.value = tab;
+  };
 
   // Verificăm autentificarea și rolul
   onMounted(() => {
