@@ -6,7 +6,7 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-import TutorProfile from '../components/tutor/TutorProfile.vue';
+//import TutorProfile from '../components/tutor/TutorProfile.vue';
 import TutorReview from '../components/tutor/TutorReview.vue';
 import TutorBookings from '../components/tutor/TutorBookings.vue';
 import TutorChat from '../components/tutor/TutorChat.vue';
@@ -22,13 +22,18 @@ const StudentMessages = { template: '<div>Messages (work in progress)</div>' };
 const StudentAccount = { template: '<div>My Account (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
+import { useProfileStore } from '../store/profileStore';
 
 const routes = [
   // Guest routes
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
   { path: '/landing', component: LandingPage },
-  { path: '/create-profile', component: CreateProfile },
+  {
+    path: '/create-profile',
+    component: CreateProfile,
+    meta: { requiresAuth: true, role: 'tutor' },
+  },
   { path: '/', component: LandingPage, meta: { requiresGuest: true } },
 
   {
@@ -51,7 +56,7 @@ const routes = [
     meta: { requiresAuth: true, role: 'tutor' },
     children: [
       { path: '', redirect: '/tutor-dashboard/profile' },
-      { path: 'profile', component: TutorProfile },
+      { path: 'profile', component: ProfilePage },
       { path: 'reviews', component: TutorReview },
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },
@@ -69,6 +74,14 @@ router.beforeEach((to, _, next) => {
   const store = useUserStore();
   const hasToken = store.isAuthenticated;
   const userRole = store.userRole;
+  const profileStore = useProfileStore();
+
+  if (to.path === '/create-profile') {
+    if (profileStore.firstName && profileStore.lastName) {
+      next('/tutor-dashboard');
+      return;
+    }
+  }
 
   if (to.meta.requiresAuth) {
     if (!hasToken) {

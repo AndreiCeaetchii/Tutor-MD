@@ -12,7 +12,7 @@ const app = createApp(App);
 app.component('font-awesome-icon', FontAwesomeIcon);
 app.use(router);
 app.use(vue3GoogleLogin, {
-  clientId: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com', // pune aici Client ID din Google Cloud Console
+  clientId: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
 });
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);

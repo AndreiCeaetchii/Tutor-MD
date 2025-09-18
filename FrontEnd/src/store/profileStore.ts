@@ -7,6 +7,7 @@ interface Subject {
 }
 
 interface ProfileState {
+  userName?: string;
   firstName: string;
   lastName: string;
   bio: string;
@@ -14,6 +15,8 @@ interface ProfileState {
   email: string;
   experience: number;
   age: number;
+  country?: string;
+  city?: string;
   location: string;
   profileImage: string;
   rating: number;
@@ -26,26 +29,24 @@ interface ProfileState {
 
 export const useProfileStore = defineStore('profile', {
   state: (): ProfileState => ({
+    userName: '',
+    firstName: '',
+    lastName: '',
+    bio: '',
+    phone: '',
+    email: '',
+    experience: 0,
+    age: 0,
+    country: '',
+    city: '',
+    location: '',
+    profileImage: '',
+    rating: 0,
+    reviews: 0,
+    students: 0,
+    languages: [],
+    subjects: [],
     isEditing: false,
-    firstName: 'Maria',
-    lastName: 'Popescu',
-    bio: 'Sunt un tutor pasionat de matematică și fizică cu peste 8 ani de experiență în predare. Îmi place să ajut studenții să înțeleagă conceptele complexe prin explicații clare și exemple practice.',
-    phone: '+40 123 456 789',
-    email: 'maria@email.com',
-    experience: 8,
-    age: 35,
-    location: 'Bucharest, Romania',
-    profileImage:
-      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop',
-    rating: 4.9,
-    reviews: 147,
-    students: 89,
-    languages: ['Română', 'Engleză', 'Franceză'],
-    subjects: [
-      { name: 'Matematică', price: 50, currency: 'EUR' },
-      { name: 'Fizică', price: 45, currency: 'MDL' },
-      { name: 'Informatică', price: 60, currency: 'MDL' },
-    ],
   }),
 
   getters: {
@@ -58,28 +59,6 @@ export const useProfileStore = defineStore('profile', {
   },
 
   actions: {
-    setField<T extends keyof ProfileState>(field: T, value: ProfileState[T]) {
-      this.$patch({ [field]: value });
-    },
-
-    addLanguage(language: string) {
-      if (!this.languages.includes(language)) {
-        this.languages.push(language);
-      }
-    },
-
-    removeLanguage(language: string) {
-      this.languages = this.languages.filter((l) => l !== language);
-    },
-
-    addSubject(newSubject: Subject) {
-      this.subjects.push(newSubject);
-    },
-
-    removeSubject(subjectName: string) {
-      this.subjects = this.subjects.filter((s) => s.name !== subjectName);
-    },
-
     toggleEditing() {
       this.isEditing = !this.isEditing;
     },
@@ -87,6 +66,30 @@ export const useProfileStore = defineStore('profile', {
     setProfileDetails(newDetails: Partial<ProfileState>) {
       Object.assign(this, newDetails);
     },
+
+    clearProfile() {
+      this.userName = '';
+      this.firstName = '';
+      this.lastName = '';
+      this.bio = '';
+      this.phone = '';
+      this.email = '';
+      this.experience = 0;
+      this.age = 0;
+      this.country = '';
+      this.city = '';
+      this.location = '';
+      this.profileImage = '';
+      this.rating = 0;
+      this.reviews = 0;
+      this.students = 0;
+      this.languages = [];
+      this.subjects = [];
+      this.isEditing = false;
+
+      this.$reset();
+    },
   },
+
   persist: true,
 });

@@ -6,6 +6,7 @@ interface UserState {
   accessToken: string | null;
   userId: string | null;
   role: UserRole | null;
+  email: string | null;
 }
 
 // @ts-ignore
@@ -14,13 +15,14 @@ export const useUserStore = defineStore('user', {
     accessToken: null,
     userId: null,
     role: null,
+    email: null,
   }),
   getters: {
     userRole: (state) => state.role,
     isAuthenticated: (state) => !!state.accessToken,
   },
   actions: {
-    setUser(token: string, id: string, role: UserRole) {
+    setUser(token: string, id: string, role: UserRole, email: string) {
       const isNew = this.accessToken !== token || this.userId !== id || this.role !== role;
 
       if (isNew) {
@@ -35,6 +37,7 @@ export const useUserStore = defineStore('user', {
       this.accessToken = token;
       this.userId = id;
       this.role = role;
+      this.email = email;
     },
     clearUser() {
       console.log('[Store Debug] Clearing user...');

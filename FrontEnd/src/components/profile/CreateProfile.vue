@@ -376,12 +376,8 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faTimes } from '@fortawesome/free-solid-svg-icons';
-  import {
-    createTutorProfile,
-    Subject,
-    TutorProfileData,
-    CreateProfileDto,
-  } from '../../services/tutorService.ts';
+  import { createTutorProfile } from '../../services/tutorService.ts';
+  import type { Subject, TutorProfileData, CreateProfileDto } from '../../services/tutorService.ts';
   import { useRouter } from 'vue-router';
 
   library.add(faTimes);
@@ -401,7 +397,7 @@
       {
         subjectName: 'Mathematics',
         pricePerHour: 0,
-        currency: 'mdl',
+        currency: 'MDL',
       },
     ],
     languages: [],
@@ -457,7 +453,7 @@
     form.value.subjects.push({
       subjectName: subjectName,
       pricePerHour: 0,
-      currency: 'mdl',
+      currency: 'MDL',
     });
   };
 
@@ -480,7 +476,7 @@
 
     const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
       subjectName: subject.subjectName,
-      subjectSlug: 'default-slug', // Placeholder, replace with actual slug logic if needed
+      subjectSlug: 'default-slug',
       pricePerHour: parseFloat(subject.pricePerHour.toString()),
       currency: 'MDL',
     }));
@@ -497,7 +493,7 @@
     };
 
     const payload: TutorProfileData = {
-      verificationStatus: 'Pending',
+      verificationStatus: 'verified',
       experienceYears: form.value.experienceYears,
       subjects: subjectsPayload,
       createProfileDto: profileDto,

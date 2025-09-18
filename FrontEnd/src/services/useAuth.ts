@@ -11,6 +11,7 @@ interface AuthFormData {
   role?: string;
 }
 
+
 // Helper function to decode JWT tokens
 function decodeJwt(token: string) {
   try {
@@ -78,7 +79,7 @@ export function useAuth() {
 
   const signup = async (formData: AuthFormData): Promise<boolean> => {
     errorMessage.value = null;
-    
+
     try {
       const response = await axios.post(
         SIGNUP_URL,
@@ -97,8 +98,9 @@ export function useAuth() {
       
       const data = response.data;
       // @ts-ignore
-      store.setUser(data.token, data.id, formData.role || 'student');
-      
+
+      store.setUser(data.token, data.id, formData.role || 'student', formData.email);
+
       console.log('Signup successful!');
       return true;
     } catch (err: any) {
@@ -135,9 +137,9 @@ export function useAuth() {
       console.log('User role from token:', userRole);
 
       // @ts-ignore
-      store.setUser(data.token, data.id, userRole);
-      
-      console.log('Store user role after setting:', store.userRole);
+
+      store.setUser(data.token, data.id, userRole, formData.email);
+
       console.log('Login successful!');
       return { success: true, role: userRole };
     } catch (err: any) {
@@ -206,6 +208,7 @@ export function useAuth() {
             );
   
             const data = res.data;
+
             console.log('Google auth response data:', data);
             
             // Extract role from JWT token
