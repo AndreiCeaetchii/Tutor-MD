@@ -64,11 +64,17 @@ const handleMarkComplete = (bookingId: number) => {
     booking.status = 'Completed';
   }
 };
+
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
 </script>
 
 <template>
   <div class="p-4 tutor-bookings">
-    <!-- Booking status cards - make responsive -->
+    <!-- Booking status cards -->
     <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4 sm:gap-4 sm:mb-8">
       <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
         <div class="text-xl font-bold sm:text-2xl text-amber-500">{{ pendingCount }}</div>
@@ -91,11 +97,11 @@ const handleMarkComplete = (bookingId: number) => {
     <!-- Booking requests section -->
     <h2 class="mb-4 text-lg font-semibold sm:text-xl">Booking Requests</h2>
 
-    <!-- Filter tabs - improve mobile display -->
+    <!-- Filter tabs -->
     <div class="mb-6 overflow-x-auto">
       <div class="flex p-1 mb-2 bg-gray-100 rounded-full sm:p-2 sm:mb-6 min-w-max">
         <button 
-          v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Draft']" 
+          v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Past']" 
           :key="filter"
           @click="setFilter(filter)"
           class="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-center transition-colors rounded-full whitespace-nowrap"
@@ -113,7 +119,7 @@ const handleMarkComplete = (bookingId: number) => {
         :key="booking.id"
         class="p-4 bg-white border border-gray-200 rounded-lg sm:p-6"
       >
-        <!-- Student info and status - improved for mobile -->
+        <!-- Student info and status -->
         <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
           <div class="flex items-center gap-3">
             <div v-if="booking.studentImage" class="flex-shrink-0 w-10 h-10 overflow-hidden rounded-full sm:w-12 sm:h-12">
@@ -134,7 +140,7 @@ const handleMarkComplete = (bookingId: number) => {
                 'bg-amber-100 text-amber-800': booking.status === 'Pending',
                 'bg-blue-100 text-blue-800': booking.status === 'Accepted',
                 'bg-green-100 text-green-800': booking.status === 'Completed',
-                'bg-gray-100 text-gray-800': booking.status === 'Draft'
+                'bg-gray-100 text-gray-800': booking.status === 'Rejected'
               }"
             >
               {{ booking.status }}
@@ -146,7 +152,7 @@ const handleMarkComplete = (bookingId: number) => {
         <div class="grid grid-cols-1 gap-2 mb-3 text-sm sm:gap-4 sm:mb-4 sm:text-base">
           <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">calendar_today</span>
-            <span>{{ booking.date }}</span>
+            <span>{{ formatDate(booking.date) }}</span>
           </div>
           <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">schedule</span>
@@ -191,8 +197,13 @@ const handleMarkComplete = (bookingId: number) => {
               </button>
             </template>
             
-            <button class="p-1.5 sm:p-2 border border-gray-300 rounded-full hover:bg-gray-100">
-              <span class="text-xs text-gray-600 material-icons sm:text-sm">chat</span>
+            <!-- Chat button with improved design -->
+            <button
+              class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
+              @click="$emit('openChat', booking.studentName)"
+            >
+              <span class="mr-1 text-sm material-icons">chat</span>
+              Chat
             </button>
           </div>
         </div>
