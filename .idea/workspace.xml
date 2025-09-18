@@ -6,14 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/EditableSubjectCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/EditableSubjectCard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetailsEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileDetailsEdit.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeader.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeaderEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileHeaderEdit.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileImageUploader.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/ProfileImageUploader.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/profileStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/profileStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -98,7 +92,8 @@
       <workItem from="1758020431888" duration="2109000" />
       <workItem from="1758049885823" duration="1508000" />
       <workItem from="1758102936331" duration="14538000" />
-      <workItem from="1758178124742" duration="17365000" />
+      <workItem from="1758178124742" duration="22062000" />
+      <workItem from="1758215144321" duration="3938000" />
     </task>
     <servers />
   </component>

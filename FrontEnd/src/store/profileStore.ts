@@ -71,6 +71,10 @@ export const useProfileStore = defineStore('profile', {
       this.isEditing = !this.isEditing;
     },
 
+    setProfileImage(imageUrl: string) {
+      this.profileImage = imageUrl;
+    },
+
     setProfileDetails(newDetails: Partial<ProfileState>) {
       const { getFullLocation, getContactInfo, getName, getSubjectPrices, ...stateData } =
         newDetails as any;

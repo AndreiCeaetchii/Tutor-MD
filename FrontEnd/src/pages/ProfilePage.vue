@@ -4,7 +4,6 @@
       <ProfileHeaderEdit :editedProfile="editedProfile" @save-profile="saveChanges" />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
     </template>
-
     <template v-else>
       <ProfileHeader />
       <ProfileDetails />
@@ -28,8 +27,6 @@
   } from '../services/tutorService.ts';
   import { useUserStore } from '../store/userStore.ts';
   import { useRouter } from 'vue-router';
-
-  // ✅ Import imagine default
   import defaultProfileImage from '../assets/DefaultImg.png';
 
   const router = useRouter();
@@ -48,7 +45,7 @@
     country: '',
     city: '',
     location: '',
-    profileImage: defaultProfileImage, // inițial default
+    profileImage: defaultProfileImage,
     rating: 0,
     reviews: 0,
     students: 0,
@@ -74,13 +71,10 @@
     try {
       const userId = userStore.userId ? Number(userStore.userId) : 0;
       const serverData = await getTutorProfile(userId);
-
       if (!serverData || !serverData.userProfile || !serverData.userProfile.username) {
-        console.log('No profile found, redirecting to /create-profile.');
         await router.push('/create-profile');
         return;
       }
-
       const profileData = {
         userName: serverData.userProfile.username || '',
         firstName: serverData.userProfile.firstName || '',
@@ -93,7 +87,7 @@
         country: serverData.userProfile.country || '',
         city: serverData.userProfile.city || '',
         location: `${serverData.userProfile.city || ''}, ${serverData.userProfile.country || ''}`,
-        profileImage: serverData.photo || defaultProfileImage, // fallback imagine default
+        profileImage: serverData.photo?.url || profileStore.profileImage || defaultProfileImage,
         rating: 0,
         reviews: 0,
         students: 0,
@@ -108,7 +102,6 @@
         })),
         birthdate: serverData.userProfile.birthdate,
       };
-
       profileStore.setProfileDetails(profileData);
     } catch (error) {
       console.error('Eroare la preluarea profilului:', error);
@@ -141,6 +134,7 @@
           country: editedProfile.value.country,
           city: editedProfile.value.city,
           experienceYears: editedProfile.value.experience,
+          profileImage: editedProfile.value.profileImage,
         },
         tutorSubjects: editedProfile.value.subjects.map((s: any) => ({
           subjectId: s.subjectId || 0,
@@ -150,9 +144,7 @@
           currency: s.currency.toLowerCase(),
         })),
       };
-
       await editTutorProfile(profileDataToUpdate.userProfile);
-
       for (const subject of editedProfile.value.subjects) {
         if (subject.isNew) {
           await addSubject({
@@ -164,7 +156,7 @@
           subject.isNew = false;
         } else if (subject.isModified) {
           await updateSubject({
-            subjectId: subject.subjectId,
+            subjectId: subject.subjectId ?? 0,
             subjectName: subject.name,
             subjectSlug: subject.name.toLowerCase().replace(/\s+/g, '-'),
             price: subject.price,
@@ -173,8 +165,11 @@
           subject.isModified = false;
         }
       }
-
-      profileStore.setProfileDetails(editedProfile.value);
+      const { profileImage, ...rest } = editedProfile.value;
+      profileStore.setProfileDetails({
+        ...rest,
+        profileImage: profileStore.profileImage,
+      });
       profileStore.toggleEditing();
     } catch (error) {
       console.error('Eroare la salvarea modificărilor profilului:', error);
