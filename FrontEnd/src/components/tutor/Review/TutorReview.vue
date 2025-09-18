@@ -1,3 +1,37 @@
+<script setup lang="ts">
+  import { ref } from 'vue';
+  import ReviewStats from '../Review/ReviewStats.vue';
+  import ReviewCard from '../Review/ReviewCard.vue';
+
+  const ratingsOpen = ref(false);
+  const selectedRating = ref('All Ratings');
+  const ratingsOptions = ['All Ratings', '5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'];
+
+  const sortOpen = ref(false);
+  const selectedSort = ref('Most Recent');
+  const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
+
+  function toggleRatingsDropdown() {
+    ratingsOpen.value = !ratingsOpen.value;
+    sortOpen.value = false;
+  }
+
+  function selectRating(rating: string) {
+    selectedRating.value = rating;
+    ratingsOpen.value = false;
+  }
+
+  function toggleSortDropdown() {
+    sortOpen.value = !sortOpen.value;
+    ratingsOpen.value = false;
+  }
+
+  function selectSort(sort: string) {
+    selectedSort.value = sort;
+    sortOpen.value = false;
+  }
+</script>
+
 <template>
   <div class="content-container">
     <ReviewStats />
@@ -92,40 +126,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref } from 'vue';
-  import ReviewStats from '../review/ReviewStats.vue';
-  import ReviewCard from '../review/ReviewCard.vue';
-
-  const ratingsOpen = ref(false);
-  const selectedRating = ref('All Ratings');
-  const ratingsOptions = ['All Ratings', '5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'];
-
-  const sortOpen = ref(false);
-  const selectedSort = ref('Most Recent');
-  const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
-
-  function toggleRatingsDropdown() {
-    ratingsOpen.value = !ratingsOpen.value;
-    sortOpen.value = false;
-  }
-
-  function selectRating(rating: string) {
-    selectedRating.value = rating;
-    ratingsOpen.value = false;
-  }
-
-  function toggleSortDropdown() {
-    sortOpen.value = !sortOpen.value;
-    ratingsOpen.value = false;
-  }
-
-  function selectSort(sort: string) {
-    selectedSort.value = sort;
-    sortOpen.value = false;
-  }
-</script>
 
 <style scoped>
 .content-container {
