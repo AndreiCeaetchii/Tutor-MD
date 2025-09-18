@@ -1,33 +1,26 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, watch } from 'vue';
+  import { useCalendarStore } from '../../store/calendarStore';
 
+  const store = useCalendarStore();
   const emit = defineEmits(['dateSelected']);
 
   const currentDate = new Date();
   const currentMonth = ref(currentDate.getMonth());
   const currentYear = ref(currentDate.getFullYear());
-  const selectedDate = ref(
-    new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()),
-  );
-
-  // Days with available slots (in this example, we're hardcoding some dates)
-  const daysWithSlots = ref([8, 15, 16, 17]);
-  const selectedDays = ref([currentDate.getDate()]); // Initial selection changed to 9 to match your example
 
   const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
   ];
+
+  // Actualizează data selectată în store când se schimbă luna în calendar
+  watch([currentMonth, currentYear], () => {
+    // Păstrăm ziua selectată dar actualizăm luna și anul
+    const selectedDay = store.currentDay;
+    const newDate = new Date(currentYear.value, currentMonth.value, selectedDay);
+    store.setSelectedDate(newDate);
+  });
 
   const formattedMonth = computed(() => {
     return `${months[currentMonth.value]} ${currentYear.value}`;
@@ -38,7 +31,8 @@
   });
 
   const startDay = computed(() => {
-    return new Date(currentYear.value, currentMonth.value, 1).getDay();
+    const day = new Date(currentYear.value, currentMonth.value, 1).getDay();
+    return day === 0 ? 6 : day - 1;
   });
 
   const previousMonth = () => {
@@ -83,13 +77,9 @@
   };
 
   const selectDate = (day: number) => {
-    selectedDate.value = new Date(currentYear.value, currentMonth.value, day);
-    selectedDays.value = [day]; // Update the selected day
-    handleDateSelected(selectedDate.value);
-  };
-
-  const handleDateSelected = (date: Date) => {
-    selectedDate.value = date;
+    const newDate = new Date(currentYear.value, currentMonth.value, day);
+    store.setSelectedDate(newDate);
+    emit('dateSelected', newDate);
   };
 
   const isCurrentMonth = (day: number) => {
@@ -102,14 +92,25 @@
   };
 
   const isSelectedDate = (day: number) => {
-    return selectedDays.value.includes(day);
+    // Asigură-te că selectedDate este un obiect Date
+    const selectedDate = store.selectedDate instanceof Date ? 
+      store.selectedDate : new Date(store.selectedDate);
+    
+    return (
+      day === selectedDate.getDate() &&
+      currentMonth.value === selectedDate.getMonth() &&
+      currentYear.value === selectedDate.getFullYear()
+    );
   };
 
   const hasSlots = (day: number) => {
-    return daysWithSlots.value.includes(day);
+    return store.daysWithSlots.includes(day);
   };
 
-  // Check if date is in the past
+  const getSlotCount = (day: number) => {
+    return store.slotData[day]?.length || 0;
+  };
+
   const isDateInPast = (day: number) => {
     const checkDate = new Date(currentYear.value, currentMonth.value, day);
     const today = new Date();
@@ -142,11 +143,10 @@
         </button>
       </div>
 
-      <!-- Calendar with more compact design -->
       <div class="max-w-md mx-auto">
         <div class="grid grid-cols-7 gap-2 mb-2 text-center">
           <div
-            v-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
+            v-for="day in ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']"
             :key="day"
             class="py-1 text-sm font-medium text-gray-500"
           >
@@ -155,7 +155,6 @@
         </div>
 
         <div class="grid grid-cols-7 gap-2 text-center">
-          <!-- Previous month days -->
           <div
             v-for="day in getPreviousMonthDays()"
             :key="`prev-${day}`"
@@ -164,7 +163,6 @@
             {{ day }}
           </div>
 
-          <!-- Current month days -->
           <button
             v-for="day in daysInMonth"
             :key="`current-${day}`"
@@ -173,25 +171,20 @@
               'h-10 w-10 rounded-full text-sm flex items-center justify-center relative mx-auto transition-colors',
               isCurrentMonth(day) ? 'bg-gray-100' : '',
               isSelectedDate(day) ? 'bg-indigo-500 text-white' : '',
-              hasSlots(day) && !isSelectedDate(day) ? 'bg-pink-100 text-gray-800' : '',
+              hasSlots(day) && !isSelectedDate(day) ? 'bg-orange-100 text-gray-800' : '',
               !hasSlots(day) && !isSelectedDate(day) ? 'hover:bg-gray-100' : '',
             ]"
             :disabled="isDateInPast(day)"
           >
             {{ day }}
-            <span
-              v-if="hasSlots(day) && !isSelectedDate(day)"
-              class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 -mb-0.5"
+            <span 
+              v-if="getSlotCount(day) > 0 && !isSelectedDate(day)" 
+              class="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-orange-500 rounded-full -top-1 -right-1"
             >
-              <span
-                v-if="day === 15 || day === 16 || day === 17"
-                class="absolute w-1 h-1 bg-pink-400 rounded-full"
-              ></span>
-              <span v-else-if="day === 8" class="absolute w-1 h-1 bg-blue-400 rounded-full"></span>
+              {{ getSlotCount(day) }}
             </span>
           </button>
 
-          <!-- Next month days -->
           <div
             v-for="day in getNextMonthDays()"
             :key="`next-${day}`"
@@ -203,23 +196,9 @@
       </div>
 
       <div class="flex items-center justify-center mt-4 text-xs text-gray-500">
-        <span class="inline-block w-2 h-2 mr-1 bg-pink-200 rounded-full"></span>
-        Days highlighted in pink have available time slots
+        <span class="inline-block w-2 h-2 mr-1 bg-orange-200 rounded-full"></span>
+        Days highlighted in orange have available time slots
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* Add smooth transitions */
-  button {
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
-  }
-</style>

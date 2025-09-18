@@ -1,166 +1,64 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, watch } from 'vue';
+import { useCalendarStore } from '../../store/calendarStore';
 import TimeSlotModal from '../modals/TutorTimeSlotModal.vue';
 
 const props = defineProps<{
   date: Date;
 }>();
 
-// Slot interface
-interface TimeSlot {
+const store = useCalendarStore();
+const isModalOpen = ref(false);
+type Slot = {
   id: string;
   startTime: string;
   endTime: string;
-  status: 'available' | 'booked';
+  status?: string;
   studentName?: string;
-}
+};
 
-// Define which days have slots - must match with TutorCalendar
-const daysWithSlots = ref([8, 15, 16, 17]);
+const editingSlot = ref<Slot | null>(null);
 
-// Get the day of the month from the date prop
-const currentDay = computed(() => props.date.getDate());
-
-// Store the actual slot data
-const slotData = ref<Record<number, TimeSlot[]>>({
-  8: [
-    {
-      id: '1',
-      startTime: '10:00',
-      endTime: '11:00',
-      status: 'booked' as const,
-      studentName: 'Alex Chen'
-    },
-    {
-      id: '2',
-      startTime: '14:00',
-      endTime: '15:00',
-      status: 'available' as const
-    }
-  ],
-  15: [
-    {
-      id: '3',
-      startTime: '09:00',
-      endTime: '10:00',
-      status: 'available' as const
-    },
-    {
-      id: '4',
-      startTime: '15:00',
-      endTime: '16:30',
-      status: 'booked' as const,
-      studentName: 'Maria Rodriguez'
-    }
-  ],
-  16: [
-    {
-      id: '5',
-      startTime: '13:00',
-      endTime: '14:00',
-      status: 'available' as const
-    }
-  ],
-  17: [
-    {
-      id: '6',
-      startTime: '13:00',
-      endTime: '14:00',
-      status: 'available' as const
-    }
-  ]
-});
-
-// Check if the selected date has any slots
-const hasSlots = computed(() => {
-  return daysWithSlots.value.includes(currentDay.value);
-});
-
-// Dynamic slots based on the selected date
-const slots = computed<TimeSlot[]>(() => {
-  if (!hasSlots.value || !slotData.value[currentDay.value]) {
-    return [];
+watch(() => props.date, (newDate) => {
+  if (newDate) {
+    store.setSelectedDate(newDate);
   }
-  
-  return slotData.value[currentDay.value];
-});
+}, { immediate: true });
 
-// Modal control
-const isModalOpen = ref(false);
-
-// Format date for display (e.g., 9/15/2025)
-const formattedDate = computed(() => {
-  const month = props.date.getMonth() + 1;
-  const day = props.date.getDate();
-  const year = props.date.getFullYear();
-  return `${month}/${day}/${year}`;
-});
-
-// Open the modal for adding a new slot
 const openAddSlotModal = () => {
+  editingSlot.value = null;
   isModalOpen.value = true;
 };
 
-// Close the modal
 const closeModal = () => {
   isModalOpen.value = false;
+  editingSlot.value = null;
 };
 
-// Save a new time slot
 const saveNewTimeSlot = (newSlotData: { startTime: string, endTime: string }) => {
-  const day = currentDay.value;
-  
-  // Create a new slot object
-  const newSlot: TimeSlot = {
-    id: `${Date.now()}`,
-    startTime: newSlotData.startTime,
-    endTime: newSlotData.endTime,
-    status: 'available' as const
-  };
-  
-  // If this day doesn't exist in our slots yet, initialize it
-  if (!daysWithSlots.value.includes(day)) {
-    daysWithSlots.value.push(day);
-  }
-  
-  // Initialize the array for this day if it doesn't exist
-  if (!slotData.value[day]) {
-    slotData.value[day] = [];
-  }
-  
-  // Add the new slot to the day's slots
-  slotData.value[day].push(newSlot);
-  
-  console.log(`Added new slot: ${newSlot.startTime}-${newSlot.endTime} on day ${day}`);
-  isModalOpen.value = false;
-};
-
-// Delete time slot
-const deleteSlot = (id: string) => {
-  const day = currentDay.value;
-  
-  // Find the index of the slot to delete
-  const slotIndex = slotData.value[day].findIndex(slot => slot.id === id);
-  
-  if (slotIndex !== -1) {
-    // Remove the slot from the array
-    slotData.value[day].splice(slotIndex, 1);
-    
-    // If this was the last slot for this day, remove the day from daysWithSlots
-    if (slotData.value[day].length === 0) {
-      const dayIndex = daysWithSlots.value.indexOf(day);
-      if (dayIndex !== -1) {
-        daysWithSlots.value.splice(dayIndex, 1);
-      }
-      delete slotData.value[day];
+  try {
+    if (editingSlot.value) {
+      // If editing an existing slot
+      store.editSlot(editingSlot.value.id, newSlotData);
+    } else {
+      // If creating a new slot
+      store.addSlot(newSlotData);
     }
+    isModalOpen.value = false;
+    editingSlot.value = null;
+  } catch (error) {
+    console.error("Error saving slot:", error);
+    // Error will be handled in the modal
   }
 };
 
-// Edit time slot
-const editSlot = (slot: TimeSlot) => {
-  console.log("Edit slot:", slot);
-  // Implement edit functionality here
+const deleteSlot = (id: string) => {
+  store.deleteSlot(id);
+};
+
+const editSlot = (slot: any) => {
+  editingSlot.value = slot;
+  isModalOpen.value = true;
 };
 </script>
 
@@ -169,7 +67,7 @@ const editSlot = (slot: TimeSlot) => {
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center">
         <h2 class="text-xl font-semibold text-gray-800">
-          Slots for {{ formattedDate }}
+          Slots for {{ store.formattedDate }}
         </h2>
       </div>
       <button 
@@ -181,8 +79,7 @@ const editSlot = (slot: TimeSlot) => {
       </button>
     </div>
 
-    <!-- Empty state - No slots scheduled -->
-    <div v-if="slots.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
+    <div v-if="store.slots.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
       <div class="flex items-center justify-center w-24 h-24 mb-4 border-4 border-gray-200 rounded-full">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -192,10 +89,9 @@ const editSlot = (slot: TimeSlot) => {
       <p class="mt-2 text-gray-400">Click "Add Slot" to create availability</p>
     </div>
     
-    <!-- Slot list -->
     <div v-else class="space-y-4">
       <div 
-        v-for="slot in slots" 
+        v-for="slot in store.slots" 
         :key="slot.id"
         class="flex items-center justify-between p-4 transition-colors rounded-lg bg-gray-50 hover:bg-gray-100"
       >
@@ -240,18 +136,11 @@ const editSlot = (slot: TimeSlot) => {
       </div>
     </div>
     
-    <!-- Time Slot Modal -->
     <TimeSlotModal 
       :is-open="isModalOpen"
+      :editing-slot="editingSlot"
       @close="closeModal"
       @save="saveNewTimeSlot"
     />
   </div>
 </template>
-
-<style scoped>
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-</style>
