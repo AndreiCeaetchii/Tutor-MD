@@ -45,6 +45,7 @@ public static class ApplicationSetup
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IBookingNotificationService ,BookingNotificationService>();
         services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IReviewService, ReviewService>();
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
         services.AddTransient<JobSchedulerService>();

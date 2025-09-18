@@ -10,6 +10,11 @@ using Tutor.Application.Features.Booking.Dto;
 using Tutor.Application.Features.Booking.GetBooking;
 using Tutor.Application.Features.Booking.GetBookingsByUser;
 using Tutor.Application.Features.Booking.UpdateBookingStatus;
+using Tutor.Application.Features.Reviews.CreateReview;
+using Tutor.Application.Features.Reviews.DeleteReview;
+using Tutor.Application.Features.Reviews.Dto;
+using Tutor.Application.Features.Reviews.GetReviews;
+using Tutor.Application.Features.Reviews.UpdateReview;
 using Tutor.Application.Features.Students.CreateStudent;
 using Tutor.Application.Features.Students.DTOs;
 using Tutor.Application.Features.Students.GetStudent;
@@ -176,6 +181,93 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetBookingsByTutor")
             .Produces<BookingDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapPost("/reviews/create",
+                async (IMediator mediator, [FromBody] CreateReviewDto createReviewDto ,HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new CreateReviewCommand(userId, createReviewDto);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("CreateReview")
+            .Produces<ReviewDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapPut("/reviews/update/{reviewId}",
+                async (IMediator mediator, [FromBody] UpdateReviewDto updateReviewDto ,HttpContext httpContext, int reviewId ) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new UpdateReviewCommand(userId, updateReviewDto, reviewId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("UpdateReview")
+            .Produces<ReviewDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
+        group.MapDelete("/reviews/delete/{reviewId}",
+                async (IMediator mediator,HttpContext httpContext, int reviewId ) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new DeleteReviewCommand(reviewId, userId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("DeleteReview")
+            .Produces(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapGet("/reviews/{tutorId}",
+                async (IMediator mediator,HttpContext httpContext, int tutorId ) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new GetReviewsCommand(tutorId, userId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("GetReviews")
+            .Produces(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
