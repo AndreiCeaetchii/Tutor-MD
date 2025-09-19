@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, defineProps, defineEmits } from 'vue';
 
 interface Message {
   id: string;
@@ -20,6 +20,23 @@ interface Conversation {
   status: 'online' | 'offline';
   messages: Message[];
 }
+
+const props = defineProps<{ studentName?: string | null }>();
+const emit = defineEmits(['close']);
+
+watch(
+  () => props.studentName,
+  (newName) => {
+    if (newName) {
+      const found = conversations.value.find(c => c.name === newName);
+      if (found) {
+        activeConversation.value = found;
+        showConversationList.value = false;
+      }
+    }
+  },
+  { immediate: true }
+);
 
 // Sample data for conversations
 const conversations = ref<Conversation[]>([

@@ -7,10 +7,10 @@ import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
 //import TutorProfile from '../components/tutor/TutorProfile.vue';
-import TutorReview from '../components/tutor/TutorReview.vue';
-import TutorBookings from '../components/tutor/TutorBookings.vue';
-import TutorChat from '../components/tutor/TutorChat.vue';
-import TutorAvailability from '../components/tutor/TutorAvailability.vue';
+import TutorReview from '../components/tutor/Review/TutorReview.vue';
+import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
+import TutorChat from '../components/tutor/Chat/TutorChat.vue';
+import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
 import ProfilePage from '../pages/ProfilePage.vue';
 
 import CreateProfile from '../components/profile/CreateProfile.vue';
@@ -41,7 +41,7 @@ const routes = [
     component: StudentDashboard,
     meta: { requiresAuth: true, role: 'student' },
     children: [
-      { path: '', redirect: '/student-dashboard/find' }, // implicit → Find Tutors
+      { path: '', redirect: '/student-dashboard/find' },
       { path: 'find', component: FindTutors },
       { path: 'bookings', component: StudentBookings },
       { path: 'reviews', component: StudentReviews },
