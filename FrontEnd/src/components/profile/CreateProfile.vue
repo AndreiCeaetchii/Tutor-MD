@@ -1,22 +1,22 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 p-6 lg:p-12">
+  <div class="min-h-screen p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 lg:p-12">
     <div class="max-w-4xl mx-auto">
       <form @submit.prevent="handleSubmit" class="space-y-8">
         <div
           class="bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] p-8 rounded-2xl shadow-2xl text-center"
         >
-          <h1 class="text-4xl font-bold text-white mb-2">Complete Your Profile</h1>
+          <h1 class="mb-2 text-4xl font-bold text-white">Complete Your Profile</h1>
           <p class="text-purple-100">Let's create your teaching profile together</p>
         </div>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+          class="p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
               class="w-8 h-8 bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] rounded-full flex items-center justify-center mr-3"
             >
-              <span class="text-white font-bold text-sm">1</span>
+              <span class="text-sm font-bold text-white">1</span>
             </div>
             <h2
               class="text-2xl font-bold bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] bg-clip-text text-transparent"
@@ -24,9 +24,9 @@
               Personal Details
             </h2>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
-              <label for="firstName" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="firstName" class="mb-2 text-sm font-semibold text-gray-700"
                 >First name <span class="text-red-500">*</span></label
               >
               <input
@@ -38,7 +38,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="lastName" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="lastName" class="mb-2 text-sm font-semibold text-gray-700"
                 >Last name <span class="text-red-500">*</span></label
               >
               <input
@@ -50,7 +50,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="username" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="username" class="mb-2 text-sm font-semibold text-gray-700"
                 >Username <span class="text-red-500">*</span></label
               >
               <input
@@ -63,7 +63,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="phone" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="phone" class="mb-2 text-sm font-semibold text-gray-700"
                 >Phone <span class="text-red-500">*</span></label
               >
               <input
@@ -76,7 +76,7 @@
               />
             </div>
             <div class="flex flex-col md:col-span-2">
-              <label for="birthdate" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="birthdate" class="mb-2 text-sm font-semibold text-gray-700"
                 >Birthdate <span class="text-red-500">*</span></label
               >
               <input
@@ -91,23 +91,23 @@
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative z-40"
+          class="relative z-40 p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
             >
-              <span class="text-white font-bold text-sm">2</span>
+              <span class="text-sm font-bold text-white">2</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text"
             >
               Location Information
             </h2>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
-              <label for="country" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="country" class="mb-2 text-sm font-semibold text-gray-700"
                 >Country <span class="text-red-500">*</span></label
               >
               <DropdownSelect
@@ -125,7 +125,7 @@
             </div>
 
             <div class="flex flex-col">
-              <label for="city" class="text-sm font-semibold text-gray-700 mb-2"
+              <label for="city" class="mb-2 text-sm font-semibold text-gray-700"
                 >City <span class="text-red-500">*</span></label
               >
               <DropdownSelect
@@ -145,22 +145,22 @@
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+          class="p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500"
             >
-              <span class="text-white font-bold text-sm">3</span>
+              <span class="text-sm font-bold text-white">3</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text"
             >
               Teaching Experience
             </h2>
           </div>
           <div class="flex flex-col">
-            <label for="experienceYears" class="text-sm font-semibold text-gray-700 mb-2"
+            <label for="experienceYears" class="mb-2 text-sm font-semibold text-gray-700"
               >Years of Experience <span class="text-red-500">*</span></label
             >
             <input
@@ -176,16 +176,16 @@
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative z-40"
+          class="relative z-40 p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500"
             >
-              <span class="text-white font-bold text-sm">4</span>
+              <span class="text-sm font-bold text-white">4</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text"
             >
               Subjects & Pricing
             </h2>
@@ -194,19 +194,19 @@
             <div
               v-for="(subject, index) in form.subjects"
               :key="index"
-              class="bg-gradient-to-r from-purple-50 to-indigo-50 p-6 rounded-xl border border-purple-100"
+              class="p-6 border border-purple-100 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl"
             >
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              <div class="grid items-end grid-cols-1 gap-4 md:grid-cols-3">
                 <div class="flex flex-col">
-                  <label class="text-sm font-semibold text-gray-700 mb-2">Subject</label>
+                  <label class="mb-2 text-sm font-semibold text-gray-700">Subject</label>
                   <div
-                    class="px-4 py-3 border-2 border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-md font-medium text-gray-800"
+                    class="px-4 py-3 font-medium text-gray-800 bg-white border-2 border-gray-200 shadow-sm rounded-xl hover:shadow-md"
                   >
                     {{ subject.subjectName }}
                   </div>
                 </div>
                 <div class="flex flex-col">
-                  <label :for="`price-${index}`" class="text-sm font-semibold text-gray-700 mb-2"
+                  <label :for="`price-${index}`" class="mb-2 text-sm font-semibold text-gray-700"
                     >Price per Hour (MDL) <span class="text-red-500">*</span></label
                   >
                   <input
@@ -225,7 +225,7 @@
                     type="button"
                     @click="removeSubject(index)"
                     :disabled="form.subjects.length === 1"
-                    class="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    class="px-4 py-2 text-white transition-colors duration-300 bg-red-500 rounded-xl hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     Remove
                   </button>
@@ -244,16 +244,16 @@
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative z-30"
+          class="relative z-30 p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-orange-500 to-red-500"
             >
-              <span class="text-white font-bold text-sm">5</span>
+              <span class="text-sm font-bold text-white">5</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text"
             >
               Languages
             </h2>
@@ -267,7 +267,7 @@
               {{ lang }}
               <font-awesome-icon
                 :icon="['fas', 'times']"
-                class="cursor-pointer text-gray-400 hover:text-red-500 transition-colors duration-200 w-4 h-4"
+                class="w-4 h-4 text-gray-400 transition-colors duration-200 cursor-pointer hover:text-red-500"
                 @click="removeLanguage(lang)"
               />
             </span>
@@ -280,23 +280,23 @@
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+          class="p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500"
             >
-              <span class="text-white font-bold text-sm">6</span>
+              <span class="text-sm font-bold text-white">6</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text"
             >
               I can teach on
             </h2>
           </div>
           <div class="flex flex-wrap gap-6">
             <div
-              class="flex items-center space-x-3 bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-3 rounded-xl border border-blue-100 hover:shadow-md transition-all duration-300"
+              class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:shadow-md"
             >
               <input
                 id="myHome"
@@ -304,10 +304,10 @@
                 v-model="form.teachingPreferences.myHome"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
               />
-              <label for="myHome" class="text-gray-700 font-medium">My home</label>
+              <label for="myHome" class="font-medium text-gray-700">My home</label>
             </div>
             <div
-              class="flex items-center space-x-3 bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-3 rounded-xl border border-green-100 hover:shadow-md transition-all duration-300"
+              class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:shadow-md"
             >
               <input
                 id="studentHome"
@@ -315,10 +315,10 @@
                 v-model="form.teachingPreferences.studentHome"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
               />
-              <label for="studentHome" class="text-gray-700 font-medium">Student's home</label>
+              <label for="studentHome" class="font-medium text-gray-700">Student's home</label>
             </div>
             <div
-              class="flex items-center space-x-3 bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 rounded-xl border border-purple-100 hover:shadow-md transition-all duration-300"
+              class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:shadow-md"
             >
               <input
                 id="online"
@@ -326,22 +326,22 @@
                 v-model="form.teachingPreferences.online"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
               />
-              <label for="online" class="text-gray-700 font-medium">Online</label>
+              <label for="online" class="font-medium text-gray-700">Online</label>
             </div>
           </div>
         </section>
 
         <section
-          class="bg-white/80 backdrop-blur-sm border border-white/50 p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+          class="p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
         >
           <div class="flex items-center mb-6">
             <div
-              class="w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center mr-3"
+              class="flex items-center justify-center w-8 h-8 mr-3 rounded-full bg-gradient-to-r from-pink-500 to-rose-500"
             >
-              <span class="text-white font-bold text-sm">7</span>
+              <span class="text-sm font-bold text-white">7</span>
             </div>
             <h2
-              class="text-2xl font-bold bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent"
+              class="text-2xl font-bold text-transparent bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text"
             >
               A brief introduction
             </h2>
@@ -360,7 +360,7 @@
             class="relative bg-gradient-to-r from-[#5f22d9] via-[#4a1fb8] to-[#3a22d9] text-white font-bold py-4 px-12 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 text-lg overflow-hidden group"
           >
             <span
-              class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              class="absolute inset-0 transition-opacity duration-300 opacity-0 bg-gradient-to-r from-white/20 to-transparent group-hover:opacity-100"
             ></span>
             <span class="relative">Create Profile</span>
           </button>
@@ -400,7 +400,7 @@
         currency: 'MDL',
       },
     ],
-    languages: [],
+    languages: [] as string[],
     teachingPreferences: {
       myHome: false,
       studentHome: false,

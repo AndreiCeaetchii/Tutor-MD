@@ -28,7 +28,7 @@ function matchesSearchQuery(tutor: Tutor, query: string): boolean {
   );
 }
 
-export const useTutorStore = defineStore('tutor', {
+export const useFindTutorStore = defineStore('tutor', {
   state: () => ({
     // State pentru filtre și paginare
     searchQuery: '',

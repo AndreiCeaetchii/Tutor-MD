@@ -7,11 +7,21 @@
 
   const store = useUserStore();
   const router = useRouter();
-  const activeTab = ref('calendar');
+  const activeTab = ref('find');
+//   const activeTab = ref('calendar');
+
 
   const handleTabChange = (tab: string) => {
     activeTab.value = tab;
   };
+
+  onMounted(() => {
+    if (!store.isAuthenticated) {
+      router.push('/login');
+    } else if (store.userRole !== 'student') {
+      router.push(store.userRole === 'tutor' ? '/tutor-dashboard' : '/landing');
+    }
+  });
 </script>
 
 <template>
@@ -22,6 +32,7 @@
         <p class="text-gray-600">
           Welcome to your dashboard! Here you can manage your sessions, view progress, and update
           your profile.
+
         </p>
       </div>
 

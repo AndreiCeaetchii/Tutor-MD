@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import { useTutorStore } from '../../../store/findTutorStore';
+import { useFindTutorStore } from '../../../store/findTutorStore';
 
-const tutorStore = useTutorStore();
+const tutorStore = useFindTutorStore();
 
 const categories = [
   'Mathematics',
@@ -21,7 +21,6 @@ const categories = [
 const showDropdown = ref(false);
 const categoryBtnRef = ref<HTMLElement | null>(null);
 
-// Watch pentru a aplica debounce când se schimbă valorile
 watch(() => tutorStore.searchQuery, () => {
   tutorStore.debouncedSearch();
 });

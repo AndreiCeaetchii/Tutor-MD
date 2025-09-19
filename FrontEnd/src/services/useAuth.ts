@@ -72,7 +72,7 @@ export function useAuth() {
     if (context === 'signup') {
       return 'Failed to create account. Please try again.';
     } else if (context === 'login') {
-      return 'Failed to log in. Please check your credentials.';
+      return 'This account does not exist. Try to sign up first.';
     } else if (context === 'google') {
       return isSignup
         ? 'Failed to sign up with Google. Please try again.'
