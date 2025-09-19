@@ -12,4 +12,6 @@ public class CreateProfileDto
     public string? City { get; set; }
     public string? Country { get; set; }
     public DateTime? Birthdate { get; set; }
+    
+    public bool? IsActive { get; set; }
 }

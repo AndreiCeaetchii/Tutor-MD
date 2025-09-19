@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Security.Claims;
+using Tutor.Application.Features.Admin.ActivateDeactivateStatus;
+using Tutor.Application.Features.Admin.CreateAdmin;
+using Tutor.Application.Features.Admin.Dto.Activate;
 using Tutor.Application.Features.Notifications.Dto;
 using Tutor.Application.Features.Notifications.GetNotificationCount;
 using Tutor.Application.Features.Notifications.GetNotifications;
@@ -181,7 +184,31 @@ public static class UserEndpoints
             .Produces<NotificationsDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
-        
+        group.MapPut("/changestatus",
+            async (IMediator mediator, [FromBody] ActivateDeactivateDto activateDeactivateDto) =>
+            {
+                var command = new ActivateDeactivateStatusCommand(activateDeactivateDto);
+                var result = await mediator.Send(command);
+                return result.IsSuccess
+                    ? Results.Ok(result.Value)
+                    : Results.BadRequest(result.Errors);
+            })  .WithName("ChangeIsActiveStatus")
+            .RequireAuthorization("AdminPolicy")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPost("/admin/create",
+                async (IMediator mediator, [FromBody] UserIdDto userIdDto) =>
+                {
+                    var command = new CreateAdminCommand(userIdDto.UserId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })  .WithName("CreateAdmin")
+            .RequireAuthorization("AdminPolicy")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+
         
 
         var healthGroup = builder.MapGroup("health")

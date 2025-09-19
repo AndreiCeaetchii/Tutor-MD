@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result;
+using System;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
@@ -87,7 +88,8 @@ public class AuthService : IAuthService
         var currentUserRole = new UserRole
         {
             UserId = user.Id,
-            RoleId = registerDto.RoleId
+            RoleId = registerDto.RoleId,
+            AssignedAt = DateTime.Now
         };
         await _userRoleRepository.Create(currentUserRole);
         

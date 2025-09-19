@@ -12,4 +12,7 @@ public interface IUserService
     Task<User?> GetUserByEmailAsync(string email);
     Task<User> CreateUserFromOAuthAsync(string provider, string providerId, string email);
     Task<Result> UpdateProfileAsync(int userId, CreateProfileDto profileDto);
+    Task<Result> ActivateUserAsync(int userId);
+    Task<Result> DeactivateUserAsync(int userId);
+    Task<Result> CreateAdminAsync(int userId);
 }
