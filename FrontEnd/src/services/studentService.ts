@@ -86,3 +86,34 @@ export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
     throw error;
   }
 };
+
+export const getStudentProfile = async () => {
+  try {
+    const userStore = useUserStore();
+    const token = userStore.accessToken;
+
+    if (!token) {
+      throw new Error('Access token not available. Please log in.');
+    }
+
+    const response = await axios.get(`${API_URL}/student-profile`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        'Eroare la preluarea profilului de student:',
+        error.response ? error.response.data : error.message,
+      );
+    } else {
+      console.error('Eroare necunoscută:', String(error));
+    }
+    throw error;
+  }
+};

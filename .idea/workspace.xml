@@ -6,7 +6,19 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/TutorService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/TutorService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorFilters.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorFilters.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/StudentSearchPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/StudentSearchPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/studentService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/studentService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -95,7 +107,7 @@
       <workItem from="1758102936331" duration="14538000" />
       <workItem from="1758178124742" duration="22062000" />
       <workItem from="1758215144321" duration="6370000" />
-      <workItem from="1758261668559" duration="11415000" />
+      <workItem from="1758261668559" duration="21801000" />
     </task>
     <servers />
   </component>

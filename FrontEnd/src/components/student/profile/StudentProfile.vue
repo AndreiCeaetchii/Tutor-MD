@@ -26,22 +26,47 @@
     >
       <div class="flex flex-col items-center gap-4 mb-8 profile sm:flex-row sm:justify-between">
         <div class="flex flex-col items-center gap-4 sm:flex-row">
-          <div class="relative flex-shrink-0 w-32 h-32 overflow-hidden rounded-full">
-            <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
-            <img
-              v-else
-              :src="profile.profileImage"
-              alt="Profile picture"
-              class="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
-            />
-          </div>
-          <div class="text-center sm:text-left sm:ml-4">
-            <h3 class="text-xl font-semibold text-gray-800">
-              {{ profile.firstName }} {{ profile.lastName }}
-            </h3>
-            <p v-if="!isEditing" class="text-gray-600">
-              Class: {{ profile.class }}, Grade: {{ profile.grade }}
-            </p>
+          <div class="flex flex-col items-center gap-4 sm:flex-row">
+            <div class="relative w-32 h-32 flex-shrink-0">
+              <div class="w-32 h-32 overflow-hidden rounded-full">
+                <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
+                <img
+                  v-else
+                  :src="profile.profileImage"
+                  alt="Profile picture"
+                  class="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
+                />
+              </div>
+
+              <div
+                v-if="isEditing"
+                class="absolute bottom-3 right-0 p-1 bg-white rounded-full shadow-md z-10"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-6 h-6 text-purple-500"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+            </div>
+            <div class="text-center sm:text-left sm:ml-4">
+              <h3 class="text-xl font-semibold text-gray-800">
+                {{ profile.firstName }} {{ profile.lastName }}
+              </h3>
+              <p v-if="!isEditing" class="text-gray-600">
+                Class: {{ profile.class }}, Grade: {{ profile.grade }}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -193,11 +218,12 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, reactive } from 'vue';
+  import { ref, watch, reactive, onMounted } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
-  import { updateStudentProfile } from '../../../services/studentService.ts';
+  import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
   import ProfilePhotoUpload from '../../../components/profile/ProfileImageUploader.vue';
+  import defaultProfileImage from '../../../assets/DefaultImg.png';
 
   const studentStore = useStudentProfileStore();
 
@@ -207,19 +233,52 @@
   const showSuccess = ref(false);
 
   const profile = reactive({
-    firstName: userProfile.value.firstName,
-    lastName: userProfile.value.lastName,
-    phone: userProfile.value.phone,
-    bio: userProfile.value.bio,
-    city: userProfile.value.city,
-    country: userProfile.value.country,
-    grade: grade.value,
-    class: studentClass.value,
-    profileImage: photo.value,
-    username: userProfile.value.username,
+    firstName: userProfile.value?.firstName || '',
+    lastName: userProfile.value?.lastName || '',
+    phone: userProfile.value?.phone || '',
+    bio: userProfile.value?.bio || '',
+    city: userProfile.value?.city || '',
+    country: userProfile.value?.country || '',
+    grade: grade.value || 0,
+    class: studentClass.value || 0,
+    profileImage: photo.value || defaultProfileImage,
+    username: userProfile.value?.username || '',
   });
 
   let originalProfile: any = null;
+
+  const initializeProfile = async () => {
+    if (!userProfile.value?.username) {
+      try {
+        const serverProfile = await getStudentProfile();
+
+        studentStore.updateUserProfile(serverProfile.userProfile);
+        studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
+        studentStore.setPhoto(serverProfile.photo.url);
+
+        syncProfileWithStore();
+      } catch (error) {
+        console.error('Failed to load student profile from server:', error);
+      }
+    } else {
+      syncProfileWithStore();
+    }
+  };
+
+  const syncProfileWithStore = () => {
+    profile.firstName = userProfile.value?.firstName || '';
+    profile.lastName = userProfile.value?.lastName || '';
+    profile.phone = userProfile.value?.phone || '';
+    profile.bio = userProfile.value?.bio || '';
+    profile.city = userProfile.value?.city || '';
+    profile.country = userProfile.value?.country || '';
+    profile.grade = grade.value || 0;
+    profile.class = studentClass.value || 0;
+    profile.username = userProfile.value?.username || '';
+    profile.profileImage = photo.value || defaultProfileImage;
+  };
+
+  onMounted(initializeProfile);
 
   const handleSave = async () => {
     const payload = {
@@ -237,7 +296,6 @@
 
     try {
       const response = await updateStudentProfile(payload);
-      console.log('Profile updated successfully on the server:', response);
 
       studentStore.updateUserProfile({
         firstName: profile.firstName || '',
@@ -249,15 +307,14 @@
         username: profile.username,
       });
       studentStore.updateGradeAndClass(profile.grade, profile.class);
-      profile.profileImage = response.photo.url;
-      studentStore.setPhoto(response.photo.url);
+      studentStore.setPhoto(response.photo?.url || defaultProfileImage); // Salvează URL-ul primit
 
+      profile.profileImage = response.photo?.url || defaultProfileImage;
       isEditing.value = false;
       showSuccess.value = true;
       setTimeout(() => (showSuccess.value = false), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to save profile changes. Please try again.');
     }
   };
 
@@ -273,6 +330,14 @@
       originalProfile = null;
     }
   });
+
+  watch(
+    () => [userProfile.value, grade.value, studentClass.value, photo.value],
+    () => {
+      syncProfileWithStore();
+    },
+    { deep: true },
+  );
 </script>
 
 <style scoped>

@@ -19,10 +19,10 @@ import CreateStudentProfile from '../components/student/profile/CreateStudentPro
 import StudentSearchPage from '../pages/StudentSearchPage.vue';
 const StudentBookings = { template: '<div>My Bookings (work in progress)</div>' };
 const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
-const StudentMessages = { template: '<div>Messages (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
+import { useStudentProfileStore } from '../store/studentProfileStore';
 
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
@@ -49,7 +49,7 @@ const routes = [
       { path: 'find', component: StudentSearchPage },
       { path: 'bookings', component: StudentBookings },
       { path: 'reviews', component: StudentReviews },
-      { path: 'messages', component: StudentMessages },
+      { path: 'messages', component: TutorChat },
       { path: 'account', component: StudentProfile },
     ],
   },
@@ -79,10 +79,18 @@ router.beforeEach((to, _, next) => {
   const hasToken = store.isAuthenticated;
   const userRole = store.userRole;
   const profileStore = useProfileStore();
+  const studentProfileStore = useStudentProfileStore();
 
   if (to.path === '/create-profile') {
     if (profileStore.firstName && profileStore.lastName) {
       next('/tutor-dashboard');
+      return;
+    }
+  }
+
+  if (to.path === '/create-student-profile') {
+    if (studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName) {
+      next('/student-dashboard');
       return;
     }
   }

@@ -240,6 +240,7 @@
   import { useUserStore } from '../store/userStore.ts';
   import { useProfileStore } from '../store/profileStore.ts';
   import { computed } from 'vue';
+  import { useStudentProfileStore } from '../store/studentProfileStore.ts';
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 
@@ -256,8 +257,8 @@
   const profileStore = useProfileStore();
   const isMenuOpen = ref(false);
   const showProfileMenu = ref(false);
+  const studentProfileStore = useStudentProfileStore();
 
-  // Adaugă referințe la elementele DOM
   const profileButton = ref<HTMLElement | null>(null);
   const profileMenu = ref<HTMLElement | null>(null);
 
@@ -276,14 +277,17 @@
   function handleLogout() {
     store.clearUser();
     profileStore.clearProfile();
+    studentProfileStore.clearProfile();
     router.push('/landing');
     showProfileMenu.value = false;
   }
 
-  const userName = computed(() => profileStore.userName);
-  const email = computed(() => profileStore.email);
+  const userName = computed(() =>
+    profileStore.userName ? profileStore.userName : studentProfileStore.userProfile.username,
+  );
 
-  // Funcția care verifică dacă click-ul a avut loc în afara meniului
+  const email = computed(() => store.email);
+
   function handleClickOutside(event: MouseEvent) {
     if (
       showProfileMenu.value &&

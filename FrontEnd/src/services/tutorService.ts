@@ -184,3 +184,29 @@ export const updateSubject = async (subjectData: UpdateSubject) => {
     throw error;
   }
 };
+
+export const getTutors = async () => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    if (!token) {
+      throw new Error('User not authenticated. Access token is missing.');
+    }
+
+    const response = await axios.get(`${API_URL}/get-tutors`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      'Eroare la preluarea listei de tutori:',
+      error.response ? error.response.data : error.message,
+    );
+    throw error;
+  }
+};

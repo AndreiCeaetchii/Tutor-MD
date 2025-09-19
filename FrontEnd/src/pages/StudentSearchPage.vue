@@ -1,12 +1,10 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useUserStore } from '../store/userStore';
   import SearchBar from '../components/student/FindTutor/SearchBar.vue';
   import TutorFilters from '../components/student/FindTutor/TutorFilters.vue';
   import TutorList from '../components/student/FindTutor/TutorList.vue';
 
-  const store = useUserStore();
   const router = useRouter();
   const showFilters = ref(false);
 </script>

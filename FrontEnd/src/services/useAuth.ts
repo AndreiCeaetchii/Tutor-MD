@@ -105,8 +105,6 @@ export function useAuth() {
       // @ts-ignore
 
       store.setUser(data.token, data.id, formData.role || 'student', formData.email);
-
-      console.log('Signup successful!');
       return true;
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'signup');
