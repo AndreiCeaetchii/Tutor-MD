@@ -55,17 +55,6 @@ export const useCalendarStore = defineStore('calendar', {
       return `${day.toString().padStart(2, '0')}.${month.toString().padStart(2, '0')}.${year}`;
     },
     
-    isPastDate(): boolean {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const selectedDate = this.selectedDate instanceof Date ?
-        this.selectedDate : new Date(this.selectedDate);
-      selectedDate.setHours(0, 0, 0, 0);
-      
-      return selectedDate < today;
-    },
-    
     currentMonthData(): MonthData {
       return this.slotsByMonth[this.currentMonthKey] || { 
         daysWithSlots: [], 
@@ -99,13 +88,11 @@ export const useCalendarStore = defineStore('calendar', {
   },
   
   actions: {
-    // Utility function to convert time string to minutes for comparison
     timeToMinutes(time: string): number {
       const [hours, minutes] = time.split(':').map(Number);
       return hours * 60 + minutes;
     },
     
-    // Inițializează datele pentru luna curentă dacă nu există
     initializeMonthData() {
       if (!this.slotsByMonth[this.currentMonthKey]) {
         this.slotsByMonth[this.currentMonthKey] = {
@@ -116,21 +103,30 @@ export const useCalendarStore = defineStore('calendar', {
       }
       return this.slotsByMonth[this.currentMonthKey];
     },
+
+    isPastDate(): boolean {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const selectedDate = this.selectedDate instanceof Date ?
+        this.selectedDate : new Date(this.selectedDate);
+      selectedDate.setHours(0, 0, 0, 0);
+      
+      return selectedDate < today;
+    },
     
-    // Check if a time slot overlaps with existing slots
     checkOverlap(newSlot: { startTime: string, endTime: string }, excludeId?: string): boolean {
       const day = this.currentDay;
       const monthData = this.currentMonthData;
       
       if (!monthData.slotData[day] || monthData.slotData[day].length === 0) {
-        return false; // No existing slots, so no overlap
+        return false;
       }
       
       const newStart = this.timeToMinutes(newSlot.startTime);
       const newEnd = this.timeToMinutes(newSlot.endTime);
       
       return monthData.slotData[day].some(existingSlot => {
-        // If we're editing a slot, exclude it from the check
         if (excludeId && existingSlot.id === excludeId) {
           return false;
         }
@@ -138,7 +134,6 @@ export const useCalendarStore = defineStore('calendar', {
         const existingStart = this.timeToMinutes(existingSlot.startTime);
         const existingEnd = this.timeToMinutes(existingSlot.endTime);
         
-        // Check for overlap: new start is before existing end AND new end is after existing start
         return (newStart < existingEnd && newEnd > existingStart);
       });
     },
@@ -147,32 +142,28 @@ export const useCalendarStore = defineStore('calendar', {
       this.selectedDate = typeof date === 'string' ? new Date(date) : date;
     },
     
-    // Modified addSlot to check for overlaps and handle past dates
     addSlot(newSlotData: { startTime: string, endTime: string }) {
-      // Check for overlaps first
       if (this.checkOverlap(newSlotData)) {
         throw new Error('This time slot overlaps with an existing slot');
       }
       
       const day = this.currentDay;
       
-      // Asigură-te că datele pentru luna curentă sunt inițializate
       const monthData = this.initializeMonthData();
-      
+
       const newSlot: TimeSlot = {
         id: `${Date.now()}`,
         startTime: newSlotData.startTime,
         endTime: newSlotData.endTime,
         status: 'available',
-        isEditedPastSlot: this.isPastDate
+        isEditedPastSlot: this.isPastDate()
       };
       
       if (!monthData.daysWithSlots.includes(day)) {
         monthData.daysWithSlots.push(day);
       }
       
-      // If this is a past date, add it to daysWithEditedPastSlots
-      if (this.isPastDate && !monthData.daysWithEditedPastSlots?.includes(day)) {
+      if (this.isPastDate() && !monthData.daysWithEditedPastSlots?.includes(day)) {
         if (!monthData.daysWithEditedPastSlots) {
           monthData.daysWithEditedPastSlots = [];
         }
@@ -186,7 +177,6 @@ export const useCalendarStore = defineStore('calendar', {
       monthData.slotData[day].push(newSlot);
     },
     
-    // Modified editSlot to check for overlaps and handle past dates
     editSlot(id: string, updatedData: { startTime?: string, endTime?: string }) {
       const day = this.currentDay;
       const monthData = this.currentMonthData;
@@ -196,26 +186,21 @@ export const useCalendarStore = defineStore('calendar', {
       const slot = monthData.slotData[day].find(slot => slot.id === id);
       
       if (slot) {
-        // Create temp slot with the updated data for overlap checking
         const tempSlot = {
           startTime: updatedData.startTime || slot.startTime,
           endTime: updatedData.endTime || slot.endTime
         };
         
-        // Check for overlaps, excluding the current slot
         if (this.checkOverlap(tempSlot, id)) {
           throw new Error('This time slot would overlap with another existing slot');
         }
         
-        // If no overlaps, update the slot
         if (updatedData.startTime) slot.startTime = updatedData.startTime;
         if (updatedData.endTime) slot.endTime = updatedData.endTime;
         
-        // Mark as edited past slot if applicable
-        if (this.isPastDate) {
+        if (this.isPastDate()) {
           slot.isEditedPastSlot = true;
           
-          // Add to daysWithEditedPastSlots if not already there
           if (!monthData.daysWithEditedPastSlots) {
             monthData.daysWithEditedPastSlots = [];
           }
@@ -243,7 +228,6 @@ export const useCalendarStore = defineStore('calendar', {
             monthData.daysWithSlots.splice(dayIndex, 1);
           }
           
-          // If this was a past date, remove from daysWithEditedPastSlots as well
           if (monthData.daysWithEditedPastSlots) {
             const editedDayIndex = monthData.daysWithEditedPastSlots.indexOf(day);
             if (editedDayIndex !== -1) {
@@ -256,7 +240,6 @@ export const useCalendarStore = defineStore('calendar', {
       }
     },
     
-    // Metodă nouă pentru a obține statistici pentru luna curentă
     getCurrentMonthStatistics() {
       const monthData = this.currentMonthData;
       
@@ -293,14 +276,12 @@ export const useCalendarStore = defineStore('calendar', {
     serializer: {
       deserialize(serializedState) {
         const state = JSON.parse(serializedState);
-        // Convertim înapoi la Date când încărcăm din localStorage
         if (state.selectedDate) {
           state.selectedDate = new Date(state.selectedDate);
         }
         return state;
       },
       serialize(state) {
-        // Creăm o copie pentru a nu modifica starea originală
         const stateCopy = JSON.parse(JSON.stringify(state));
         return JSON.stringify(stateCopy);
       }
