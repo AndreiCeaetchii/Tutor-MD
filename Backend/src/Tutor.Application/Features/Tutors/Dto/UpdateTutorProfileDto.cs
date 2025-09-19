@@ -13,4 +13,6 @@ public class UpdateTutorProfileDto
     public string? City { get; set; }
     public string? Country { get; set; }
     public int? ExperienceYears { get; set; }
+    public int WorkingLocation { get; set; }
+
 }

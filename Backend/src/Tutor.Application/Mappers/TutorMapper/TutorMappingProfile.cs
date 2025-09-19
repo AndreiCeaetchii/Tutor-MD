@@ -1,6 +1,7 @@
 ﻿using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Domain.Entities;
 using AutoMapper;
+using System.Linq;
 using Tutor.Application.Features.Photos.DTOs;
 using Tutor.Application.Features.Users.Dtos;
 
@@ -15,6 +16,12 @@ public class TutorMappingProfile : Profile
         CreateMap<TutorProfile, TutorProfileDto>()
             .ForMember(dest => dest.UserProfile, 
                 opt => opt.MapFrom(src => src.User))
+            .ForMember(dest => dest.Rating,
+                opt => opt.MapFrom(src => src.Reviews.Any()
+                    ? src.Reviews.Average(r => r.Rating)   // assumes Review has Rating
+                    : 0))
+            .ForMember(dest => dest.ReviewCount,
+                opt => opt.MapFrom(src => src.Reviews.Count))
             .ForMember(dest => dest.Photo,
                 opt => opt.MapFrom(src => src.User.Photo));
 

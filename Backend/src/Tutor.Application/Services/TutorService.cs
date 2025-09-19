@@ -54,6 +54,7 @@ public class TutorService : ITutorService
             UserId = userId,
             VerificationStatus = createTutorProfileDto.VerificationStatus,
             ExperienceYears = createTutorProfileDto.ExperienceYears,
+            WorkingLocation = createTutorProfileDto.WorkingLocation
         };
 
         await _tutorProfileRepository.Create(tutorProfile);
@@ -126,6 +127,7 @@ public class TutorService : ITutorService
         if (tutorProfile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
         tutorProfile.ExperienceYears = updateTutorProfileDto.ExperienceYears;
+        tutorProfile.WorkingLocation = updateTutorProfileDto.WorkingLocation;
         await _tutorProfileRepository.Update(tutorProfile);
         
         return  Result<TutorProfileDto>.Success(_mapper.Map<TutorProfileDto>(tutorProfile));
