@@ -32,9 +32,9 @@ const calculateDuration = (startTime: string, endTime: string): string => {
   if (durationMinutes < 0) durationMinutes += 24 * 60;
   
   if (durationMinutes % 60 === 0) {
-    return `${durationMinutes / 60} ore`;
+    return `${durationMinutes / 60} hours`;
   } else {
-    return `${Math.floor(durationMinutes / 60)} ore ${durationMinutes % 60} minute`;
+    return `${Math.floor(durationMinutes / 60)} hours ${durationMinutes % 60} minutes`;
   }
 };
 
@@ -121,6 +121,7 @@ export const useBookingStore = defineStore('booking', {
           tutorId: 104
         }
       ];
+      console.log(`Fetching bookings for student ${studentId}`);
       
       this.loading = false;
     },
@@ -135,6 +136,8 @@ export const useBookingStore = defineStore('booking', {
         { id: 6, startTime: "15:00", endTime: "16:00", isAvailable: false },
         { id: 7, startTime: "16:00", endTime: "17:00", isAvailable: true }
       ].filter(slot => slot.isAvailable);
+
+      console.log(`Getting available slots for tutor ${tutorId} on ${date}`);
       
       return this.availableTimeSlots;
     },
@@ -152,7 +155,7 @@ export const useBookingStore = defineStore('booking', {
       const duration = startTime && endTime ? calculateDuration(startTime, endTime) : "";
       
       const newBooking: Booking = {
-        id: Math.floor(Math.random() * 1000) + 10,
+        id: Date.now() + Math.floor(Math.random() * 1000),
         studentName: "Current Student",
         tutorName: bookingData.tutorName || "Selected Tutor",
         subject: bookingData.subject || "",

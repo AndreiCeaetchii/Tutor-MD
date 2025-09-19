@@ -200,7 +200,12 @@ const cancelBooking = async (bookingId: number) => {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  return date.toLocaleDateString(navigator.language || 'en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
 };
 
 const getStatusClass = (status: string) => {
@@ -225,7 +230,11 @@ const getStatusText = (status: string) => {
 
 const loadTutorTimeSlots = async () => {
   if (selectedTutor.value && selectedDate.value) {
-    await bookingStore.getAvailableTimeSlots(selectedTutor.value.id, selectedDate.value);
+    try {
+      await bookingStore.getAvailableTimeSlots(selectedTutor.value.id, selectedDate.value);
+    } catch (error) {
+      console.error("Failed to load available time slots:", error);
+    }
   }
 };
 
