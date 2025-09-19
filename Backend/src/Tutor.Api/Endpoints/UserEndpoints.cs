@@ -102,6 +102,7 @@ public static class UserEndpoints
             .WithName("AddPhoto")
             .Produces<PhotoDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status401Unauthorized)
             .DisableAntiforgery();
         group.MapDelete("/delete-photo",
@@ -121,6 +122,7 @@ public static class UserEndpoints
                 })
             .WithName("DeletePhoto")
             .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -161,6 +163,7 @@ public static class UserEndpoints
                 })
             .WithName("GetNotifications")
             .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces<NotificationsDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -181,6 +184,7 @@ public static class UserEndpoints
                 })
             .WithName("ReadNotification")
             .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces<NotificationsDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
@@ -194,8 +198,10 @@ public static class UserEndpoints
                     : Results.BadRequest(result.Errors);
             })  .WithName("ChangeIsActiveStatus")
             .RequireAuthorization("AdminPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
+       
         group.MapPost("/admin/create",
                 async (IMediator mediator, [FromBody] UserIdDto userIdDto) =>
                 {
@@ -206,6 +212,7 @@ public static class UserEndpoints
                         : Results.BadRequest(result.Errors);
                 })  .WithName("CreateAdmin")
             .RequireAuthorization("AdminPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 

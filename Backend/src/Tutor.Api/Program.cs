@@ -10,6 +10,7 @@ using System.Threading;
 using Tutor.Api.Common;
 using Tutor.Api.Configurations;
 using Tutor.Api.Endpoints;
+using Tutor.Api.Filters.Guards;
 using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Seeder;
@@ -51,6 +52,9 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser().RequireRole("Admin"));
     options.AddPolicy("TutorOrStudentPolicy", policy =>
         policy.RequireRole("Tutor", "Student"));
+    
+    options.AddPolicy("ActiveUserOnly", policy =>
+        policy.Requirements.Add(new ActiveUserRequirement()));
 });
 // Add identity stuff
 builder.Services

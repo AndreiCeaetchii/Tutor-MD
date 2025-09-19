@@ -48,7 +48,8 @@ public static class StudentEndpoints
                     : Results.BadRequest(result.Errors);
             })
             .WithName("CreateStudentProfile")
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("StudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -72,6 +73,7 @@ public static class StudentEndpoints
             .WithName("GetStudentProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPut("/update-profile",
@@ -94,6 +96,7 @@ public static class StudentEndpoints
             .WithName("UpdateStudentProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -116,6 +119,7 @@ public static class StudentEndpoints
             }).WithName("CreateBooking")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -138,6 +142,7 @@ public static class StudentEndpoints
                 }).WithName("UpdateBookingStatus")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -160,6 +165,7 @@ public static class StudentEndpoints
                 }).WithName("GetBooking")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -204,6 +210,7 @@ public static class StudentEndpoints
                 }).WithName("CreateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -226,6 +233,7 @@ public static class StudentEndpoints
                 }).WithName("UpdateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -248,8 +256,10 @@ public static class StudentEndpoints
                 }).WithName("DeleteReview")
             .Produces(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapGet("/reviews/{tutorId}",
                 async (IMediator mediator,HttpContext httpContext, int tutorId ) =>
                 {
@@ -269,6 +279,7 @@ public static class StudentEndpoints
                 }).WithName("GetReviews")
             .Produces(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         

@@ -101,6 +101,10 @@ public class BookingService : IBookingService
         var availability = await _tutorAvailabilityRuleRepository.GetById(createBookingDto.AvailabilityRuleId);
         if (availability == null)
             return Result.Error("Availability Rule not found");
+        var bookingsExisting = await _bookingRepository.FindAsync(u=>u.AvailabilityRuleId == availability.Id);
+        foreach (var booking in bookingsExisting)
+            if(booking.Status != BookingStatus.Cancelled)
+                return Result.Error("Booking already exists");
         return Result.Success();
     }
 

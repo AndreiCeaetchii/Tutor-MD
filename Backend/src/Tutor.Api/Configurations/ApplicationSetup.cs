@@ -1,11 +1,13 @@
 ﻿using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using Tutor.Api.Filters.Guards;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Mappers;
@@ -46,6 +48,8 @@ public static class ApplicationSetup
         services.AddScoped<IBookingNotificationService ,BookingNotificationService>();
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
+
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
         services.AddTransient<JobSchedulerService>();
