@@ -1,8 +1,6 @@
-// src/stores/studentProfileStore.ts
 import { defineStore } from 'pinia';
 import defaultProfileImage from '../assets/DefaultImg.png';
 
-// Type for the user profile object
 interface UserProfile {
   phone: string;
   username: string;
@@ -14,7 +12,6 @@ interface UserProfile {
   birthdate: string;
 }
 
-// Main state interface
 export interface StudentProfileState {
   grade: number;
   class: number;

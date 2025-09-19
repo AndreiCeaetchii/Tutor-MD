@@ -1,74 +1,3 @@
-<script setup lang="ts">
-  import { ref, watch, reactive } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
-
-  const studentStore = useStudentProfileStore();
-
-  const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
-
-  const isEditing = ref(false);
-  const showSuccess = ref(false);
-
-  const profile = reactive({
-    firstName: userProfile.value.firstName,
-    lastName: userProfile.value.lastName,
-    phone: userProfile.value.phone,
-    bio: userProfile.value.bio,
-    city: userProfile.value.city,
-    country: userProfile.value.country,
-    grade: grade.value,
-    class: studentClass.value,
-    profileImage: photo.value,
-    username: userProfile.value.username,
-  });
-
-  let originalProfile: any = null;
-
-  const handleSave = () => {
-    studentStore.updateUserProfile({
-      firstName: profile.firstName || '',
-      lastName: profile.lastName || '',
-      phone: profile.phone,
-      bio: profile.bio,
-      city: profile.city,
-      country: profile.country,
-      username: profile.username,
-    });
-    studentStore.updateGradeAndClass(profile.grade, profile.class);
-    studentStore.setPhoto(profile.profileImage);
-
-    isEditing.value = false;
-    showSuccess.value = true;
-    setTimeout(() => (showSuccess.value = false), 3000);
-  };
-
-  const handleCancel = () => {
-    if (originalProfile) Object.assign(profile, originalProfile);
-    isEditing.value = false;
-  };
-
-  watch(isEditing, (val) => {
-    if (val) {
-      originalProfile = { ...profile };
-    } else {
-      originalProfile = null;
-    }
-  });
-
-  const handleImageUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        profile.profileImage = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-</script>
-
 <template>
   <div class="profile-container">
     <transition name="fade">
@@ -97,31 +26,14 @@
     >
       <div class="flex flex-col items-center gap-4 mb-8 profile sm:flex-row sm:justify-between">
         <div class="flex flex-col items-center gap-4 sm:flex-row">
-          <div class="relative flex-shrink-0 w-24 h-24 overflow-hidden rounded-full">
+          <div class="relative flex-shrink-0 w-32 h-32 overflow-hidden rounded-full">
+            <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
             <img
+              v-else
               :src="profile.profileImage"
               alt="Profile picture"
-              class="object-cover w-full h-full"
+              class="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
             />
-            <label v-if="isEditing" class="absolute inset-0 cursor-pointer">
-              <input type="file" class="hidden" accept="image/*" @change="handleImageUpload" />
-              <div
-                class="absolute bottom-0 right-0 bg-purple-600 text-white rounded-full p-1.5 shadow-lg hover:bg-purple-700 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-3.5 w-3.5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              </div>
-            </label>
           </div>
           <div class="text-center sm:text-left sm:ml-4">
             <h3 class="text-xl font-semibold text-gray-800">
@@ -279,6 +191,89 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+  import { ref, watch, reactive } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
+  import { updateStudentProfile } from '../../../services/studentService.ts';
+  import ProfilePhotoUpload from '../../../components/profile/ProfileImageUploader.vue';
+
+  const studentStore = useStudentProfileStore();
+
+  const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
+
+  const isEditing = ref(false);
+  const showSuccess = ref(false);
+
+  const profile = reactive({
+    firstName: userProfile.value.firstName,
+    lastName: userProfile.value.lastName,
+    phone: userProfile.value.phone,
+    bio: userProfile.value.bio,
+    city: userProfile.value.city,
+    country: userProfile.value.country,
+    grade: grade.value,
+    class: studentClass.value,
+    profileImage: photo.value,
+    username: userProfile.value.username,
+  });
+
+  let originalProfile: any = null;
+
+  const handleSave = async () => {
+    const payload = {
+      username: profile.username,
+      phone: profile.phone,
+      firstName: profile.firstName || '',
+      lastName: profile.lastName || '',
+      bio: profile.bio,
+      birthdate: userProfile.value.birthdate,
+      grade: profile.grade,
+      class: profile.class,
+      city: profile.city,
+      country: profile.country,
+    };
+
+    try {
+      const response = await updateStudentProfile(payload);
+      console.log('Profile updated successfully on the server:', response);
+
+      studentStore.updateUserProfile({
+        firstName: profile.firstName || '',
+        lastName: profile.lastName || '',
+        phone: profile.phone,
+        bio: profile.bio,
+        city: profile.city,
+        country: profile.country,
+        username: profile.username,
+      });
+      studentStore.updateGradeAndClass(profile.grade, profile.class);
+      profile.profileImage = response.photo.url;
+      studentStore.setPhoto(response.photo.url);
+
+      isEditing.value = false;
+      showSuccess.value = true;
+      setTimeout(() => (showSuccess.value = false), 3000);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to save profile changes. Please try again.');
+    }
+  };
+
+  const handleCancel = () => {
+    if (originalProfile) Object.assign(profile, originalProfile);
+    isEditing.value = false;
+  };
+
+  watch(isEditing, (val) => {
+    if (val) {
+      originalProfile = { ...profile };
+    } else {
+      originalProfile = null;
+    }
+  });
+</script>
 
 <style scoped>
   .profile-container {
