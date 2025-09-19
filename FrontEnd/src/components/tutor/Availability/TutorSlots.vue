@@ -72,7 +72,7 @@ const editSlot = (slot: any) => {
       </div>
       <button 
         @click="openAddSlotModal"
-        class="flex items-center px-4 py-2 text-white transition-colors bg-orange-500 rounded-full hover:bg-orange-600"
+        class="flex items-center px-4 py-2 text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600"
       >
         <span class="mr-1">+</span>
         Add Slot
