@@ -1,79 +1,86 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useFindTutorStore } from '../../../store/findTutorStore';
-import debounce from 'lodash/debounce';
+  import { ref, watch } from 'vue';
+  import { useTutorStore } from '../../../store/findTutorStore';
+  import debounce from 'lodash/debounce';
 
-const tutorStore = useFindTutorStore();
+  const tutorStore = useTutorStore();
 
-const localPriceMin = ref(tutorStore.priceMin);
-const localPriceMax = ref(tutorStore.priceMax);
+  // Variabile locale pentru price range cu debounce
+  const localPriceMin = ref(tutorStore.priceMin);
+  const localPriceMax = ref(tutorStore.priceMax);
 
-const educationLevels = [
-  'Primary (Class 1-5)',
-  'Middle (Class 6-10)',
-  'Intermediate',
-  'High school'
-];
+  const educationLevels = [
+    'Primary (Class 1-5)',
+    'Middle (Class 6-10)',
+    'Intermediate',
+    'High school',
+  ];
 
-const showDropdown = ref(false);
+  const showDropdown = ref(false);
 
-const subjects = [
-  'English', 
-  'Informatics', 
-  'Mathematics', 
-  'Science', 
-  'Physics', 
-  'Chemistry', 
-  'Biology', 
-  'History', 
-  'Geography', 
-  'Economics', 
-  'Art', 
-  'Music', 
-  'Foreign Languages', 
-  'Literature', 
-  'Computer Science', 
-  'Physical Education'
-];
+  // Lista de subiecte
+  const subjects = [
+    'English',
+    'Informatics',
+    'Mathematics',
+    'Science',
+    'Physics',
+    'Chemistry',
+    'Biology',
+    'History',
+    'Geography',
+    'Economics',
+    'Art',
+    'Music',
+    'Foreign Languages',
+    'Literature',
+    'Computer Science',
+    'Physical Education',
+  ];
 
-const ratings = [5, 4, 3, 2, 1];
+  const ratings = [5, 4, 3, 2, 1];
 
-const services = ['My home', "Student's home", 'Online'];
+  const services = ['My home', "Student's home", 'Online'];
 
-const debouncedUpdatePriceRange = debounce(() => {
-  tutorStore.priceMin = localPriceMin.value;
-  tutorStore.priceMax = localPriceMax.value;
-  tutorStore.applyFilters();
-}, 500);
+  const debouncedUpdatePriceRange = debounce(() => {
+    tutorStore.priceMin = localPriceMin.value;
+    tutorStore.priceMax = localPriceMax.value;
+  }, 500);
 
-watch([localPriceMin, localPriceMax], () => {
-  debouncedUpdatePriceRange();
-});
+  watch([localPriceMin, localPriceMax], () => {
+    debouncedUpdatePriceRange();
+  });
 
-watch(() => tutorStore.priceMin, (newVal) => {
-  localPriceMin.value = newVal;
-});
+  // Funcție pentru a seta valorile inițiale când se resetează filtrele
+  watch(
+    () => tutorStore.priceMin,
+    (newVal) => {
+      localPriceMin.value = newVal;
+    },
+  );
 
-watch(() => tutorStore.priceMax, (newVal) => {
-  localPriceMax.value = newVal;
-});
+  watch(
+    () => tutorStore.priceMax,
+    (newVal) => {
+      localPriceMax.value = newVal;
+    },
+  );
 
-function selectEducationLevel(level: string) {
-  tutorStore.educationLevel = level;
-  showDropdown.value = false;
-  tutorStore.applyFilters();
-}
-
-function handleClickOutside(event: MouseEvent) {
-  const dropdown = document.getElementById('education-dropdown');
-  if (dropdown && !dropdown.contains(event.target as Node)) {
+  function selectEducationLevel(level: string) {
+    tutorStore.educationLevel = level;
     showDropdown.value = false;
   }
-}
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('mousedown', handleClickOutside);
-}
+  function handleClickOutside(event: MouseEvent) {
+    const dropdown = document.getElementById('education-dropdown');
+    if (dropdown && !dropdown.contains(event.target as Node)) {
+      showDropdown.value = false;
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('mousedown', handleClickOutside);
+  }
 </script>
 
 <template>
@@ -86,8 +93,18 @@ if (typeof window !== 'undefined') {
         type="button"
       >
         <span>{{ tutorStore.educationLevel || 'Select education level' }}</span>
-        <svg class="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <svg
+          class="w-5 h-5 ml-2 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
       <div
@@ -129,20 +146,20 @@ if (typeof window !== 'undefined') {
     <div class="mb-6">
       <label class="block mb-2 font-semibold text-gray-700">Price range</label>
       <div class="flex items-center gap-2">
-        <input 
-          type="number" 
-          v-model="localPriceMin" 
-          class="w-20 px-2 py-1 border rounded" 
-          min="0" 
-          placeholder="Min" 
+        <input
+          type="number"
+          v-model="localPriceMin"
+          class="w-20 px-2 py-1 border rounded"
+          min="0"
+          placeholder="Min"
         />
         <span>-</span>
-        <input 
-          type="number" 
-          v-model="localPriceMax" 
-          class="w-20 px-2 py-1 border rounded" 
-          min="0" 
-          placeholder="Max" 
+        <input
+          type="number"
+          v-model="localPriceMax"
+          class="w-20 px-2 py-1 border rounded"
+          min="0"
+          placeholder="Max"
         />
       </div>
     </div>
@@ -150,11 +167,7 @@ if (typeof window !== 'undefined') {
     <div class="mb-6">
       <label class="block mb-2 font-semibold text-gray-700">Rating</label>
       <div class="flex flex-col gap-2">
-        <label
-          v-for="star in ratings"
-          :key="star"
-          class="flex items-center gap-2 cursor-pointer"
-        >
+        <label v-for="star in ratings" :key="star" class="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
             :value="star"
@@ -162,12 +175,13 @@ if (typeof window !== 'undefined') {
             class="w-4 h-4 rounded accent-purple-600"
           />
           <span class="flex items-center">
-            <span 
-              v-for="i in 5" 
-              :key="i" 
+            <span
+              v-for="i in 5"
+              :key="i"
               class="text-xl"
               :class="i <= star ? 'text-yellow-400' : 'text-gray-300'"
-            >&#9733;</span>
+              >&#9733;</span
+            >
             <span class="ml-2 font-semibold text-gray-700">{{ star }}.0</span>
             <span class="ml-1 text-gray-400">/5.0</span>
           </span>
@@ -177,11 +191,11 @@ if (typeof window !== 'undefined') {
 
     <div class="mb-6">
       <label class="block mb-2 font-semibold text-gray-700">Location</label>
-      <input 
-        type="text" 
-        v-model="tutorStore.location" 
-        class="w-full px-3 py-2 mb-2 border rounded" 
-        placeholder="Enter city or country" 
+      <input
+        type="text"
+        v-model="tutorStore.location"
+        class="w-full px-3 py-2 mb-2 border rounded"
+        placeholder="Enter city or country"
       />
     </div>
 
@@ -203,16 +217,16 @@ if (typeof window !== 'undefined') {
         </label>
       </div>
     </div>
-    
+
     <div class="flex gap-2 mt-4">
-      <button 
-        @click="tutorStore.applyFilters()" 
+      <button
+        @click="tutorStore.applyFilters()"
         class="flex-1 py-2 text-white transition bg-purple-700 rounded hover:bg-purple-800"
       >
         Apply filters
       </button>
-      <button 
-        @click="tutorStore.clearFilters()" 
+      <button
+        @click="tutorStore.clearFilters()"
         class="flex-1 py-2 text-gray-700 transition bg-gray-100 rounded hover:bg-gray-200"
       >
         Clear all filters
