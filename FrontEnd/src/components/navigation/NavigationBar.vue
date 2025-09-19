@@ -60,7 +60,7 @@
   }
 
   .router-link-active {
-    color: #7e22ce; /* Purple-700 */
+    color: #7e22ce;
   }
 
   button:hover,

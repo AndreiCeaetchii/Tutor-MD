@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { useCalendarStore } from '../../store/calendarStore';
-import TimeSlotModal from '../modals/TutorTimeSlotModal.vue';
+import { useCalendarStore } from '../../../store/calendarStore';
+import TimeSlotModal from '../../modals/TutorTimeSlotModal.vue';
 
 const props = defineProps<{
   date: Date;

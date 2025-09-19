@@ -17,8 +17,9 @@ const store = useCalendarStore();
 // Generate all time options in 30 minute increments (00:00 - 23:30)
 const generateTimeOptions = () => {
   const options = [];
-  for (let hour = 0; hour < 24; hour++) {
+  for (let hour = 8; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
+      if (hour === 22 && minute > 0) continue;
       const formattedHour = hour.toString().padStart(2, '0');
       const formattedMinute = minute.toString().padStart(2, '0');
       options.push(`${formattedHour}:${formattedMinute}`);
