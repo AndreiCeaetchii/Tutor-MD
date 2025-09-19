@@ -80,11 +80,11 @@ public class TutorService : ITutorService
         if (profiles is null)
             return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
         var nonVerifiedProfiles = profiles
-            .Where(profile => profile.VerificationStatus != VerificationStatus.Verified)
+            .Where(profile => profile.VerificationStatus == VerificationStatus.Verified)
             .ToList();
 
-        if (!nonVerifiedProfiles.Any())
-            return Result<List<TutorProfileDto>>.NotFound("No pending tutor profiles found");
+        // if (!nonVerifiedProfiles.Any())
+        //     return Result<List<TutorProfileDto>>.NotFound("No pending tutor profiles found");
 
         var result = _mapper.Map<List<TutorProfileDto>>(nonVerifiedProfiles);
         return Result<List<TutorProfileDto>>.Success(result);

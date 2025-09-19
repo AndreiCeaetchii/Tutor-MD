@@ -9,12 +9,10 @@
   const router = useRouter();
   const activeTab = ref('calendar');
 
-  // Handle tab changes from the navigation bar
   const handleTabChange = (tab: string) => {
     activeTab.value = tab;
   };
 
-  // Verificăm autentificarea și rolul
   onMounted(() => {
     if (!store.isAuthenticated) {
       router.push('/login');
