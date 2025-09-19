@@ -16,8 +16,8 @@
             :subject="subject"
             :index="index"
             @remove="removeSubject(index)"
-            @update:currency="subject.currency = $event"
-            @update:price="subject.price = $event"
+            @update:price="updateSubjectPrice(index, $event)"
+            @update:currency="updateSubjectCurrency(index, $event)"
           />
           <DropdownSelect
             :options="availableSubjects"
@@ -37,6 +37,18 @@
                 <span class="text-xs text-gray-400">Phone</span>
                 <input
                   v-model="editedProfile.phone"
+                  type="text"
+                  class="w-full font-medium text-gray-800 px-2 py-1 bg-gray-100 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#5f22d9]"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <font-awesome-icon :icon="['fas', 'envelope']" class="text-gray-400" />
+              <div class="flex-1">
+                <span class="text-xs text-gray-400">Username</span>
+                <input
+                  v-model="editedProfile.userName"
                   type="text"
                   class="w-full font-medium text-gray-800 px-2 py-1 bg-gray-100 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#5f22d9]"
                 />
@@ -85,6 +97,7 @@
   import { faPhone, faEnvelope, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
   import DropdownSelect from './DropdownSelect.vue';
   import EditableSubjectCard from './EditableSubjectCard.vue';
+  import { deleteSubject } from '../../services/tutorService.ts';
 
   library.add(faPhone, faEnvelope, faTrash, faTimes);
 
@@ -96,7 +109,7 @@
   });
 
   const selectedLanguage = ref('');
-  const selectedSubject = ref('');
+  //const selectedSubject = ref('');
 
   const availableLanguages = ref([
     'Română',
@@ -111,15 +124,14 @@
   ]);
 
   const availableSubjects = ref([
-    'Matematică',
-    'Fizică',
-    'Chimie',
-    'Biologie',
-    'Istorie',
-    'Geografie',
-    'Limba și Literatura Română',
-    'Limba Engleză',
-    'Informatică',
+    'Mathematics',
+    'Physics',
+    'Computer Science',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
   ]);
 
   const addSubject = (subjectName: string) => {
@@ -128,11 +140,40 @@
         name: subjectName,
         price: 0,
         currency: 'MDL',
+        isNew: true,
+        isModified: false,
       });
     }
   };
 
-  const removeSubject = (index: number) => {
+  const updateSubjectPrice = (index: number, newPrice: number) => {
+    const subject = props.editedProfile.subjects[index];
+    subject.price = newPrice;
+    if (!subject.isNew) subject.isModified = true;
+  };
+
+  const updateSubjectCurrency = (index: number, newCurrency: string) => {
+    const subject = props.editedProfile.subjects[index];
+    subject.currency = newCurrency;
+    if (!subject.isNew) subject.isModified = true;
+  };
+
+  const removeSubject = async (index: number) => {
+    const subject = props.editedProfile.subjects[index];
+
+    // dacă subiectul are subjectId, îl ștergem din backend
+    if (subject.subjectId) {
+      try {
+        console.log('Ștergem subiectul cu ID:', subject.subjectId);
+        await deleteSubject(subject.subjectId);
+        console.log(`Subiectul ${subject.name} a fost șters din backend.`);
+      } catch (err) {
+        console.error('Eroare la ștergerea subiectului din backend:', err);
+        return; // nu eliminăm subiectul din UI dacă ștergerea a eșuat
+      }
+    }
+
+    // eliminăm subiectul din array-ul local
     props.editedProfile.subjects.splice(index, 1);
   };
 

@@ -44,28 +44,33 @@
               </div>
             </div>
 
-            <div class="mt-4 text-sm text-gray-200 grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div class="flex items-center space-x-2">
-                <div class="flex-1">
-                  <span class="text-xs text-gray-300">Years of experience</span>
-                  <input
-                    v-model.number="editedProfile.experience"
-                    type="number"
-                    min="0"
-                    class="w-full text-base font-bold text-left bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
-                  />
-                </div>
+            <div class="mt-4 text-sm text-gray-200 grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-gray-300">Years of experience</span>
+                <input
+                  v-model.number="editedProfile.experience"
+                  type="number"
+                  min="0"
+                  class="w-full text-base font-bold text-left bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
+                />
               </div>
 
-              <div class="flex items-center space-x-2">
-                <div class="flex-1">
-                  <span class="text-xs text-gray-300">Location</span>
-                  <input
-                    v-model="editedProfile.location"
-                    type="text"
-                    class="w-full bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
-                  />
-                </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-gray-300">City</span>
+                <input
+                  v-model="editedProfile.city"
+                  type="text"
+                  class="text-base w-full bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
+                />
+              </div>
+
+              <div class="flex flex-col">
+                <span class="text-xs text-gray-300">Country</span>
+                <input
+                  v-model="editedProfile.country"
+                  type="text"
+                  class="text-base w-full bg-gradient-to-r from-[#5f5ce1] to-[#4a3de1] text-white rounded-lg px-4 py-2 border border-white/70 focus:outline-none focus:ring-1 focus:ring-white"
+                />
               </div>
             </div>
           </div>
@@ -100,6 +105,14 @@
     editedProfile: {
       type: Object,
       required: true,
+      default: () => ({
+        firstName: '',
+        lastName: '',
+        experience: 0,
+        city: '',
+        country: '',
+        profileImage: null,
+      }),
     },
   });
 

@@ -463,7 +463,6 @@
     }
   };
 
-  // Reset city when country changes
   watch(
     () => form.value.country,
     () => {
