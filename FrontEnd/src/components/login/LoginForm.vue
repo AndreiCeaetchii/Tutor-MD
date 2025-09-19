@@ -49,10 +49,10 @@
   };
 
   const showSuccessNotification = ref(false);
-  const successMessage = ref('Login successful!');
+  const successMessage = ref('Login successful! ');
 
   const showSuccess = () => {
-    successMessage.value = 'Login successful!';
+    successMessage.value = 'Login successful! ';
     showSuccessNotification.value = true;
     setTimeout(() => {
       showSuccessNotification.value = false;

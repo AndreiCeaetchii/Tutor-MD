@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed, watch } from 'vue';
-  import { useCalendarStore } from '../../store/calendarStore';
+  import { useCalendarStore } from '../../../store/calendarStore';
 
   const store = useCalendarStore();
 
