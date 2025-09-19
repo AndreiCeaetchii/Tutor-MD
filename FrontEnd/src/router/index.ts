@@ -18,7 +18,6 @@ import CreateProfile from '../components/profile/CreateProfile.vue';
 import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
 
 const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
-const StudentAccount = { template: '<div>My Account (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
@@ -26,7 +25,7 @@ import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 import StudentChat from '../components/student/Chat/StudentChat.vue';
-import StudentSearchPage from '../pages/StudentSearchPage.vue';
+// import StudentSearchPage from '../pages/StudentSearchPage.vue';
 
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
@@ -54,7 +53,7 @@ const routes = [
       { path: 'bookings', component: StudentBookings },
       { path: 'reviews', component: StudentReviews },
       { path: 'messages', component: StudentChat },
-      { path: 'account', component: StudentAccount },
+      { path: 'account', component: StudentProfile },
     ],
   },
 
