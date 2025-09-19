@@ -1,84 +1,3 @@
-<script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
-import { useRouter } from 'vue-router';
-import logo from '../assets/tutor2.png';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faUser,
-  faCog,
-  faBook,
-  faCreditCard,
-  faCircleQuestion,
-  faRightFromBracket,
-} from '@fortawesome/free-solid-svg-icons';
-import { useUserStore } from '../store/userStore.ts';
-import { useProfileStore } from '../store/profileStore.ts';
-
-library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
-
-interface HeaderProps {
-  userType?: 'student' | 'tutor';
-}
-
-withDefaults(defineProps<HeaderProps>(), {
-  userType: 'student',
-});
-
-const router = useRouter();
-const store = useUserStore();
-const profileStore = useProfileStore();
-const isMenuOpen = ref(false);
-const showProfileMenu = ref(false);
-
-const profileButton = ref<HTMLElement | null>(null);
-const profileMenu = ref<HTMLElement | null>(null);
-
-function toggleMenu() {
-  isMenuOpen.value = !isMenuOpen.value;
-}
-
-function closeMenu() {
-  isMenuOpen.value = false;
-}
-
-function toggleProfileMenu() {
-  showProfileMenu.value = !showProfileMenu.value;
-}
-
-function handleLogout() {
-  store.clearUser();
-  profileStore.clearProfile();
-  router.push('/landing');
-  showProfileMenu.value = false;
-}
-
-const userName = computed(() => profileStore.userName);
-const email = computed(() => profileStore.email);
-
-function handleClickOutside(event: MouseEvent) {
-  if (
-    showProfileMenu.value &&
-    profileButton.value &&
-    profileMenu.value &&
-    !profileButton.value.contains(event.target as Node) &&
-    !profileMenu.value.contains(event.target as Node)
-  ) {
-    showProfileMenu.value = false;
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
-</script>
-
-
 <template>
   <header class="sticky top-0 z-50 bg-white border-b border-gray-100">
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -234,28 +153,49 @@ onBeforeUnmount(() => {
       <div v-if="isMenuOpen" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 sm:px-3">
           <div class="py-2 space-y-1">
-            <a href="#profile" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#profile"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'user']" class="w-5 h-5 mr-3 text-gray-500" />
               Profile
             </a>
-            <a href="#settings" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#settings"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'cog']" class="w-5 h-5 mr-3 text-gray-500" />
               Settings
             </a>
-            <a href="#my-courses" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#my-courses"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'book']" class="w-5 h-5 mr-3 text-gray-500" />
               My Courses
             </a>
-            <a href="#billing" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
-              <font-awesome-icon :icon="['fas', 'credit-card']" class="w-5 h-5 mr-3 text-gray-500" />
+            <a
+              href="#billing"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'credit-card']"
+                class="w-5 h-5 mr-3 text-gray-500"
+              />
               Billing & Payments
             </a>
-            <a href="#help" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
-              <font-awesome-icon :icon="['fas', 'circle-question']" class="w-5 h-5 mr-3 text-gray-500" />
+            <a
+              href="#help"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'circle-question']"
+                class="w-5 h-5 mr-3 text-gray-500"
+              />
               Help & Support
             </a>
           </div>
-          
+
           <div class="pt-4 pb-3 border-t border-gray-100">
             <div class="flex items-center justify-between px-3">
               <div class="flex items-center gap-3">
@@ -281,3 +221,91 @@ onBeforeUnmount(() => {
     </div>
   </header>
 </template>
+
+<script setup lang="ts">
+  import { ref, onMounted, onBeforeUnmount } from 'vue';
+  import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
+  import { useRouter } from 'vue-router';
+  import logo from '../assets/tutor2.png';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import {
+    faUser,
+    faCog,
+    faBook,
+    faCreditCard,
+    faCircleQuestion,
+    faRightFromBracket,
+  } from '@fortawesome/free-solid-svg-icons';
+  import { useUserStore } from '../store/userStore.ts';
+  import { useProfileStore } from '../store/profileStore.ts';
+  import { computed } from 'vue';
+  import { useStudentProfileStore } from '../store/studentProfileStore.ts';
+
+  library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
+
+  interface HeaderProps {
+    userType?: 'student' | 'tutor';
+  }
+
+  withDefaults(defineProps<HeaderProps>(), {
+    userType: 'student',
+  });
+
+  const router = useRouter();
+  const store = useUserStore();
+  const profileStore = useProfileStore();
+  const isMenuOpen = ref(false);
+  const showProfileMenu = ref(false);
+  const studentProfileStore = useStudentProfileStore();
+
+  const profileButton = ref<HTMLElement | null>(null);
+  const profileMenu = ref<HTMLElement | null>(null);
+
+  function toggleMenu() {
+    isMenuOpen.value = !isMenuOpen.value;
+  }
+
+  function closeMenu() {
+    isMenuOpen.value = false;
+  }
+
+  function toggleProfileMenu() {
+    showProfileMenu.value = !showProfileMenu.value;
+  }
+
+  function handleLogout() {
+    store.clearUser();
+    profileStore.clearProfile();
+    studentProfileStore.clearProfile();
+    router.push('/landing');
+    showProfileMenu.value = false;
+  }
+
+  const userName = computed(() =>
+    profileStore.userName ? profileStore.userName : studentProfileStore.userProfile.username,
+  );
+
+  const email = computed(() => store.email);
+
+  function handleClickOutside(event: MouseEvent) {
+    if (
+      showProfileMenu.value &&
+      profileButton.value &&
+      profileMenu.value &&
+      !profileButton.value.contains(event.target as Node) &&
+      !profileMenu.value.contains(event.target as Node)
+    ) {
+      showProfileMenu.value = false;
+    }
+  }
+
+  // Adaugă și elimină event listener-ul în momentele corespunzătoare
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
+</script>

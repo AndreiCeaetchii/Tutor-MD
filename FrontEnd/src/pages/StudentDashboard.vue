@@ -8,6 +8,8 @@
   const store = useUserStore();
   const router = useRouter();
   const activeTab = ref('find');
+//   const activeTab = ref('calendar');
+
 
   const handleTabChange = (tab: string) => {
     activeTab.value = tab;
@@ -28,7 +30,9 @@
       <div class="mb-6">
         <h1 class="mb-2 text-2xl font-bold">Student Dashboard</h1>
         <p class="text-gray-600">
-          Welcome to your dashboard! Here you can find tutors, manage your bookings, and track your learning progress.
+          Welcome to your dashboard! Here you can manage your sessions, view progress, and update
+          your profile.
+
         </p>
       </div>
 

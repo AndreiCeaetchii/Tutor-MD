@@ -43,8 +43,10 @@
     const result = [];
     if (!formData.value.password) return [];
     if (!passwordRules.minLength(formData.value.password)) result.push('at least 8 characters');
-    if (!passwordRules.hasUppercase(formData.value.password)) result.push('at least one uppercase letter');
-    if (!passwordRules.hasLowercase(formData.value.password)) result.push('at least one lowercase letter');
+    if (!passwordRules.hasUppercase(formData.value.password))
+      result.push('at least one uppercase letter');
+    if (!passwordRules.hasLowercase(formData.value.password))
+      result.push('at least one lowercase letter');
     return result;
   });
 
@@ -85,9 +87,9 @@
     touchedFields.value.add('email');
     touchedFields.value.add('password');
     touchedFields.value.add('role');
-    
+
     formData.value = data;
-    
+
     if (emailError.value || passwordError.value || roleError.value) {
       return;
     }
@@ -98,18 +100,18 @@
     showSuccess();
 
     if (data.role === 'tutor') router.push('/create-profile');
-    else if (data.role === 'student') router.push('/student-dashboard');
+    else if (data.role === 'student') router.push('/create-student-profile');
     else if (data.role === 'admin') router.push('/admin-dashboard');
   };
 
   const handleSocialLogin = async ({ provider, role }: { provider: string; role?: string }) => {
     if (provider !== 'google') return;
-    
+
     if (!role) {
       touchedFields.value.add('role');
       return;
     }
-    
+
     touchedFields.value.add('role');
     formData.value.role = role;
 
@@ -119,7 +121,7 @@
     showSuccess();
 
     if (role === 'tutor') router.push('/create-profile');
-    else if (role === 'student') router.push('/student-dashboard');
+    else if (role === 'student') router.push('/create-student-profile');
     else if (role === 'admin') router.push('/admin-dashboard');
   };
 </script>

@@ -6,26 +6,29 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-//import TutorProfile from '../components/tutor/TutorProfile.vue';
+import StudentProfile from '../components/student/profile/StudentProfile.vue';
 import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
 import TutorChat from '../components/tutor/Chat/TutorChat.vue';
 import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
+
 import ProfilePage from '../pages/ProfilePage.vue';
 
 import CreateProfile from '../components/profile/CreateProfile.vue';
+import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
 
 const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
 const StudentAccount = { template: '<div>My Account (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
+import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 import StudentChat from '../components/student/Chat/StudentChat.vue';
+import StudentSearchPage from '../pages/StudentSearchPage.vue';
 
 const routes = [
-  // Guest routes
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
   { path: '/landing', component: LandingPage },
@@ -33,6 +36,11 @@ const routes = [
     path: '/create-profile',
     component: CreateProfile,
     meta: { requiresAuth: true, role: 'tutor' },
+  },
+  {
+    path: '/create-student-profile',
+    component: CreateStudentProfile,
+    meta: { requiresAuth: true, role: 'student' },
   },
   { path: '/', component: LandingPage, meta: { requiresGuest: true } },
 
@@ -75,10 +83,18 @@ router.beforeEach((to, _, next) => {
   const hasToken = store.isAuthenticated;
   const userRole = store.userRole;
   const profileStore = useProfileStore();
+  const studentProfileStore = useStudentProfileStore();
 
   if (to.path === '/create-profile') {
     if (profileStore.firstName && profileStore.lastName) {
       next('/tutor-dashboard');
+      return;
+    }
+  }
+
+  if (to.path === '/create-student-profile') {
+    if (studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName) {
+      next('/student-dashboard');
       return;
     }
   }
