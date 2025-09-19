@@ -6,12 +6,11 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-
 import StudentProfile from '../components/student/profile/StudentProfile.vue';
-import TutorReview from '../components/tutor/TutorReview.vue';
-import TutorBookings from '../components/tutor/TutorBookings.vue';
-import TutorChat from '../components/tutor/TutorChat.vue';
-import TutorAvailability from '../components/tutor/TutorAvailability.vue';
+import TutorReview from '../components/tutor/Review/TutorReview.vue';
+import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
+import TutorChat from '../components/tutor/Chat/TutorChat.vue';
+import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
 
 import ProfilePage from '../pages/ProfilePage.vue';
 
