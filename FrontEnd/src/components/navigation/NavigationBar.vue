@@ -6,7 +6,6 @@
   const store = useUserStore();
   const route = useRoute();
 
-  // Definim tab-urile pentru tutor și student, dar acum includem și ruta
   const tutorTabs = [
     { name: 'Availability', icon: 'calendar_month', path: '/tutor-dashboard/availability' },
     { name: 'Profile', icon: 'person', path: '/tutor-dashboard/profile' },
@@ -23,10 +22,8 @@
     { name: 'My Account', icon: 'person', path: '/student-dashboard/account' },
   ];
 
-  // Alegem tab-urile în funcție de rol
   const tabs = computed(() => (store.userRole === 'tutor' ? tutorTabs : studentTabs));
 
-  // Verificăm care tab este activ în funcție de ruta curentă
   const isActive = (path: string) => route.path === path;
 </script>
 
