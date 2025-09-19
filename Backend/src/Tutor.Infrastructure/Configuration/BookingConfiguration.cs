@@ -9,15 +9,7 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
     public void Configure(EntityTypeBuilder<Booking> builder)
     {
         builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.StartTime)
-            .IsRequired()
-            .HasColumnType("timestamp with time zone");
-
-        builder.Property(x => x.EndTime)
-            .IsRequired()
-            .HasColumnType("timestamp with time zone");
-
+        
         builder.Property(x => x.Status)
             .IsRequired()
             .HasDefaultValue(BookingStatus.Pending);
@@ -49,6 +41,11 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
         builder.HasOne(x => x.Review)
             .WithOne(x => x.Booking)
             .HasForeignKey<Review>(x => x.BookingId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(x => x.TutorAvailabilityRule)
+            .WithMany(x => x.Bookings)  // Now using the collection navigation property
+            .HasForeignKey(x => x.AvailabilityRuleId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

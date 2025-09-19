@@ -8,8 +8,8 @@ public class Booking : Entity<int>
     public int TutorUserId { get; set; }
     public int StudentUserId { get; set; }
     public int SubjectId { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
+    
+    public int AvailabilityRuleId { get; set; }
     
     public string? Description { get; set; }
     public BookingStatus Status { get; set; }
@@ -19,6 +19,7 @@ public class Booking : Entity<int>
     public virtual Student Student { get; set; }
     public virtual SubjectCatalog Subject { get; set; }
     public virtual Review Review { get; set; }
+    public virtual TutorAvailabilityRule TutorAvailabilityRule { get; set; }
 }
 
 public enum BookingStatus

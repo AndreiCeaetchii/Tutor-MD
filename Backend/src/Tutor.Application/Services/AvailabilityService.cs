@@ -33,9 +33,6 @@ public class AvailabilityService : IAvailabilityService
             if (createAvailabilityDto.StartTime >= createAvailabilityDto.EndTime)
                 return Result<AvailabilityDto>.Error("Start time must be before end time");
 
-            if (createAvailabilityDto.DayOfWeek < 0 || createAvailabilityDto.DayOfWeek > 6)
-                return Result<AvailabilityDto>.Error("Day of week must be between 0 and 6");
-
             var availabilityRule = _mapper.Map<TutorAvailabilityRule>(createAvailabilityDto);
             availabilityRule.TutorUserId = userId;
 
@@ -58,9 +55,6 @@ public class AvailabilityService : IAvailabilityService
         {
             if (availabilityDto.StartTime >= availabilityDto.EndTime)
                 return Result<AvailabilityDto>.Error("Start time must be before end time");
-
-            if (availabilityDto.DayOfWeek < 0 || availabilityDto.DayOfWeek > 6)
-                return Result<AvailabilityDto>.Error("Day of week must be between 0 and 6");
 
             var availabilityRule = await _availabilityRepository.GetById(availabilityDto.Id);
             

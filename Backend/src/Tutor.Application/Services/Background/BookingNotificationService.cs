@@ -33,7 +33,7 @@ public class BookingNotificationService:IBookingNotificationService
         using var scope = _serviceProvider.CreateScope();
         var bookingService = scope.ServiceProvider.GetRequiredService<IBookingService>();
         
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var startWindow = now.AddHours(0.2);
         var endWindow = now.AddHours(2);
 
@@ -62,8 +62,9 @@ public class BookingNotificationService:IBookingNotificationService
                     Payload = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         BookingId = booking.Id,
-                        StartTime = booking.StartTime,
-                        EndTime = booking.EndTime,
+                        StartTime = booking.TutorAvailabilityRule.StartTime,
+                        EndTime = booking.TutorAvailabilityRule.EndTime,
+                        Date = booking.TutorAvailabilityRule.Date,
                         Subject = booking.Subject?.Name,
                         TutorName =
                             $"{booking.TutorProfile?.User?.FirstName} {booking.TutorProfile?.User?.LastName}",
@@ -83,9 +84,10 @@ public class BookingNotificationService:IBookingNotificationService
                     Payload = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         BookingId = booking.Id,
-                        StartTime = booking.StartTime,
-                        EndTime = booking.EndTime,
+                        StartTime = booking.TutorAvailabilityRule.StartTime,
+                        EndTime = booking.TutorAvailabilityRule.EndTime,
                         Subject = booking.Subject?.Name,
+                        Date = booking.TutorAvailabilityRule.Date,
                         StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
                         Status = booking.Status
                     }),
@@ -114,8 +116,9 @@ public class BookingNotificationService:IBookingNotificationService
                     Payload = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         BookingId = booking.Id,
-                        StartTime = booking.StartTime,
-                        EndTime = booking.EndTime,
+                        StartTime = booking.TutorAvailabilityRule.StartTime,
+                        EndTime = booking.TutorAvailabilityRule.EndTime,
+                        Date = booking.TutorAvailabilityRule.Date,
                         Subject = booking.Subject?.Name,
                         TutorName =
                             $"{booking.TutorProfile?.User?.FirstName} {booking.TutorProfile?.User?.LastName}",
@@ -135,9 +138,10 @@ public class BookingNotificationService:IBookingNotificationService
                     Payload = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         BookingId = booking.Id,
-                        StartTime = booking.StartTime,
-                        EndTime = booking.EndTime,
+                        StartTime = booking.TutorAvailabilityRule.StartTime,
+                        EndTime = booking.TutorAvailabilityRule.EndTime,
                         Subject = booking.Subject?.Name,
+                        Date = booking.TutorAvailabilityRule.Date,
                         StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
                         Status = booking.Status
                     }),
@@ -146,7 +150,7 @@ public class BookingNotificationService:IBookingNotificationService
                 };
                 await _notificationRepository.Create(tutorNotification);
 
-                _logger.LogInformation("Created reminder notifications for booking {BookingId}", booking.Id);
+                _logger.LogInformation("Status updated for booking {BookingId}", booking.Id);
         }
         catch (Exception ex)
         {
@@ -166,9 +170,10 @@ public class BookingNotificationService:IBookingNotificationService
                     Payload = System.Text.Json.JsonSerializer.Serialize(new
                     {
                         BookingId = booking.Id,
-                        StartTime = booking.StartTime,
-                        EndTime = booking.EndTime,
+                        StartTime = booking.TutorAvailabilityRule.StartTime,
+                        EndTime = booking.TutorAvailabilityRule.EndTime,
                         Subject = booking.Subject?.Name,
+                        Date = booking.TutorAvailabilityRule.Date,
                         StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
                         Status = booking.Status
                     }),
@@ -177,7 +182,7 @@ public class BookingNotificationService:IBookingNotificationService
                 };
                 await _notificationRepository.Create(tutorNotification);
 
-                _logger.LogInformation("Created reminder notifications for booking {BookingId}", booking.Id);
+                _logger.LogInformation("New Booking notifications for booking {BookingId}", booking.Id);
         }
         catch (Exception ex)
         {

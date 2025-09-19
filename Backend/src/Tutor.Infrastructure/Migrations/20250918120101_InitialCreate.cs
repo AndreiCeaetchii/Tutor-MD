@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Tutor.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateEntities : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -77,8 +77,8 @@ namespace Tutor.Infrastructure.Migrations
                     Age = table.Column<int>(type: "integer", nullable: true),
                     HeroType = table.Column<int>(type: "integer", nullable: false),
                     Team = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -97,9 +97,9 @@ namespace Tutor.Infrastructure.Migrations
                     Width = table.Column<int>(type: "integer", nullable: true),
                     Height = table.Column<int>(type: "integer", nullable: true),
                     MimeType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Bytes = table.Column<int>(type: "integer", nullable: true),
+                    Bytes = table.Column<long>(type: "bigint", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -234,19 +234,18 @@ namespace Tutor.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Username = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     FirstName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     LastName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Bio = table.Column<string>(type: "text", nullable: true),
+                    Country = table.Column<string>(type: "text", nullable: true),
+                    City = table.Column<string>(type: "text", nullable: true),
                     Birthdate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     PhotoId = table.Column<int>(type: "integer", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    OAuthProvider = table.Column<string>(type: "text", nullable: false),
-                    OAuthProviderId = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
@@ -259,6 +258,29 @@ namespace Tutor.Infrastructure.Migrations
                         principalTable: "Photos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "google_auth",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    OAuthProvider = table.Column<string>(type: "text", nullable: false),
+                    OAuthProviderId = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_google_auth", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_google_auth_AppUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,11 +315,34 @@ namespace Tutor.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "passwords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    PasswordHash = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_passwords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_passwords_AppUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AppUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    Grade = table.Column<int>(type: "integer", nullable: true)
+                    Grade = table.Column<int>(type: "integer", nullable: true),
+                    Class = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -335,7 +380,7 @@ namespace Tutor.Infrastructure.Migrations
                 {
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     RoleId = table.Column<int>(type: "integer", nullable: false),
-                    AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
+                    AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -355,55 +400,15 @@ namespace Tutor.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TutorUserId = table.Column<int>(type: "integer", nullable: false),
-                    StudentUserId = table.Column<int>(type: "integer", nullable: false),
-                    SubjectId = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PriceSnapshot = table.Column<decimal>(type: "numeric(8,2)", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Students_StudentUserId",
-                        column: x => x.StudentUserId,
-                        principalTable: "Students",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_SubjectCatalog_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "SubjectCatalog",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Tutors_TutorUserId",
-                        column: x => x.TutorUserId,
-                        principalTable: "Tutors",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "TutorAvailabilityRules",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     TutorUserId = table.Column<int>(type: "integer", nullable: false),
-                    DayOfWeek = table.Column<int>(type: "integer", nullable: false),
-                    StartTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
-                    EndTime = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
-                    Timezone = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     ActiveStatus = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
@@ -439,6 +444,50 @@ namespace Tutor.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_TutorSubjects_Tutors_TutorUserId",
+                        column: x => x.TutorUserId,
+                        principalTable: "Tutors",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TutorUserId = table.Column<int>(type: "integer", nullable: false),
+                    StudentUserId = table.Column<int>(type: "integer", nullable: false),
+                    SubjectId = table.Column<int>(type: "integer", nullable: false),
+                    AvailabilityRuleId = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Students_StudentUserId",
+                        column: x => x.StudentUserId,
+                        principalTable: "Students",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_SubjectCatalog_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "SubjectCatalog",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Bookings_TutorAvailabilityRules_AvailabilityRuleId",
+                        column: x => x.AvailabilityRuleId,
+                        principalTable: "TutorAvailabilityRules",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Tutors_TutorUserId",
                         column: x => x.TutorUserId,
                         principalTable: "Tutors",
                         principalColumn: "UserId",
@@ -541,6 +590,12 @@ namespace Tutor.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_AvailabilityRuleId",
+                table: "Bookings",
+                column: "AvailabilityRuleId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_StudentUserId",
                 table: "Bookings",
                 column: "StudentUserId");
@@ -556,6 +611,12 @@ namespace Tutor.Infrastructure.Migrations
                 column: "TutorUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_google_auth_UserId",
+                table: "google_auth",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notifications_ActorUserId",
                 table: "Notifications",
                 column: "ActorUserId");
@@ -564,6 +625,12 @@ namespace Tutor.Infrastructure.Migrations
                 name: "IX_Notifications_RecipientUserId",
                 table: "Notifications",
                 column: "RecipientUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_passwords_UserId",
+                table: "passwords",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_BookingId",
@@ -622,16 +689,19 @@ namespace Tutor.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "google_auth");
+
+            migrationBuilder.DropTable(
                 name: "Heroes");
 
             migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
-                name: "Reviews");
+                name: "passwords");
 
             migrationBuilder.DropTable(
-                name: "TutorAvailabilityRules");
+                name: "Reviews");
 
             migrationBuilder.DropTable(
                 name: "TutorSubjects");
@@ -656,6 +726,9 @@ namespace Tutor.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SubjectCatalog");
+
+            migrationBuilder.DropTable(
+                name: "TutorAvailabilityRules");
 
             migrationBuilder.DropTable(
                 name: "Tutors");

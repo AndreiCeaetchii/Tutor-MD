@@ -20,8 +20,9 @@ public class BookingService : IBookingService
     private readonly IGenericRepository2<TutorSubject> _tutorSubjectRepository;
     private readonly IGenericRepository2<TutorProfile> _tutorProfileRepository;
     private readonly IGenericRepository2<Student> _studentRepository;
-    private readonly IGenericRepository<Notification,int> _notificationRepository;
+    private readonly IGenericRepository<Notification, int> _notificationRepository;
     private readonly IBookingNotificationService _bookingNotificationService;
+    private readonly IGenericRepository<TutorAvailabilityRule, int> _tutorAvailabilityRuleRepository;
     private readonly IMapper _mapper;
 
     public BookingService(IGenericRepository<Booking, int> bookingRepository,
@@ -31,8 +32,9 @@ public class BookingService : IBookingService
         IGenericRepository2<TutorSubject> tutorSubjectRepository,
         IGenericRepository2<TutorProfile> tutorProfileRepository,
         IGenericRepository2<Student> studentRepository,
-        IGenericRepository<Notification,int> notificationRepository,
+        IGenericRepository<Notification, int> notificationRepository,
         IBookingNotificationService bookingNotificationService,
+        IGenericRepository<TutorAvailabilityRule, int> tutorAvailabilityRuleRepository,
         IMapper mapper)
     {
         _bookingRepository = bookingRepository;
@@ -44,6 +46,7 @@ public class BookingService : IBookingService
         _studentRepository = studentRepository;
         _notificationRepository = notificationRepository;
         _bookingNotificationService = bookingNotificationService;
+        _tutorAvailabilityRuleRepository = tutorAvailabilityRuleRepository;
         _mapper = mapper;
     }
 
@@ -64,14 +67,16 @@ public class BookingService : IBookingService
             if (tutorSubject == null)
                 return Result<BookingDto>.Error("Tutor doesn't teach this subject");
 
-            var hasOverlap = await CheckForOverlappingBookings(createBookingDto, userId);
-            if (hasOverlap)
-                return Result<BookingDto>.Error("Time slot overlaps with existing booking");
 
             var booking = _mapper.Map<Booking>(createBookingDto);
             booking.StudentUserId = userId;
             await _bookingRepository.Create(booking);
-            await _bookingNotificationService.NewBookingNotification(booking);
+            var bookingNew = await _bookingRepository.GetById(booking.Id);
+            var availability = await _tutorAvailabilityRuleRepository.GetById(createBookingDto.AvailabilityRuleId);
+            availability.ActiveStatus = true;
+            await _tutorAvailabilityRuleRepository.Update(availability);
+
+            await _bookingNotificationService.NewBookingNotification(bookingNew);
             var bookingDto = await GetBookingDtoWithDetails(booking);
             return Result<BookingDto>.Success(bookingDto);
         }
@@ -83,7 +88,8 @@ public class BookingService : IBookingService
 
     private async Task<Result> ValidateBooking(CreateBookingDto createBookingDto, int userId)
     {
-        var tutor = await _tutorProfileRepository.FindAsyncDefault(u => u.UserId == createBookingDto.TutorUserId && u.VerificationStatus==VerificationStatus.Verified) ;
+        var tutor = await _tutorProfileRepository.FindAsyncDefault(u =>
+            u.UserId == createBookingDto.TutorUserId && u.VerificationStatus == VerificationStatus.Verified);
         if (tutor == null)
             return Result.Error("Tutor not found");
         var student = await _studentRepository.FindAsyncDefault(u => u.UserId == userId);
@@ -92,23 +98,10 @@ public class BookingService : IBookingService
         var subject = await _subjectCatalogRepository.GetById(createBookingDto.SubjectId);
         if (subject == null)
             return Result.Error("Subject not found");
-        if (createBookingDto.StartTime >= createBookingDto.EndTime)
-            return Result.Error("Start time must be before end time");
-        if (createBookingDto.StartTime < DateTime.UtcNow)
-            return Result.Error("Cannot book in the past");
+        var availability = await _tutorAvailabilityRuleRepository.GetById(createBookingDto.AvailabilityRuleId);
+        if (availability == null)
+            return Result.Error("Availability Rule not found");
         return Result.Success();
-    }
-
-    private async Task<bool> CheckForOverlappingBookings(CreateBookingDto createBookingDto, int userId)
-    {
-        var existingBookings = await _bookingRepository.FindAsync(b =>
-            (b.StudentUserId == userId || b.TutorUserId == createBookingDto.TutorUserId) &&
-            b.Status != BookingStatus.Cancelled &&
-            ((b.StartTime < createBookingDto.StartTime && b.EndTime > createBookingDto.StartTime) ||
-             (b.StartTime < createBookingDto.EndTime && b.EndTime > createBookingDto.EndTime) ||
-             (b.StartTime > createBookingDto.StartTime && b.EndTime < createBookingDto.EndTime)));
-
-        return existingBookings.Any();
     }
 
     private async Task<BookingDto> GetBookingDtoWithDetails(Booking booking)
@@ -121,7 +114,8 @@ public class BookingService : IBookingService
             ts.TutorUserId == booking.TutorUserId &&
             ts.SubjectId == booking.SubjectId);
 
-        var duration = (decimal)(booking.EndTime - booking.StartTime).TotalHours;
+        var duration = (decimal)(booking.TutorAvailabilityRule.EndTime - booking.TutorAvailabilityRule.StartTime)
+            .TotalHours;
         var price = tutorSubject.Price * duration;
 
         return new BookingDto
@@ -132,8 +126,9 @@ public class BookingService : IBookingService
             StudentUserId = booking.StudentUserId,
             StudentName = $"{student?.FirstName} {student?.LastName}",
             Price = price,
-            StartTime = booking.StartTime,
-            EndTime = booking.EndTime,
+            StartTime = booking.TutorAvailabilityRule.StartTime,
+            EndTime = booking.TutorAvailabilityRule.EndTime,
+            Date = booking.TutorAvailabilityRule.Date,
             Description = booking.Description,
             Status = booking.Status,
             StudentPhoto = studentPhoto?.Url,
@@ -161,10 +156,10 @@ public class BookingService : IBookingService
         foreach (var booking in bookings)
         {
             var bookingDto = await GetBookingDtoWithDetails(booking);
-           bookingDtos.Add(bookingDto);
+            bookingDtos.Add(bookingDto);
         }
+
         return Result<List<BookingDto>>.Success(bookingDtos);
-        
     }
 
     public async Task<Result<BookingDto>> UpdateBookingStatus(int bookingId, int userId, BookingStatus newStatus)
@@ -178,15 +173,22 @@ public class BookingService : IBookingService
 
         if (!IsValidStatusTransition(booking.Status, newStatus))
             return Result.Error("Invalid status transition");
-        
-        if(newStatus == BookingStatus.Confirmed && booking.TutorUserId != userId)
+
+        if (newStatus == BookingStatus.Confirmed && booking.TutorUserId != userId)
             return Result.Error("Just Tutors can accept booking");
+        if (newStatus == BookingStatus.Cancelled)
+        {
+            var availability = await _tutorAvailabilityRuleRepository.GetById(booking.AvailabilityRuleId);
+            availability.ActiveStatus = false;
+            await _tutorAvailabilityRuleRepository.Update(availability);
+        }
+
         booking.Status = newStatus;
         await _bookingRepository.Update(booking);
         var bookingDto = await GetBookingDtoWithDetails(booking);
-        
+
         await _bookingNotificationService.CreateBookingChangeNotification(booking);
-        
+
         return Result<BookingDto>.Success(bookingDto);
     }
 
@@ -202,15 +204,18 @@ public class BookingService : IBookingService
 
         return validTransitions[current].Contains(next);
     }
-    
-    
-    public async Task<List<Booking>> GetBookingsStartingBetweenAsync(DateTime startWindow, DateTime endWindow, BookingStatus status)
+
+
+    public async Task<List<Booking>> GetBookingsStartingBetweenAsync(DateTime startWindow, DateTime endWindow,
+        BookingStatus status)
     {
         return await _bookingRepository.FindAsync(b =>
-            b.StartTime >= startWindow &&
-            b.StartTime <= endWindow &&
-            b.Status == status );
+            b.Status == status &&
+            b.TutorAvailabilityRule.Date.ToDateTime(b.TutorAvailabilityRule.StartTime) >= startWindow &&
+            b.TutorAvailabilityRule.Date.ToDateTime(b.TutorAvailabilityRule.StartTime) <= endWindow
+        );
     }
+
 
     public async Task<bool> NotificationExistsAsync(int bookingId, string notificationType, int recipientUserId)
     {
@@ -218,7 +223,7 @@ public class BookingService : IBookingService
             n.Payload.Contains($"\"BookingId\":{bookingId}") &&
             n.Type == notificationType &&
             n.RecipientUserId == recipientUserId);
-    
+
         return notifications.Any();
     }
 
