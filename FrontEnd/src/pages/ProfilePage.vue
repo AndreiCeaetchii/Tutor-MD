@@ -33,26 +33,7 @@
   const profileStore = useProfileStore();
   const userStore = useUserStore();
 
-  const editedProfile = ref<ProfileState>({
-    userName: '',
-    firstName: '',
-    lastName: '',
-    bio: '',
-    phone: '',
-    email: '',
-    experience: 0,
-    age: 0,
-    country: '',
-    city: '',
-    location: '',
-    profileImage: defaultProfileImage,
-    rating: 0,
-    reviews: 0,
-    students: 0,
-    languages: [],
-    subjects: [],
-    isEditing: false,
-  });
+  const editedProfile = ref<ProfileState>({ ...profileStore.$state });
 
   const calculateAge = (birthdate: string | null) => {
     if (!birthdate) return 0;
@@ -116,7 +97,7 @@
     () => profileStore.isEditing,
     (newValue) => {
       if (newValue) {
-        editedProfile.value = JSON.parse(JSON.stringify(profileStore));
+        editedProfile.value = { ...profileStore.$state };
       }
     },
   );
@@ -155,6 +136,7 @@
           });
           subject.isNew = false;
         } else if (subject.isModified) {
+          console.log(subject);
           await updateSubject({
             subjectId: subject.subjectId ?? 0,
             subjectName: subject.name,

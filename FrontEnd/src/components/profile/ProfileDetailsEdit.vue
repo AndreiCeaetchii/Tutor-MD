@@ -124,15 +124,14 @@
   ]);
 
   const availableSubjects = ref([
-    'Matematică',
-    'Fizică',
-    'Chimie',
-    'Biologie',
-    'Istorie',
-    'Geografie',
-    'Limba și Literatura Română',
-    'Limba Engleză',
-    'Informatică',
+    'Mathematics',
+    'Physics',
+    'Computer Science',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
   ]);
 
   const addSubject = (subjectName: string) => {
@@ -141,20 +140,18 @@
         name: subjectName,
         price: 0,
         currency: 'MDL',
-        isNew: true, // subiect nou, urmează să fie trimis la backend
-        isModified: false, // nu a fost modificat încă
+        isNew: true,
+        isModified: false,
       });
     }
   };
 
-  // Marchează subiectul ca modificat atunci când se schimbă prețul
   const updateSubjectPrice = (index: number, newPrice: number) => {
     const subject = props.editedProfile.subjects[index];
     subject.price = newPrice;
     if (!subject.isNew) subject.isModified = true;
   };
 
-  // Marchează subiectul ca modificat atunci când se schimbă valuta
   const updateSubjectCurrency = (index: number, newCurrency: string) => {
     const subject = props.editedProfile.subjects[index];
     subject.currency = newCurrency;
