@@ -15,14 +15,14 @@ import ProfilePage from '../pages/ProfilePage.vue';
 
 import CreateProfile from '../components/profile/CreateProfile.vue';
 
-const FindTutors = { template: '<div>Find Tutors (work in progress)</div>' };
-const StudentBookings = { template: '<div>My Bookings (work in progress)</div>' };
 const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
 const StudentMessages = { template: '<div>Messages (work in progress)</div>' };
 const StudentAccount = { template: '<div>My Account (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
+import FindTutor from '../components/student/FindTutor/FindTutor.vue';
+import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 
 const routes = [
   // Guest routes
@@ -42,7 +42,7 @@ const routes = [
     meta: { requiresAuth: true, role: 'student' },
     children: [
       { path: '', redirect: '/student-dashboard/find' },
-      { path: 'find', component: FindTutors },
+      { path: 'find', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
       { path: 'reviews', component: StudentReviews },
       { path: 'messages', component: StudentMessages },

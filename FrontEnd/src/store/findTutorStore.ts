@@ -24,7 +24,7 @@ function matchesSearchQuery(tutor: Tutor, query: string): boolean {
          tutor.description.toLowerCase().includes(query);
 }
 
-export const useTutorStore = defineStore('tutor', {
+export const useFindTutorStore = defineStore('tutor', {
   state: () => ({
     // Search & Filter State
     searchQuery: '',

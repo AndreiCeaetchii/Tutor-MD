@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { useTutorStore } from '../../../store/findTutorStore';
+import { useFindTutorStore } from '../../../store/findTutorStore';
 import debounce from 'lodash/debounce';
 
-const tutorStore = useTutorStore();
+const tutorStore = useFindTutorStore();
 
-// Variabile locale pentru price range cu debounce
 const localPriceMin = ref(tutorStore.priceMin);
 const localPriceMax = ref(tutorStore.priceMax);
 
@@ -18,7 +17,6 @@ const educationLevels = [
 
 const showDropdown = ref(false);
 
-// Lista de subiecte
 const subjects = [
   'English', 
   'Informatics', 
@@ -52,7 +50,6 @@ watch([localPriceMin, localPriceMax], () => {
   debouncedUpdatePriceRange();
 });
 
-// Funcție pentru a seta valorile inițiale când se resetează filtrele
 watch(() => tutorStore.priceMin, (newVal) => {
   localPriceMin.value = newVal;
 });

@@ -2,9 +2,9 @@
 import { onMounted } from 'vue';
 import TutorCard from './TutorCards.vue';
 import TutorPagination from './TutorPagination.vue';
-import { useTutorStore } from '../../../store/findTutorStore';
+import { useFindTutorStore } from '../../../store/findTutorStore';
 
-const tutorStore = useTutorStore();
+const tutorStore = useFindTutorStore();
 
 onMounted(() => {
   tutorStore.initialize();
