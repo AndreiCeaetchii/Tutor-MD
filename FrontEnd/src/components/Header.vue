@@ -153,28 +153,49 @@
       <div v-if="isMenuOpen" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 sm:px-3">
           <div class="py-2 space-y-1">
-            <a href="#profile" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#profile"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'user']" class="w-5 h-5 mr-3 text-gray-500" />
               Profile
             </a>
-            <a href="#settings" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#settings"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'cog']" class="w-5 h-5 mr-3 text-gray-500" />
               Settings
             </a>
-            <a href="#my-courses" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
+            <a
+              href="#my-courses"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
               <font-awesome-icon :icon="['fas', 'book']" class="w-5 h-5 mr-3 text-gray-500" />
               My Courses
             </a>
-            <a href="#billing" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
-              <font-awesome-icon :icon="['fas', 'credit-card']" class="w-5 h-5 mr-3 text-gray-500" />
+            <a
+              href="#billing"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'credit-card']"
+                class="w-5 h-5 mr-3 text-gray-500"
+              />
               Billing & Payments
             </a>
-            <a href="#help" class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600">
-              <font-awesome-icon :icon="['fas', 'circle-question']" class="w-5 h-5 mr-3 text-gray-500" />
+            <a
+              href="#help"
+              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
+              <font-awesome-icon
+                :icon="['fas', 'circle-question']"
+                class="w-5 h-5 mr-3 text-gray-500"
+              />
               Help & Support
             </a>
           </div>
-          
+
           <div class="pt-4 pb-3 border-t border-gray-100">
             <div class="flex items-center justify-between px-3">
               <div class="flex items-center gap-3">
@@ -287,4 +308,4 @@
   onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside);
   });
-
+</script>
