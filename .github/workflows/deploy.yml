@@ -92,6 +92,5 @@ jobs:
             mv .deploy/docker-compose.yml docker-compose.yml || cp .deploy/docker-compose.yml docker-compose.yml
             mv .deploy/.env .env || cp .deploy/.env .env
             docker compose pull
+            docker compose down
             docker compose up -d
-
-
