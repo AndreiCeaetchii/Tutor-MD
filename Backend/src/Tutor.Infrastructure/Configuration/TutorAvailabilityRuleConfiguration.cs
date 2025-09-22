@@ -10,17 +10,14 @@ public class TutorAvailabilityRuleConfiguration : IEntityTypeConfiguration<Tutor
     {
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.DayOfWeek)
-            .IsRequired();
-
         builder.Property(x => x.StartTime)
+            .HasColumnType("time")
             .IsRequired();
 
         builder.Property(x => x.EndTime)
+            .HasColumnType("time")
             .IsRequired();
 
-        builder.Property(x => x.Timezone)
-            .HasMaxLength(64);
 
         builder.Property(x => x.ActiveStatus)
             .IsRequired()
@@ -39,5 +36,7 @@ public class TutorAvailabilityRuleConfiguration : IEntityTypeConfiguration<Tutor
             .WithMany(x => x.AvailabilityRules)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        
     }
 }

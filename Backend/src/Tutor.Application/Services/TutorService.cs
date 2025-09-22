@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +55,7 @@ public class TutorService : ITutorService
             UserId = userId,
             VerificationStatus = createTutorProfileDto.VerificationStatus,
             ExperienceYears = createTutorProfileDto.ExperienceYears,
+            WorkingLocation = createTutorProfileDto.WorkingLocation
         };
 
         await _tutorProfileRepository.Create(tutorProfile);
@@ -74,22 +76,118 @@ public class TutorService : ITutorService
         return _mapper.Map<TutorProfileDto>(profile);
     }
 
-    public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsync()
+  public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsync(
+    string? city = null,
+    string? country = null,
+    int[]? subjectIds = null,
+    int[]? ratings = null,
+    decimal? minPrice = null,
+    decimal? maxPrice = null,
+    string? sortBy = null,
+    bool sortDescending = false)
+{
+    var profiles = await _tutorProfileRepository.GetAll();
+    if (profiles is null || profiles.Count() == 0)
+        return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
+
+    // Filter verified profiles first
+    var verifiedProfiles = profiles
+        .Where(profile => profile.VerificationStatus == VerificationStatus.Verified)
+        .ToList();
+
+    // Apply all filters client-side
+    var filteredProfiles = verifiedProfiles.AsEnumerable();
+
+    if (!string.IsNullOrEmpty(city))
     {
-        var profiles = await _tutorProfileRepository.GetAll();
-        if (profiles is null)
-            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
-        var nonVerifiedProfiles = profiles
-            .Where(profile => profile.VerificationStatus == VerificationStatus.Verified)
-            .ToList();
-
-        // if (!nonVerifiedProfiles.Any())
-        //     return Result<List<TutorProfileDto>>.NotFound("No pending tutor profiles found");
-
-        var result = _mapper.Map<List<TutorProfileDto>>(nonVerifiedProfiles);
-        return Result<List<TutorProfileDto>>.Success(result);
+        filteredProfiles = filteredProfiles.Where(profile => 
+            profile.User?.City != null &&
+            profile.User.City.Equals(city, StringComparison.OrdinalIgnoreCase));
     }
 
+    if (!string.IsNullOrEmpty(country))
+    {
+        filteredProfiles = filteredProfiles.Where(profile => 
+            profile.User?.Country != null &&
+            profile.User.Country.Equals(country, StringComparison.OrdinalIgnoreCase));
+    }
+
+    if (subjectIds != null && subjectIds.Length > 0)
+    {
+        filteredProfiles = filteredProfiles.Where(profile =>
+            profile.TutorSubjects != null &&
+            profile.TutorSubjects.Any(ts => subjectIds.Contains(ts.SubjectId)));
+    }
+
+    if (minPrice.HasValue)
+    {
+        filteredProfiles = filteredProfiles.Where(profile =>
+            profile.TutorSubjects != null &&
+            profile.TutorSubjects.Any(ts => ts.Price >= minPrice.Value));
+    }
+
+    if (maxPrice.HasValue)
+    {
+        filteredProfiles = filteredProfiles.Where(profile =>
+            profile.TutorSubjects != null &&
+            profile.TutorSubjects.Any(ts => ts.Price <= maxPrice.Value));
+    }
+
+    if (ratings != null && ratings.Length > 0)
+    {
+        filteredProfiles = filteredProfiles.Where(profile =>
+            profile.Reviews != null && 
+            profile.Reviews.Any() &&
+            ratings.Contains((int)Math.Floor(profile.Reviews.Average(r => r.Rating))));
+    }
+
+    // Apply sorting
+    IOrderedEnumerable<TutorProfile> orderedProfiles;
+    switch (sortBy?.ToLower())
+    {
+        case "price":
+            orderedProfiles = sortDescending
+                ? filteredProfiles.OrderByDescending(profile =>
+                    profile.TutorSubjects != null && profile.TutorSubjects.Any()
+                        ? profile.TutorSubjects.Min(ts => ts.Price)
+                        : decimal.MaxValue)
+                : filteredProfiles.OrderBy(profile =>
+                    profile.TutorSubjects != null && profile.TutorSubjects.Any()
+                        ? profile.TutorSubjects.Min(ts => ts.Price)
+                        : decimal.MaxValue);
+            break;
+        
+        case "experience":
+            orderedProfiles = sortDescending
+                ? filteredProfiles.OrderByDescending(profile => profile.ExperienceYears ?? 0)
+                : filteredProfiles.OrderBy(profile => profile.ExperienceYears ?? 0);
+            break;
+        
+        case "rating":
+            orderedProfiles = sortDescending
+                ? filteredProfiles.OrderByDescending(profile =>
+                    profile.Reviews != null && profile.Reviews.Any()
+                        ? profile.Reviews.Average(r => r.Rating)
+                        : 0)
+                : filteredProfiles.OrderBy(profile =>
+                    profile.Reviews != null && profile.Reviews.Any()
+                        ? profile.Reviews.Average(r => r.Rating)
+                        : 0);
+            break;
+        
+        default:
+            orderedProfiles = filteredProfiles.OrderBy(profile => profile.UserId);
+            break;
+    }
+
+    var resultList = orderedProfiles.ToList();
+    
+    if (resultList.Count == 0)
+        return Result<List<TutorProfileDto>>.NotFound("No tutors found matching the criteria");
+
+    var result = _mapper.Map<List<TutorProfileDto>>(resultList);
+    return Result<List<TutorProfileDto>>.Success(result);
+}
     public async Task<Result<TutorProfileDto>> ApproveTutorAsync(int userId)
     {
         var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
@@ -126,6 +224,7 @@ public class TutorService : ITutorService
         if (tutorProfile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
         tutorProfile.ExperienceYears = updateTutorProfileDto.ExperienceYears;
+        tutorProfile.WorkingLocation = updateTutorProfileDto.WorkingLocation;
         await _tutorProfileRepository.Update(tutorProfile);
         
         return  Result<TutorProfileDto>.Success(_mapper.Map<TutorProfileDto>(tutorProfile));

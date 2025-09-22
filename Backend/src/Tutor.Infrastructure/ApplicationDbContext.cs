@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Text.RegularExpressions;
 using Tutor.Application.Common;
@@ -36,6 +37,7 @@ public class ApplicationDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
 
         // Apply existing configurations
         builder.ApplyConfigurationsFromAssembly(typeof(HeroConfiguration).Assembly);

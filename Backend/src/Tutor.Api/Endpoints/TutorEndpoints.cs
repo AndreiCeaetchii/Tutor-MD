@@ -53,6 +53,7 @@ public static class TutorEndpoints
                 })
             .WithName("CreateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("ActiveUserOnly")
             .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -77,6 +78,7 @@ public static class TutorEndpoints
                 })
             .WithName("UpdateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("ActiveUserOnly")
             .RequireAuthorization("TutorPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
 
@@ -96,9 +98,26 @@ public static class TutorEndpoints
 
         group.MapGet("/get-tutors",
                
-                async (IMediator mediator) =>
+                async (IMediator mediator,
+                    [FromQuery] string? city = null,
+                    [FromQuery] string? country = null,
+                    [FromQuery] int[]? subjectId = null,
+                    [FromQuery] int[]? ratings = null,
+                    [FromQuery] decimal? minPrice = null,
+                    [FromQuery] decimal? maxPrice = null,
+                    [FromQuery] string? sortBy = null,
+                    [FromQuery] bool sortDescending = false) =>
                 {
-                    var command = new GetAllTutorsQuery();
+                     var command = new GetAllTutorsQuery(
+                        city, 
+                        country, 
+                        subjectId, 
+                        ratings,
+                        minPrice, 
+                        maxPrice, 
+                        sortBy, 
+                        sortDescending
+                    );;
 
                     var result = await mediator.Send(command);
                     return result.IsSuccess
@@ -106,8 +125,10 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetAllTutorProfile")
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
+            .RequireAuthorization("AdminOrStudentPolicy") 
             .Produces(StatusCodes.Status400BadRequest)
+
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/approve-tutor/{id}",
@@ -120,6 +141,8 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("ApproveTutor")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 
@@ -133,6 +156,8 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeclineTutor")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 
@@ -154,6 +179,7 @@ public static class TutorEndpoints
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status401Unauthorized);
         
         group.MapDelete("/delete-subject/{subjectId}",
@@ -173,6 +199,7 @@ public static class TutorEndpoints
                 }).WithName("DeleteSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         
@@ -193,6 +220,7 @@ public static class TutorEndpoints
                 }).WithName("UpdateSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPost("availability/create",
@@ -212,6 +240,7 @@ public static class TutorEndpoints
             }).WithName("CreateAvailability")
             .Produces<AvailabilityDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPut("availability/update",
@@ -231,6 +260,7 @@ public static class TutorEndpoints
                 }).WithName("UpdateAvailability")
             .Produces<AvailabilityDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapDelete("availability/delete/{id}",
@@ -250,8 +280,10 @@ public static class TutorEndpoints
                 }).WithName("DeleteAvailability")
             .Produces(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapGet("availability/{userId}",
                 async (IMediator mediator, int userId) =>
                 {
@@ -262,7 +294,8 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetTutorAvailability")
             .Produces<List<AvailabilityDto>>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorPolicy")
+            .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 

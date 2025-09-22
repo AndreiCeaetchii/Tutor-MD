@@ -133,17 +133,14 @@ namespace Tutor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AvailabilityRuleId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("PriceSnapshot")
-                        .HasColumnType("decimal(8,2)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
@@ -163,6 +160,8 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AvailabilityRuleId");
 
                     b.HasIndex("StudentUserId");
 
@@ -495,19 +494,14 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("integer");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time without time zone");
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time without time zone");
-
-                    b.Property<string>("Timezone")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("time");
 
                     b.Property<int>("TutorUserId")
                         .HasColumnType("integer");
@@ -534,6 +528,9 @@ namespace Tutor.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(0);
+
+                    b.Property<int>("WorkingLocation")
+                        .HasColumnType("integer");
 
                     b.HasKey("UserId");
 
@@ -797,6 +794,12 @@ namespace Tutor.Infrastructure.Migrations
 
             modelBuilder.Entity("Tutor.Domain.Entities.Booking", b =>
                 {
+                    b.HasOne("Tutor.Domain.Entities.TutorAvailabilityRule", "TutorAvailabilityRule")
+                        .WithMany("Bookings")
+                        .HasForeignKey("AvailabilityRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Tutor.Domain.Entities.Student", "Student")
                         .WithMany("Bookings")
                         .HasForeignKey("StudentUserId")
@@ -818,6 +821,8 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Subject");
+
+                    b.Navigation("TutorAvailabilityRule");
 
                     b.Navigation("TutorProfile");
                 });
@@ -998,6 +1003,11 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Bookings");
 
                     b.Navigation("TutorSubjects");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.TutorAvailabilityRule", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.TutorProfile", b =>
