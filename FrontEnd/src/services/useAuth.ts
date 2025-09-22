@@ -8,6 +8,7 @@ interface AuthFormData {
 }
 
 export function useAuth() {
+    const apiBaseUrl = (import.meta as any).env?.VITE_API_BASE_URL || (window as any)?.VITE_API_BASE_URL || '';
     const router = useRouter();
     const accessToken = ref<string | null>(null);
     const currentUser = ref<any>(null);
@@ -17,7 +18,7 @@ export function useAuth() {
     const signup = async (formData: AuthFormData) => {
         errorMessage.value = null;
         try {
-            const res = await fetch('http://localhost:3000/api/auth/register', {
+            const res = await fetch(`${apiBaseUrl}/api/users/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -51,7 +52,7 @@ export function useAuth() {
     const login = async (formData: AuthFormData) => {
         errorMessage.value = null;
         try {
-            const res = await fetch('http://localhost:3000/api/auth/login', {
+            const res = await fetch(`${apiBaseUrl}/api/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -81,17 +82,9 @@ export function useAuth() {
 
     // --- Logout ---
     const logout = async () => {
-        try {
-            await fetch('http://localhost:3000/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include', // șterge refresh token cookie
-            });
-            accessToken.value = null;
-            currentUser.value = null;
-            router.push('/login');
-        } catch (err) {
-            console.error('Logout error:', err);
-        }
+        accessToken.value = null;
+        currentUser.value = null;
+        router.push('/login');
     };
 
     return {
