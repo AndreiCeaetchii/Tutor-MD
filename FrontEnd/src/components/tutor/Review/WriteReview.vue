@@ -83,10 +83,15 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
+  import { createReview } from '../../../services/reviewService.ts';
 
   const isModalOpen = ref(false);
   const rating = ref(0);
   const reviewText = ref('');
+  const isLoading = ref(false);
+
+  // Aici trebuie ID-ul real al rezervării.
+  const bookingId = 1;
 
   const closeModal = () => {
     isModalOpen.value = false;
@@ -96,10 +101,31 @@
     rating.value = star;
   };
 
-  const handleSubmit = () => {
-    console.log('Rating:', rating.value, 'stars');
-    console.log('Review:', reviewText.value);
-    console.log('Recenzia a fost trimisă cu succes!');
-    closeModal();
+  const handleSubmit = async () => {
+    if (rating.value === 0 || reviewText.value.trim() === '') {
+      alert('Vă rugăm să oferiți o notă și să scrieți o recenzie.');
+      return;
+    }
+
+    isLoading.value = true;
+    try {
+      const reviewData = {
+        BookingId: bookingId,
+        Rating: rating.value,
+        Description: reviewText.value,
+      };
+
+      await createReview(reviewData);
+
+      console.log('Recenzia a fost trimisă cu succes!');
+      closeModal();
+      rating.value = 0;
+      reviewText.value = '';
+    } catch (error) {
+      console.error('Eroare la trimiterea recenziei:', error);
+      alert('A apărut o eroare la trimiterea recenziei. Vă rugăm să încercați din nou.');
+    } finally {
+      isLoading.value = false;
+    }
   };
 </script>
