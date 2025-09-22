@@ -1,0 +1,235 @@
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useBookingStore } from '../../../store/bookingStore';
+
+const bookingStore = useBookingStore();
+const activeFilter = ref('All');
+
+onMounted(() => {
+  if (bookingStore.bookings.length === 0) {
+    bookingStore.setBookings([
+      {
+        id: 1,
+        studentName: 'Alex Chen',
+        subject: 'Calculus',
+        status: 'Pending',
+        date: '2025-09-15',
+        time: '10:00',
+        duration: '60 min',
+        message: 'Hi! I need help with integration by parts and related problems. I have an exam next week.',
+        studentImage: 'https://i.pravatar.cc/150?img=11'
+      },
+      {
+        id: 2,
+        studentName: 'Maria Rodriguez',
+        subject: 'Statistics',
+        status: 'Accepted',
+        date: '2025-09-17',
+        time: '11:00',
+        duration: '90 min',
+        message: 'Looking for help with hypothesis testing and p-values.',
+        studentImage: 'https://i.pravatar.cc/150?img=11'
+      },
+      {
+        id: 3,
+        studentName: 'Arina Popescu',
+        subject: 'Algebra',
+        status: 'Completed',
+        date: '2025-09-18',
+        time: '12:00',
+        duration: '90 min',
+        message: 'Looking for help with hypothesis testing and p-values.',
+        studentImage: 'https://i.pravatar.cc/150?img=11'
+      }
+    ]);
+  }
+});
+
+const pendingCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Pending').length);
+const acceptedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Accepted').length);
+const completedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Completed').length);
+const pastReviewsCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Completed').length);
+
+const filteredBookings = computed(() => {
+  if (activeFilter.value === 'All') return bookingStore.bookings;
+  if (activeFilter.value === 'Past Reviews') {
+    return bookingStore.bookings.filter(b => b.status === 'Completed');
+  }
+  return bookingStore.bookings.filter(b => b.status === activeFilter.value);
+});
+
+const setFilter = (filter: string) => {
+  activeFilter.value = filter;
+};
+
+const handleAccept = (bookingId: number) => {
+  bookingStore.updateBookingStatus(bookingId, 'Accepted');
+};
+
+const handleReject = (bookingId: number) => {
+  bookingStore.updateBookingStatus(bookingId, 'Cancelled');
+};
+
+const handleMarkComplete = (bookingId: number) => {
+  bookingStore.updateBookingStatus(bookingId, 'Completed');
+};
+
+function formatDate(dateStr: string): string {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+  }
+  
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return dateStr;
+  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function formatTimeInterval(time: string, duration: string): string {
+  const [hour, minute] = time.split(':').map(Number);
+  const durationMin = parseInt(duration);
+  const start = new Date(0, 0, 0, hour, minute);
+  const end = new Date(start.getTime() + durationMin * 60000);
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())} (${duration})`;
+}
+</script>
+
+<template>
+  <div class="p-4 tutor-bookings">
+    <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4 sm:gap-4 sm:mb-8">
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold sm:text-2xl text-amber-500">{{ pendingCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Pending</div>
+      </div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-blue-500 sm:text-2xl">{{ acceptedCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Accepted</div>
+      </div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-green-500 sm:text-2xl">{{ completedCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Completed</div>
+      </div>
+      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
+        <div class="text-xl font-bold text-gray-500 sm:text-2xl">{{ pastReviewsCount }}</div>
+        <div class="text-sm text-gray-600 sm:text-base">Past Reviews</div>
+      </div>
+    </div>
+
+    <h2 class="mb-4 text-lg font-semibold sm:text-xl">Booking Requests</h2>
+
+    <div class="mb-6 overflow-x-auto">
+      <div class="flex p-1 mb-2 bg-gray-100 rounded-full sm:p-2 sm:mb-6 min-w-max">
+        <button 
+          v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Past Reviews', 'Cancelled']" 
+          :key="filter"
+          @click="setFilter(filter)"
+          class="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-center transition-colors rounded-full whitespace-nowrap"
+          :class="activeFilter === filter ? 'bg-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'"
+        >
+          {{ filter }}
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div 
+        v-for="booking in filteredBookings" 
+        :key="booking.id"
+        class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-6"
+      >
+        <div class="flex flex-col gap-2 mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-0">
+          <div class="flex items-center gap-3">
+            <div v-if="booking.studentImage" class="flex-shrink-0 w-10 h-10 overflow-hidden rounded-full sm:w-12 sm:h-12">
+              <img :src="booking.studentImage" alt="Student" class="object-cover w-full h-full" />
+            </div>
+            <div v-else class="flex items-center justify-center flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full sm:w-12 sm:h-12">
+              <span class="text-sm text-gray-400 material-icons sm:text-base">person</span>
+            </div>
+            <div>
+              <h3 class="text-base font-semibold sm:text-lg">{{ booking.studentName }}</h3>
+              <p class="text-sm text-gray-600 sm:text-base">{{ booking.subject }}</p>
+            </div>
+          </div>
+          <div class="self-start sm:self-auto">
+            <span 
+              class="px-2 py-1 text-xs rounded-full sm:text-sm"
+              :class="{
+                'bg-amber-100 text-amber-800': booking.status === 'Pending',
+                'bg-blue-100 text-blue-800': booking.status === 'Accepted',
+                'bg-green-100 text-green-800': booking.status === 'Completed',
+                'bg-red-100 text-red-800': booking.status === 'Cancelled'
+              }"
+            >
+              {{ booking.status }}
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-2 mb-3 text-sm sm:gap-4 sm:mb-4 sm:text-base">
+          <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">calendar_today</span>
+            <span>{{ formatDate(booking.date) }}</span>
+          </div>
+          <div class="flex items-center">
+            <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">schedule</span>
+            <span>{{ formatTimeInterval(booking.time, booking.duration) }}</span>
+          </div>
+        </div>
+
+        <p class="py-2 mb-3 text-sm text-gray-700 border-gray-100 sm:mb-4 sm:text-base border-y">
+          {{ booking.message }}
+        </p>
+
+        <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
+          <div></div>
+          <div class="flex flex-wrap justify-end w-full gap-2 sm:w-auto">
+            <template v-if="booking.status === 'Pending'">
+              <button 
+                @click="handleReject(booking.id)" 
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+              >
+                <span class="mr-1 text-xs text-red-500 material-icons sm:text-sm">close</span>
+                Reject
+              </button>
+              <button 
+                @click="handleAccept(booking.id)" 
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-green-600 rounded-full hover:bg-green-700"
+              >
+                <span class="mr-1 text-xs material-icons sm:text-sm">check</span>
+                Accept
+              </button>
+            </template>
+            <template v-if="booking.status === 'Accepted'">
+              <button 
+                @click="handleMarkComplete(booking.id)" 
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-blue-600 rounded-full hover:bg-blue-700"
+              >
+                <span class="mr-1 text-xs material-icons sm:text-sm">task_alt</span>
+                Mark Complete
+              </button>
+            </template>
+            <button
+              class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
+              @click="$emit('openChat', booking.studentName)"
+            >
+              <span class="mr-1 text-sm material-icons">chat</span>
+              Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.tutor-bookings {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+</style>

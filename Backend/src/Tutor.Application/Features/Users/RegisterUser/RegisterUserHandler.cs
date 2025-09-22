@@ -22,7 +22,6 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
     {
         if (request.RegisterUserDto.RoleId == 1)
             return Result<UserResponseDto>.Error("You cannot create Admin account");
-
         return await _authService.RegisterAsync(request.RegisterUserDto);
     }
 }

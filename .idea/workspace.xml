@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/TutorService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/TutorService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/signup/SignupForm.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorFilters.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorFilters.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/StudentSearchPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/StudentSearchPage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/studentService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/studentService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/useAuth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;jonnyy04&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/AndreiCeaetchii/Tutor-Backend.git&quot;,
+    &quot;accountId&quot;: &quot;a0254acd-9d7b-4dc0-81cb-0c76cd54560c&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="32GzyAUWVvVXOG9hYCN5anDESI8" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "feat/student-profile-api",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
+    "ts.external.directory.path": "C:\\Users\\ionvo\\OneDrive\\Desktop\\Tutor-Backend\\FrontEnd\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\student\profile" />
+      <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\student" />
+      <recent name="C:\Users\ionvo\OneDrive\Desktop\Tutor-Backend\FrontEnd\src\components\landing" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-WS-252.25557.126" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="" />
+      <created>1757061959023</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1757061959023</updated>
+      <workItem from="1757061961506" duration="189000" />
+      <workItem from="1757069809235" duration="11850000" />
+      <workItem from="1757152549543" duration="128000" />
+      <workItem from="1757158047322" duration="3804000" />
+      <workItem from="1757256795418" duration="378000" />
+      <workItem from="1757315376836" duration="9275000" />
+      <workItem from="1757451158203" duration="853000" />
+      <workItem from="1757487015380" duration="748000" />
+      <workItem from="1757488098377" duration="7047000" />
+      <workItem from="1757497736290" duration="2047000" />
+      <workItem from="1757500853545" duration="10091000" />
+      <workItem from="1757576015940" duration="2445000" />
+      <workItem from="1757579462376" duration="10782000" />
+      <workItem from="1757662514407" duration="15312000" />
+      <workItem from="1757917978242" duration="16029000" />
+      <workItem from="1758008472924" duration="8738000" />
+      <workItem from="1758020431888" duration="2109000" />
+      <workItem from="1758049885823" duration="1508000" />
+      <workItem from="1758102936331" duration="14538000" />
+      <workItem from="1758178124742" duration="22062000" />
+      <workItem from="1758215144321" duration="6370000" />
+      <workItem from="1758261668559" duration="21801000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

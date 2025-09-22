@@ -1,0 +1,96 @@
+<template>
+  <div class="relative w-full max-w-7xl mx-auto py-12 overflow-hidden">
+    <div
+        ref="carouselTrack"
+        class="flex transition-transform duration-500 ease-in-out"
+        :style="{ transform: `translateX(-${currentIndex * cardWidthPercentage}%)` }"
+        @touchstart="handleTouchStart"
+        @touchmove="handleTouchMove"
+        @touchend="handleTouchEnd"
+    >
+      <slot></slot>
+    </div>
+
+    <button
+        @click="prevSlide"
+        class="hidden md:block absolute top-1/2 left-0 -translate-y-1/2 bg-gray-200 text-gray-800 p-2 rounded-full shadow-lg hover:bg-gray-300 transition-colors"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+    </button>
+    <button
+        @click="nextSlide"
+        class="hidden md:block absolute top-1/2 right-0 -translate-y-1/2  p-2  shadow-lg  rounded-full bg-purple-600 text-white  items-center justify-center hover:bg-purple-700 transition-colors"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+    </button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+
+const currentIndex = ref(0);
+const touchStartX = ref(0);
+const touchEndX = ref(0);
+
+// Referința pentru a accesa elementul DOM.
+const carouselTrack = ref<HTMLElement | null>(null);
+
+// Numarul de carduri din interiorul slotului.
+const slotChildren = ref<number>(0);
+
+const cardsToShow = computed(() => {
+  if (window.innerWidth >= 1024) return 3;
+  if (window.innerWidth >= 768) return 2;
+  return 1;
+});
+
+const cardWidthPercentage = computed(() => 100 / cardsToShow.value);
+
+const prevSlide = () => {
+  currentIndex.value = (currentIndex.value > 0) ? currentIndex.value - 1 : slotChildren.value - cardsToShow.value;
+};
+
+const nextSlide = () => {
+  const maxIndex = slotChildren.value - cardsToShow.value;
+  currentIndex.value = (currentIndex.value < maxIndex) ? currentIndex.value + 1 : 0;
+};
+
+const handleTouchStart = (e: TouchEvent) => {
+  touchStartX.value = e.touches[0].clientX;
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+  touchEndX.value = e.touches[0].clientX;
+};
+
+const handleTouchEnd = () => {
+  if (touchStartX.value - touchEndX.value > 50) {
+    nextSlide();
+  } else if (touchEndX.value - touchStartX.value > 50) {
+    prevSlide();
+  }
+};
+
+const handleResize = () => {
+  const maxIndex = slotChildren.value - cardsToShow.value;
+  if (currentIndex.value > maxIndex) {
+    currentIndex.value = maxIndex;
+  }
+  if (currentIndex.value < 0) {
+    currentIndex.value = 0;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  // Actualizam numarul de copii la montare.
+  if (carouselTrack.value) {
+    slotChildren.value = carouselTrack.value.children.length;
+  }
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
+</script>
