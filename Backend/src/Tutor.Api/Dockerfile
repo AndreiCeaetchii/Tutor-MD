@@ -27,4 +27,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 USER $APP_UID 
-ENTRYPOINT ["dotnet", "Tutor.Api.dll"]
+ENTRYPOINT ["sh", "-c", "dotnet ef database update --project ../Tutor.Infrastructure --startup-project . && dotnet Tutor.Api.dll"]
