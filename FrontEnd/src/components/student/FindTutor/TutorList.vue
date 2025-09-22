@@ -30,6 +30,7 @@
         :description="tutor.description"
         :services="tutor.services"
         :saved="tutor.saved"
+        :workingLocation="tutor.workingLocation"
         @save-toggled="handleTutorSaveChange(tutor.id, $event)"
       />
     </div>
