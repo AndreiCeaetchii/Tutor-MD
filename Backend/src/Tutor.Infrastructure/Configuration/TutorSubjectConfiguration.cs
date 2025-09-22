@@ -19,7 +19,7 @@ public class TutorSubjectConfiguration : IEntityTypeConfiguration<TutorSubject>
             .HasMaxLength(3);
 
         // Relationships
-        builder.HasOne(x => x.Tutor)
+        builder.HasOne(x => x.TutorProfile)
             .WithMany(x => x.TutorSubjects)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.Cascade);

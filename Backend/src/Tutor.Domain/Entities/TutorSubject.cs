@@ -8,6 +8,6 @@ public class TutorSubject
     public string Currency { get; set; } // ISO 4217 (e.g., EUR, USD)
 
     // Navigation properties
-    public virtual Tutor Tutor { get; set; }
+    public virtual TutorProfile TutorProfile { get; set; }
     public virtual SubjectCatalog Subject { get; set; }
 }

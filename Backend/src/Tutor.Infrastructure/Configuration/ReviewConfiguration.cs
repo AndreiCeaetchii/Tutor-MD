@@ -14,9 +14,11 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .IsRequired();
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         builder.Property(x => x.UpdatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships
@@ -25,7 +27,7 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
             .HasForeignKey<Review>(x => x.BookingId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(x => x.Tutor)
+        builder.HasOne(x => x.TutorProfile)
             .WithMany(x => x.Reviews)
             .HasForeignKey(x => x.TutorUserId)
             .OnDelete(DeleteBehavior.NoAction);

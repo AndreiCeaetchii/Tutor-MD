@@ -12,8 +12,8 @@ using Tutor.Infrastructure;
 namespace Tutor.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250904105521_PendingChanges")]
-    partial class PendingChanges
+    [Migration("20250908171056_AddedPasswordAndGAutheEntities")]
+    partial class AddedPasswordAndGAutheEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -137,7 +137,7 @@ namespace Tutor.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("timestamp with time zone");
@@ -163,7 +163,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -176,6 +176,39 @@ namespace Tutor.Infrastructure.Migrations
                     b.ToTable("Bookings");
                 });
 
+            modelBuilder.Entity("Tutor.Domain.Entities.GoogleAuth", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("OAuthProvider")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OAuthProviderId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("google_auth", (string)null);
+                });
+
             modelBuilder.Entity("Tutor.Domain.Entities.Hero", b =>
                 {
                     b.Property<Guid>("Id")
@@ -185,7 +218,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("HeroType")
                         .HasColumnType("integer");
@@ -204,7 +237,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -223,7 +256,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Payload")
                         .IsRequired()
@@ -243,7 +276,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -252,6 +285,36 @@ namespace Tutor.Infrastructure.Migrations
                     b.HasIndex("RecipientUserId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.Password", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("passwords", (string)null);
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.Photo", b =>
@@ -266,7 +329,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int?>("Height")
                         .HasColumnType("integer");
@@ -287,7 +350,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("character varying(191)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -314,7 +377,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -330,7 +393,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -353,7 +416,7 @@ namespace Tutor.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -361,7 +424,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("character varying(30)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -393,7 +456,7 @@ namespace Tutor.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -406,7 +469,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("character varying(120)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -448,7 +511,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasDefaultValue(true);
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("integer");
@@ -468,7 +531,7 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -509,14 +572,13 @@ namespace Tutor.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Bio")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("Birthdate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -524,7 +586,6 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -533,21 +594,14 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
-                    b.Property<DateTime?>("LastLoginAt")
+                    b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
                     b.Property<string>("Phone")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
@@ -555,10 +609,9 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Username")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
@@ -765,6 +818,17 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Tutor");
                 });
 
+            modelBuilder.Entity("Tutor.Domain.Entities.GoogleAuth", b =>
+                {
+                    b.HasOne("Tutor.Domain.Entities.User", "User")
+                        .WithOne("GoogleAuth")
+                        .HasForeignKey("Tutor.Domain.Entities.GoogleAuth", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Tutor.Domain.Entities.Notification", b =>
                 {
                     b.HasOne("Tutor.Domain.Entities.User", "Actor")
@@ -781,6 +845,17 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Actor");
 
                     b.Navigation("Recipient");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.Password", b =>
+                {
+                    b.HasOne("Tutor.Domain.Entities.User", "User")
+                        .WithOne("Password")
+                        .HasForeignKey("Tutor.Domain.Entities.Password", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.Review", b =>
@@ -934,6 +1009,12 @@ namespace Tutor.Infrastructure.Migrations
 
             modelBuilder.Entity("Tutor.Domain.Entities.User", b =>
                 {
+                    b.Navigation("GoogleAuth")
+                        .IsRequired();
+
+                    b.Navigation("Password")
+                        .IsRequired();
+
                     b.Navigation("ReceivedNotifications");
 
                     b.Navigation("SentNotifications");

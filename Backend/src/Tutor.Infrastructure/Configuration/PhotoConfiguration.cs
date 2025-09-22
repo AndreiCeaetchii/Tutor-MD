@@ -23,6 +23,7 @@ public class PhotoConfiguration : IEntityTypeConfiguration<Photo>
             .HasMaxLength(100);
 
         builder.Property(x => x.CreatedAt)
+            .HasColumnType("timestamp without time zone")
             .IsRequired();
 
         // Relationships

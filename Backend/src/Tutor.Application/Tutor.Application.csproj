@@ -10,11 +10,23 @@
   <ItemGroup>
     <PackageReference Include="Ardalis.Result" />
     <PackageReference Include="Ardalis.Result.FluentValidation" />
+    <PackageReference Include="DotNetEnv" />
+    <PackageReference Include="AutoMapper" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="NodaTime" />
+    <PackageReference Include="NodaTime.EntityFrameworkCore.Conversions" />
+    <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="Riok.Mapperly" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,6 +35,10 @@
 
   <ItemGroup>
     <Compile Remove="Features\Users.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup> 
 
 </Project>
