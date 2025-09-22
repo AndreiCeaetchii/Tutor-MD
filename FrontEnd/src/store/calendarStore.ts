@@ -7,6 +7,7 @@ import {
   type AvailabilitySlot,
 } from '../services/tutorAvailability';
 import { useUserStore } from './userStore';
+import { useRouter } from 'vue-router';
 
 export interface TimeSlot {
   id: string;
@@ -218,7 +219,10 @@ export const useCalendarStore = defineStore('calendar', {
         this.loading = true;
         this.error = null;
         const userStore = useUserStore();
-        const userId = Number(userStore.userId);
+        const router = useRouter();
+
+        const routeId = router.currentRoute.value.params.id ? Number(router.currentRoute.value.params.id) : null;
+        const userId = routeId || Number(userStore.userId);
 
         if (!userId) {
           throw new Error('User not authenticated');
