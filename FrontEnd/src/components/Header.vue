@@ -287,9 +287,15 @@
     showProfileMenu.value = false;
   }
 
-  const userName = computed(() =>
-    profileStore.userName ? profileStore.userName : studentProfileStore.userProfile.username,
-  );
+  const userRole = computed(() => store.userRole);
+
+  const userName = computed(() => {
+    if (userRole.value === 'student') {
+      return studentProfileStore.userProfile?.username || '';
+    } else {
+      return profileStore.userName || '';
+    }
+  });
 
   const email = computed(() => store.email);
 

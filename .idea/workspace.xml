@@ -7,11 +7,7 @@
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/Header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorCards.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorCards.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/TutorList.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/findTutorStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +102,7 @@
       <workItem from="1758463469941" duration="1067000" />
       <workItem from="1758482570091" duration="5502000" />
       <workItem from="1758522875735" duration="13749000" />
-      <workItem from="1758568547301" duration="6263000" />
+      <workItem from="1758568547301" duration="7123000" />
     </task>
     <servers />
   </component>

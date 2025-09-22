@@ -66,7 +66,7 @@
         lastName: serverData.userProfile.lastName || '',
         bio: serverData.userProfile.bio || '',
         phone: serverData.userProfile.phone || '',
-        email: userStore.email || '',
+        email: serverData.email || '',
         experience: serverData.experienceYears || 0,
         age: calculateAge(serverData.userProfile.birthdate),
         country: serverData.userProfile.country || '',
