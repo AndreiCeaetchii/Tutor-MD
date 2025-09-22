@@ -71,18 +71,36 @@ public static class ApplicationSetup
                 options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
             });
 
-        var allowedOrigins = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
-        var corsPolicyName = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
+        var allowedOriginsEnv = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        var corsPolicyNameEnv = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
+
+        var corsPolicyName = string.IsNullOrWhiteSpace(corsPolicyNameEnv)
+            ? "AllowFrontend"
+            : corsPolicyNameEnv;
+
+        var allowedOrigins = string.IsNullOrWhiteSpace(allowedOriginsEnv)
+            ? Array.Empty<string>()
+            : allowedOriginsEnv
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         services.AddCors(options =>
         {
-            options.AddPolicy(corsPolicyName,
-                policy =>
+            options.AddPolicy(corsPolicyName, policy =>
+            {
+                if (allowedOrigins.Length > 0)
                 {
                     policy.WithOrigins(allowedOrigins)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                }
+                else
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                }
+            });
         });
 
         return services;

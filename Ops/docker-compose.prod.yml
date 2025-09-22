@@ -26,6 +26,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB:-Tutor};Username=${POSTGRES_USER:-admin};Password=${POSTGRES_PASSWORD:-admin}
       - ASPNETCORE_URLS=http://+:8080
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,https://localhost}
+      - CORS_POLICY_NAME=${CORS_POLICY_NAME:-AllowFrontend}
     ports:
       - "8080:8080"
     networks:
