@@ -14,4 +14,6 @@ public class CreateProfileDto
     public DateTime? Birthdate { get; set; }
     
     public bool? IsActive { get; set; }
+    
+    public string? Email { get; set; }
 }
