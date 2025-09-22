@@ -9,12 +9,12 @@ const props = defineProps<{
     startTime: string;
     endTime: string;
   } | null;
+  lastEndTime?: string;
 }>();
 
 const emit = defineEmits(['close', 'save']);
 const store = useCalendarStore();
 
-// Generate all time options in 30 minute increments (00:00 - 23:30)
 const generateTimeOptions = () => {
   const options = [];
   for (let hour = 8; hour < 24; hour++) {
@@ -38,7 +38,6 @@ const startTimeText = ref('Select start time');
 const endTimeText = ref('Select end time');
 const errorMessage = ref('');
 
-// Reset values when modal is opened
 watch(() => props.isOpen, (isOpen) => {
   if (isOpen) {
     errorMessage.value = '';
@@ -48,6 +47,17 @@ watch(() => props.isOpen, (isOpen) => {
       startTimeText.value = props.editingSlot.startTime;
       endTime.value = props.editingSlot.endTime;
       endTimeText.value = props.editingSlot.endTime;
+    } else if (props.lastEndTime) {
+      startTime.value = props.lastEndTime;
+      startTimeText.value = props.lastEndTime;
+      
+      const startIndex = timeOptions.findIndex(t => t === props.lastEndTime);
+      if (startIndex !== -1 && startIndex < timeOptions.length - 1) {
+        endTime.value = timeOptions[startIndex + 1];
+      } else {
+        endTime.value = '09:00';
+      }
+      endTimeText.value = endTime.value;
     } else {
       startTime.value = '08:00';
       startTimeText.value = '08:00';
@@ -65,13 +75,11 @@ const closeModal = () => {
 const saveTimeSlot = () => {
   errorMessage.value = '';
   
-  // Basic validation
   if (!startTime.value || !endTime.value) {
     errorMessage.value = 'Please select both start and end times';
     return;
   }
   
-  // Verify that end time is after start time
   const startMinutes = store.timeToMinutes(startTime.value);
   const endMinutes = store.timeToMinutes(endTime.value);
   
@@ -80,18 +88,15 @@ const saveTimeSlot = () => {
     return;
   }
   
-  // Check for overlaps
   try {
     const slotData = { startTime: startTime.value, endTime: endTime.value };
     
     if (props.editingSlot) {
-      // Check if editing would create an overlap
       if (store.checkOverlap(slotData, props.editingSlot.id)) {
         errorMessage.value = 'This time slot would overlap with another existing slot';
         return;
       }
     } else {
-      // Check if new slot would create an overlap
       if (store.checkOverlap(slotData)) {
         errorMessage.value = 'This time slot overlaps with an existing slot';
         return;
@@ -124,9 +129,7 @@ const selectStartTime = (time: string) => {
   startTimeText.value = time;
   showStartTimeDropdown.value = false;
   
-  // If end time is not set or is earlier than start time, adjust it
   if (!endTime.value || store.timeToMinutes(endTime.value) <= store.timeToMinutes(time)) {
-    // Find next valid end time
     const startIndex = timeOptions.findIndex(t => t === time);
     if (startIndex < timeOptions.length - 1) {
       endTime.value = timeOptions[startIndex + 1];
@@ -155,7 +158,6 @@ const toggleEndTimeDropdown = () => {
   }
 };
 
-// Filter end times to only show times after the selected start time
 const filteredEndTimes = computed(() => {
   if (!startTime.value) return timeOptions;
   
@@ -165,7 +167,6 @@ const filteredEndTimes = computed(() => {
   return timeOptions.slice(startIndex + 1);
 });
 
-// Close dropdowns when clicking outside
 const startTimeRef = ref<HTMLElement | null>(null);
 const endTimeRef = ref<HTMLElement | null>(null);
 
@@ -187,7 +188,6 @@ const handleClickOutside = (event: MouseEvent) => {
 };
 
 const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
-  // Skip overlap check when editing to allow selecting the same times
   if (props.editingSlot) {
     return false;
   }
@@ -201,28 +201,22 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
 </script>
 
 <template>
-  <!-- Modal Overlay -->
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <!-- Modal Content -->
     <div class="relative w-full max-w-md p-6 mx-auto bg-white rounded-lg shadow-xl">
-      <!-- Close Button -->
       <button @click="closeModal" class="absolute text-gray-500 top-4 right-4 hover:text-gray-700">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       
-      <!-- Modal Header -->
       <h2 class="mb-6 text-xl font-semibold text-gray-800">
         {{ props.editingSlot ? 'Edit Time Slot' : 'Add Time Slot' }}
       </h2>
       
-      <!-- Error Message -->
       <div v-if="errorMessage" class="p-3 mb-4 text-sm text-red-600 bg-red-100 rounded-md">
         {{ errorMessage }}
       </div>
       
-      <!-- Start Time Dropdown -->
       <div class="mb-6">
         <label class="block mb-2 text-sm font-medium text-gray-700">Start Time</label>
         <div ref="startTimeRef" class="relative">
@@ -264,7 +258,6 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
         </div>
       </div>
       
-      <!-- End Time Dropdown -->
       <div class="mb-8">
         <label class="block mb-2 text-sm font-medium text-gray-700">End Time</label>
         <div ref="endTimeRef" class="relative">
@@ -306,7 +299,6 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
         </div>
       </div>
       
-      <!-- Add/Edit Time Slot Button -->
       <button 
         @click="saveTimeSlot"
         :disabled="!startTime || !endTime"
@@ -323,7 +315,6 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
   max-height: 15rem;
 }
 
-/* Scrollbar pentru tema deschisă */
 .overflow-y-auto {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
