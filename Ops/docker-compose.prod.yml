@@ -1,0 +1,51 @@
+version: "3.8"
+
+name: tutor-stack-prod
+
+networks:
+  app:
+    name: tutor-prod
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tutor-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-admin}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-admin}
+      - POSTGRES_DB=${POSTGRES_DB:-Tutor}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app
+
+  backend:
+    image: ${IMAGE_BACKEND}
+    container_name: tutor-api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB:-Tutor};Username=${POSTGRES_USER:-admin};Password=${POSTGRES_PASSWORD:-admin}
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "8080:8080"
+    networks:
+      - app
+
+  frontend:
+    image: ${IMAGE_FRONTEND}
+    container_name: tutor-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app
+
+volumes:
+  db_data:
+
+
