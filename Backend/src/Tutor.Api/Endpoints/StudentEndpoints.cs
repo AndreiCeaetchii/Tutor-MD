@@ -17,6 +17,7 @@ using Tutor.Application.Features.Reviews.GetReviews;
 using Tutor.Application.Features.Reviews.UpdateReview;
 using Tutor.Application.Features.Students.CreateStudent;
 using Tutor.Application.Features.Students.DTOs;
+using Tutor.Application.Features.Students.GetAllStudents;
 using Tutor.Application.Features.Students.GetStudent;
 using Tutor.Application.Features.Students.UpdateStudent;
 using Tutor.Application.Features.Tutors.Dto;
@@ -31,7 +32,7 @@ public static class StudentEndpoints
         var group = builder.MapGroup("api/students")
             .WithTags("students");
         group.MapPost("/create-student",
-            [Authorize] async (IMediator mediator, [FromBody] CreateStudentDto createStudentDto, HttpContext httpContext) =>
+            async (IMediator mediator, [FromBody] CreateStudentDto createStudentDto, HttpContext httpContext) =>
             {
                 var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userIdClaim))
@@ -50,11 +51,11 @@ public static class StudentEndpoints
             .WithName("CreateStudentProfile")
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
-            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces<StudentDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         
         group.MapGet("/student-profile",
-                [Authorize] async (IMediator mediator,  HttpContext httpContext) =>
+                async (IMediator mediator,  HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -71,11 +72,29 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("GetStudentProfile")
-            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces<StudentDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        group.MapGet("/all-students",
+                async (IMediator mediator) =>
+                {
+                    var command = new GetAllStudentsCommand();
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
+            .WithName("AllStudents")
+            .Produces<StudentDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("ActiveUserOnly")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapPut("/update-profile",
                  async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,HttpContext httpContext) =>
                 {
@@ -94,7 +113,7 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("UpdateStudentProfile")
-            .Produces<TutorProfileDto>(StatusCodes.Status200OK)
+            .Produces<StudentDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy") 
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
@@ -255,7 +274,7 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeleteReview")
             .Produces(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("AdminOrStudentPolicy") 
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
@@ -278,7 +297,7 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetReviews")
             .Produces(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("AdminOrTutorOrStudentPolicy") 
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);

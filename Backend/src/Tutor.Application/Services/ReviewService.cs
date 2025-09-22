@@ -14,13 +14,16 @@ public class ReviewService : IReviewService
 {
     private readonly IGenericRepository<Review, int> _reviewRepository;
     private readonly IGenericRepository<Booking, int> _bookingRepository;
+    private readonly IBookingNotificationService _bookingNotificationService;
 
     public ReviewService(
         IGenericRepository<Review, int> reviewRepository,
-        IGenericRepository<Booking, int> bookingRepository)
+        IGenericRepository<Booking, int> bookingRepository,
+        IBookingNotificationService bookingNotificationService)
     {
         _reviewRepository = reviewRepository;
         _bookingRepository = bookingRepository;
+        _bookingNotificationService = bookingNotificationService;
     }
 
     public async Task<Result<ReviewDto>> CreateReview(CreateReviewDto createDto, int studentUserId)
@@ -50,7 +53,8 @@ public class ReviewService : IReviewService
         };
 
         await _reviewRepository.Create(review);
-
+        await _bookingNotificationService.NewReviewNotification(review);
+        
         return Result.Success(MapToDto(review));
     }
 

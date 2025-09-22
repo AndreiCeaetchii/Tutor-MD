@@ -110,7 +110,9 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<Result<List<AvailabilityDto>>> GetAvailabilitiesByTutor(int tutorUserId)
     {
-        var tutorAvailabilities = await _availabilityRepository.FindAsync(u => u.TutorUserId == tutorUserId);
+        var today = DateOnly.FromDateTime(DateTime.Now);
+
+        var tutorAvailabilities = await _availabilityRepository.FindAsync(u => u.TutorUserId == tutorUserId && u.Date>= today);
         if (tutorAvailabilities.Count == 0)
             return Result<List<AvailabilityDto>>.Error("Tutor does not have any availability");
         return Result<List<AvailabilityDto>>.Success(

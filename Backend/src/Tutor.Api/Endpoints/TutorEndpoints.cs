@@ -98,9 +98,26 @@ public static class TutorEndpoints
 
         group.MapGet("/get-tutors",
                
-                async (IMediator mediator) =>
+                async (IMediator mediator,
+                    [FromQuery] string? city = null,
+                    [FromQuery] string? country = null,
+                    [FromQuery] int[]? subjectId = null,
+                    [FromQuery] int[]? ratings = null,
+                    [FromQuery] decimal? minPrice = null,
+                    [FromQuery] decimal? maxPrice = null,
+                    [FromQuery] string? sortBy = null,
+                    [FromQuery] bool sortDescending = false) =>
                 {
-                    var command = new GetAllTutorsQuery();
+                     var command = new GetAllTutorsQuery(
+                        city, 
+                        country, 
+                        subjectId, 
+                        ratings,
+                        minPrice, 
+                        maxPrice, 
+                        sortBy, 
+                        sortDescending
+                    );;
 
                     var result = await mediator.Send(command);
                     return result.IsSuccess
@@ -109,7 +126,7 @@ public static class TutorEndpoints
                 }).WithName("GetAllTutorProfile")
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("AdminOrStudentPolicy") 
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/approve-tutor/{id}",

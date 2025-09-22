@@ -11,28 +11,29 @@ using Tutor.Domain.Interfaces;
 
 namespace Tutor.Application.Services.Background;
 
-public class BookingNotificationService:IBookingNotificationService
+public class BookingNotificationService : IBookingNotificationService
 {
     private readonly ILogger<BookingNotificationService> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5); 
-    private readonly IGenericRepository<Notification,int> _notificationRepository;
+    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
+    private readonly IGenericRepository<Notification, int> _notificationRepository;
 
     public BookingNotificationService(
         ILogger<BookingNotificationService> logger,
-        IGenericRepository<Notification,int> notificationRepository,
+        IGenericRepository<Notification, int> notificationRepository,
         IServiceProvider serviceProvider)
     {
         _logger = logger;
         _notificationRepository = notificationRepository;
         _serviceProvider = serviceProvider;
     }
+
     [AutomaticRetry(Attempts = 3)]
     public async Task CheckUpcomingBookings()
     {
         using var scope = _serviceProvider.CreateScope();
         var bookingService = scope.ServiceProvider.GetRequiredService<IBookingService>();
-        
+
         var now = DateTime.Now;
         var startWindow = now.AddHours(0.2);
         var endWindow = now.AddHours(2);
@@ -45,6 +46,7 @@ public class BookingNotificationService:IBookingNotificationService
             await CreateBookingReminderNotification(bookingService, booking);
         }
     }
+
     private async Task CreateBookingReminderNotification(IBookingService bookingService, Booking booking)
     {
         try
@@ -75,7 +77,7 @@ public class BookingNotificationService:IBookingNotificationService
                 };
 
                 await bookingService.CreateNotificationAsync(studentNotification);
-                
+
                 var tutorNotification = new Notification
                 {
                     RecipientUserId = booking.TutorUserId,
@@ -104,89 +106,137 @@ public class BookingNotificationService:IBookingNotificationService
             _logger.LogError(ex, "Error creating notification for booking {BookingId}", booking.Id);
         }
     }
+
     public async Task CreateBookingChangeNotification(Booking booking)
     {
         try
         {
-                var studentNotification = new Notification
+            var studentNotification = new Notification
+            {
+                RecipientUserId = booking.StudentUserId,
+                ActorUserId = booking.TutorUserId,
+                Type = "BookingUpdatedStatus",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
                 {
-                    RecipientUserId = booking.StudentUserId,
-                    ActorUserId = booking.TutorUserId,
-                    Type = "BookingUpdatedStatus",
-                    Payload = System.Text.Json.JsonSerializer.Serialize(new
-                    {
-                        BookingId = booking.Id,
-                        StartTime = booking.TutorAvailabilityRule.StartTime,
-                        EndTime = booking.TutorAvailabilityRule.EndTime,
-                        Date = booking.TutorAvailabilityRule.Date,
-                        Subject = booking.Subject?.Name,
-                        TutorName =
-                            $"{booking.TutorProfile?.User?.FirstName} {booking.TutorProfile?.User?.LastName}",
-                        Status = booking.Status
-                    }),
-                    Status = NotificationStatus.Unread,
-                    CreatedAt = DateTime.UtcNow
-                };
+                    BookingId = booking.Id,
+                    StartTime = booking.TutorAvailabilityRule.StartTime,
+                    EndTime = booking.TutorAvailabilityRule.EndTime,
+                    Date = booking.TutorAvailabilityRule.Date,
+                    Subject = booking.Subject?.Name,
+                    TutorName =
+                        $"{booking.TutorProfile?.User?.FirstName} {booking.TutorProfile?.User?.LastName}",
+                    Status = booking.Status
+                }),
+                Status = NotificationStatus.Unread,
+                CreatedAt = DateTime.UtcNow
+            };
 
-                await _notificationRepository.Create(studentNotification);
-                
-                var tutorNotification = new Notification
+            await _notificationRepository.Create(studentNotification);
+
+            var tutorNotification = new Notification
+            {
+                RecipientUserId = booking.TutorUserId,
+                ActorUserId = booking.StudentUserId,
+                Type = "BookingUpdatedStatus",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
                 {
-                    RecipientUserId = booking.TutorUserId,
-                    ActorUserId = booking.StudentUserId,
-                    Type = "BookingUpdatedStatus",
-                    Payload = System.Text.Json.JsonSerializer.Serialize(new
-                    {
-                        BookingId = booking.Id,
-                        StartTime = booking.TutorAvailabilityRule.StartTime,
-                        EndTime = booking.TutorAvailabilityRule.EndTime,
-                        Subject = booking.Subject?.Name,
-                        Date = booking.TutorAvailabilityRule.Date,
-                        StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
-                        Status = booking.Status
-                    }),
-                    Status = NotificationStatus.Unread,
-                    CreatedAt = DateTime.UtcNow
-                };
-                await _notificationRepository.Create(tutorNotification);
+                    BookingId = booking.Id,
+                    StartTime = booking.TutorAvailabilityRule.StartTime,
+                    EndTime = booking.TutorAvailabilityRule.EndTime,
+                    Subject = booking.Subject?.Name,
+                    Date = booking.TutorAvailabilityRule.Date,
+                    StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
+                    Status = booking.Status
+                }),
+                Status = NotificationStatus.Unread,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _notificationRepository.Create(tutorNotification);
 
-                _logger.LogInformation("Status updated for booking {BookingId}", booking.Id);
+            _logger.LogInformation("Status updated for booking {BookingId}", booking.Id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating notification for booking {BookingId}", booking.Id);
         }
     }
+
     public async Task NewBookingNotification(Booking booking)
     {
         try
         {
-                
-                var tutorNotification = new Notification
+            var tutorNotification = new Notification
+            {
+                RecipientUserId = booking.TutorUserId,
+                ActorUserId = booking.StudentUserId,
+                Type = "NewBooking",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
                 {
-                    RecipientUserId = booking.TutorUserId,
-                    ActorUserId = booking.StudentUserId,
-                    Type = "NewBooking",
-                    Payload = System.Text.Json.JsonSerializer.Serialize(new
-                    {
-                        BookingId = booking.Id,
-                        StartTime = booking.TutorAvailabilityRule.StartTime,
-                        EndTime = booking.TutorAvailabilityRule.EndTime,
-                        Subject = booking.Subject?.Name,
-                        Date = booking.TutorAvailabilityRule.Date,
-                        StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
-                        Status = booking.Status
-                    }),
-                    Status = NotificationStatus.Unread,
-                    CreatedAt = DateTime.UtcNow
-                };
-                await _notificationRepository.Create(tutorNotification);
+                    BookingId = booking.Id,
+                    StartTime = booking.TutorAvailabilityRule.StartTime,
+                    EndTime = booking.TutorAvailabilityRule.EndTime,
+                    Subject = booking.Subject?.Name,
+                    Date = booking.TutorAvailabilityRule.Date,
+                    StudentName = $"{booking.Student?.User?.FirstName} {booking.Student?.User?.LastName}",
+                    Status = booking.Status
+                }),
+                Status = NotificationStatus.Unread,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _notificationRepository.Create(tutorNotification);
 
-                _logger.LogInformation("New Booking notifications for booking {BookingId}", booking.Id);
+            _logger.LogInformation("New Booking notifications for booking {BookingId}", booking.Id);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating notification for booking {BookingId}", booking.Id);
+        }
+    }
+
+    public async Task NewReviewNotification(Review review)
+    {
+        try
+        {
+            var tutorNotification = new Notification
+            {
+                RecipientUserId = review.TutorUserId,
+                ActorUserId = review.StudentUserId,
+                Type = "NewReview",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    ReviewId = review.Id,
+                    Rating = review.Rating,
+                    Message = review.Description,
+                    StudentName = $"{review.Student?.User?.FirstName} {review.Student?.User?.LastName}",
+                }),
+                Status = NotificationStatus.Unread,
+                CreatedAt = DateTime.UtcNow
+            };
+            var adminNotification = new Notification
+            {
+                //here in future when we will have seeder the id will be 1
+                RecipientUserId = 3,
+                ActorUserId = review.StudentUserId,
+                Type = "NewReview",
+                Payload = System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    ReviewId = review.Id,
+                    Rating = review.Rating,
+                    Message = review.Description,
+                    StudentName = $"{review.Student?.User?.FirstName} {review.Student?.User?.LastName}",
+                }),
+                Status = NotificationStatus.Unread,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _notificationRepository.Create(tutorNotification);
+            await _notificationRepository.Create(adminNotification);
+
+
+            _logger.LogInformation("New Booking notifications for rview {ReviewId}", review.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating notification for review {ReviewId}", review.Id);
         }
     }
 }

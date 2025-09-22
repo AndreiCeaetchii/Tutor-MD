@@ -52,6 +52,10 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser().RequireRole("Admin"));
     options.AddPolicy("TutorOrStudentPolicy", policy =>
         policy.RequireRole("Tutor", "Student"));
+    options.AddPolicy("AdminOrStudentPolicy", policy =>
+        policy.RequireRole("Admin", "Student"));
+    options.AddPolicy("AdminOrTutorOrStudentPolicy", policy =>
+        policy.RequireRole("Tutor", "Student","Admin"));
     
     options.AddPolicy("ActiveUserOnly", policy =>
         policy.Requirements.Add(new ActiveUserRequirement()));

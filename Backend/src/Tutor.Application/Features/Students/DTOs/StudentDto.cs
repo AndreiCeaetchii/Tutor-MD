@@ -5,7 +5,7 @@ namespace Tutor.Application.Features.Students.DTOs;
 
 public class StudentDto
 {
-    public int Id { get; set; }
+    public int UserId { get; set; }
     public int? Grade { get; set; }
 
     public int? Class { get; set; }
