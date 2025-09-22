@@ -27,6 +27,8 @@ import StudentBookings from '../components/student/Bookings/StudentBookings.vue'
 import StudentChat from '../components/student/Chat/StudentChat.vue';
 // import StudentSearchPage from '../pages/StudentSearchPage.vue';
 
+import GuestPage from '../pages/GuestPage.vue';
+
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
@@ -68,6 +70,18 @@ const routes = [
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },
       { path: 'messages', component: TutorChat },
+    ],
+  },
+
+  {
+    path: '/tutor/:id',
+    component: GuestPage,
+    meta: { requiresAuth: true },
+    children: [
+      { path: '', redirect: 'profile' },
+      { path: 'profile', component: ProfilePage },
+      { path: 'availability', component: TutorAvailability },
+      { path: 'reviews', component: TutorReview },
     ],
   },
 ];

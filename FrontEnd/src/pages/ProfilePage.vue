@@ -5,7 +5,7 @@
       <ProfileDetailsEdit :editedProfile="editedProfile" />
     </template>
     <template v-else>
-      <ProfileHeader />
+      <ProfileHeader :hasIdFromUrl="hasIdFromUrl" />
       <ProfileDetails />
     </template>
   </div>
@@ -28,12 +28,16 @@
   import { useUserStore } from '../store/userStore.ts';
   import { useRouter } from 'vue-router';
   import defaultProfileImage from '../assets/DefaultImg.png';
+  import { useRoute } from 'vue-router';
+  const route = useRoute();
 
   const router = useRouter();
   const profileStore = useProfileStore();
   const userStore = useUserStore();
 
   const editedProfile = ref<ProfileState>({ ...profileStore.$state });
+
+  const hasIdFromUrl = !!route.params.id;
 
   const calculateAge = (birthdate: string | null) => {
     if (!birthdate) return 0;
@@ -50,8 +54,8 @@
 
   const fetchAndSetProfile = async () => {
     try {
-      const userId = userStore.userId ? Number(userStore.userId) : 0;
-      const serverData = await getTutorProfile(userId);
+      const userIdFromUrl = route.params.id ? Number(route.params.id) : Number(userStore.userId);
+      const serverData = await getTutorProfile(userIdFromUrl);
       if (!serverData || !serverData.userProfile || !serverData.userProfile.username) {
         await router.push('/create-profile');
         return;
