@@ -1,7 +1,3 @@
-version: "3.8"
-
-name: tutor-stack-prod
-
 networks:
   app:
     name: tutor-prod
@@ -22,7 +18,7 @@ services:
       - app
 
   backend:
-    image: ${IMAGE_BACKEND}
+    image: ${IMAGE_BACKEND}   
     container_name: tutor-api
     depends_on:
       - db
