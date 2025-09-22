@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ feature/add-docker ]
 
 env:
   REGISTRY: ghcr.io
@@ -45,7 +45,7 @@ jobs:
           push: true
           tags: ${{ env.IMAGE_FRONTEND }}
           build-args: |
-            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL || 'https://your-domain-or-ip:8080' }}
+            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL || 'http://144.91.110.197:8080' }}
 
   deploy:
     needs: build-and-push
@@ -57,6 +57,7 @@ jobs:
 
       - name: Prepare deployment bundle
         run: |
+          mkdir -p .deploy
           cat << 'EOF' > .deploy/.env
           IMAGE_BACKEND=${{ env.IMAGE_BACKEND }}
           IMAGE_FRONTEND=${{ env.IMAGE_FRONTEND }}
@@ -64,7 +65,6 @@ jobs:
           POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB=${{ secrets.POSTGRES_DB }}
           EOF
-          mkdir -p .deploy
           cp Ops/docker-compose.prod.yml .deploy/docker-compose.yml
 
       - name: Copy files to server
@@ -72,8 +72,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
           source: ".deploy/*"
           target: "~/apps/tutor"
 
@@ -82,8 +82,8 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
           script_stop: true
           script: |
             set -e
