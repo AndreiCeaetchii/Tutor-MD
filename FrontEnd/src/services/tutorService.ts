@@ -34,6 +34,7 @@ export interface TutorProfileData {
   experienceYears: number;
   subjects: Subject[];
   createProfileDto: CreateProfileDto;
+  workingLocation: number;
 }
 
 const API_URL = 'https://localhost:7123/api/tutors';
@@ -77,6 +78,7 @@ export const getTutorProfile = async (userId: number) => {
       withCredentials: true,
     });
 
+    console.log('profilul: ', response.data);
     return response.data;
   } catch (error: any) {
     if (error.response && error.response.status === 404) {

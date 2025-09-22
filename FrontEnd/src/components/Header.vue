@@ -10,7 +10,7 @@
           </div>
         </div>
         <div class="items-center hidden space-x-4 md:flex">
-          <Bell class="w-5 h-5 text-gray-600" />
+          <NotificationsDropdown @close-other-menus="closeProfileMenu" />
 
           <div v-if="store.isAuthenticated" class="relative">
             <button
@@ -241,6 +241,7 @@
   import { useProfileStore } from '../store/profileStore.ts';
   import { computed } from 'vue';
   import { useStudentProfileStore } from '../store/studentProfileStore.ts';
+  import NotificationsDropdown from '../components/profile/NotificationsDropdown.vue';
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 
@@ -274,6 +275,10 @@
     showProfileMenu.value = !showProfileMenu.value;
   }
 
+  function closeProfileMenu() {
+    showProfileMenu.value = false;
+  }
+
   function handleLogout() {
     store.clearUser();
     profileStore.clearProfile();
@@ -300,7 +305,6 @@
     }
   }
 
-  // Adaugă și elimină event listener-ul în momentele corespunzătoare
   onMounted(() => {
     document.addEventListener('click', handleClickOutside);
   });
