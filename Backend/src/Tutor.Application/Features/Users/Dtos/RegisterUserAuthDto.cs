@@ -1,4 +1,6 @@
-﻿namespace Tutor.Application.Features.Users.Dtos;
+﻿using System;
+
+namespace Tutor.Application.Features.Users.Dtos;
 
 public record RegisterUserAuthDto
 {

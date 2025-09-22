@@ -34,10 +34,7 @@ public class SubjectCatalogConfiguration : IEntityTypeConfiguration<SubjectCatal
             .HasForeignKey(x => x.SubjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(x => x.Bookings)
-            .WithOne(x => x.Subject)
-            .HasForeignKey(x => x.SubjectId)
-            .OnDelete(DeleteBehavior.Restrict);
+ 
         
     }
 }

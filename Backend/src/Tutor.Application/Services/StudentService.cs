@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Students.DTOs;
@@ -68,7 +69,16 @@ public class StudentService : IStudentService
         student.Grade = updateStudentProfileDto.Grade;
         student.Class = updateStudentProfileDto.Class;
         await _studentRepository.Update(student);
-
+        
         return Result<StudentDto>.Success(_mapper.Map<StudentDto>(student));
+    }
+
+    public async Task<Result<List<StudentDto>>> GetAllStudentsAsync()
+    {
+        var profiles = await _studentRepository.GetAll();
+        
+        var result = _mapper.Map<List<StudentDto>>(profiles);
+        return Result<List<StudentDto>>.Success(result);
+        
     }
 }

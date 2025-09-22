@@ -71,6 +71,8 @@ public class RegisterUserWithOAuthCommandHandler
         if (existingUserByEmail != null)
             return Result<UserResponseDto>.Error("Email already registered");
 
+        if (request.RoleId == 1)
+            return Result<UserResponseDto>.Error("You cannot create Admin account");
         // Create new user with OAuth data
         var user = await _userService.CreateUserFromOAuthAsync(
             provider: request.Provider,
@@ -81,6 +83,7 @@ public class RegisterUserWithOAuthCommandHandler
         var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (usersRole != null)
             return Result<UserResponseDto>.Error("User already has an role");
+        
         var currentUserRole = new UserRole
         {
             UserId = user.Id,

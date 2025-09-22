@@ -1,7 +1,9 @@
 <script setup lang="ts">
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import ReviewStats from '../Review/ReviewStats.vue';
   import ReviewCard from '../Review/ReviewCard.vue';
+  import WriteReview from './WriteReview.vue';
+  import { useRoute } from 'vue-router';
 
   const ratingsOpen = ref(false);
   const selectedRating = ref('All Ratings');
@@ -10,6 +12,9 @@
   const sortOpen = ref(false);
   const selectedSort = ref('Most Recent');
   const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
+
+  const route = useRoute();
+  const tutorId = computed(() => (route.params.id as string) || '');
 
   function toggleRatingsDropdown() {
     ratingsOpen.value = !ratingsOpen.value;
@@ -34,7 +39,8 @@
 
 <template>
   <div class="content-container">
-    <ReviewStats />
+    <WriteReview v-if="tutorId" />
+    <ReviewStats v-else />
     <div class="my-6">
       <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
         <div
@@ -128,15 +134,15 @@
 </template>
 
 <style scoped>
-.content-container {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-}
-
-@media (max-width: 640px) {
   .content-container {
-    padding: 0 0.5rem;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
   }
-}
+
+  @media (max-width: 640px) {
+    .content-container {
+      padding: 0 0.5rem;
+    }
+  }
 </style>

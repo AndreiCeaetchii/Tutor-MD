@@ -33,9 +33,6 @@ public class AvailabilityService : IAvailabilityService
             if (createAvailabilityDto.StartTime >= createAvailabilityDto.EndTime)
                 return Result<AvailabilityDto>.Error("Start time must be before end time");
 
-            if (createAvailabilityDto.DayOfWeek < 0 || createAvailabilityDto.DayOfWeek > 6)
-                return Result<AvailabilityDto>.Error("Day of week must be between 0 and 6");
-
             var availabilityRule = _mapper.Map<TutorAvailabilityRule>(createAvailabilityDto);
             availabilityRule.TutorUserId = userId;
 
@@ -58,9 +55,6 @@ public class AvailabilityService : IAvailabilityService
         {
             if (availabilityDto.StartTime >= availabilityDto.EndTime)
                 return Result<AvailabilityDto>.Error("Start time must be before end time");
-
-            if (availabilityDto.DayOfWeek < 0 || availabilityDto.DayOfWeek > 6)
-                return Result<AvailabilityDto>.Error("Day of week must be between 0 and 6");
 
             var availabilityRule = await _availabilityRepository.GetById(availabilityDto.Id);
             
@@ -116,7 +110,9 @@ public class AvailabilityService : IAvailabilityService
 
     public async Task<Result<List<AvailabilityDto>>> GetAvailabilitiesByTutor(int tutorUserId)
     {
-        var tutorAvailabilities = await _availabilityRepository.FindAsync(u => u.TutorUserId == tutorUserId);
+        var today = DateOnly.FromDateTime(DateTime.Now);
+
+        var tutorAvailabilities = await _availabilityRepository.FindAsync(u => u.TutorUserId == tutorUserId && u.Date>= today);
         if (tutorAvailabilities.Count == 0)
             return Result<List<AvailabilityDto>>.Error("Tutor does not have any availability");
         return Result<List<AvailabilityDto>>.Success(

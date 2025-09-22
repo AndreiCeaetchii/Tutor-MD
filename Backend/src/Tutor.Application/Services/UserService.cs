@@ -14,12 +14,15 @@ public class UserService : IUserService
 {
     private readonly IGenericRepository<User, int> _userRepository;
     private readonly IGenericRepository<GoogleAuth, int> _googleAuthRepository;
+    private readonly IGenericRepository2<UserRole> _userRoleRepository;
 
     public UserService(IGenericRepository<User, int> userRepository,
-        IGenericRepository<GoogleAuth, int> googleAuthRepository)
+        IGenericRepository<GoogleAuth, int> googleAuthRepository,
+        IGenericRepository2<UserRole> userRoleRepository)
     {
         _userRepository = userRepository;
         _googleAuthRepository = googleAuthRepository;
+        _userRoleRepository = userRoleRepository;
     }
 
     public async Task<User?> GetUserByOAuthIdAsync(string provider, string providerId)
@@ -118,12 +121,43 @@ public class UserService : IUserService
         return user != null;
     }
 
-    // public async Task<bool> UserExistsByOAuthIdAsync(string provider, string providerId)
-    // {
-    //     Expression<Func<User, bool>> predicate = u => 
-    //         u.OAuthProvider == provider && u.OAuthProviderId == providerId;
-    //     
-    //     var user = await _userRepository.FindAsyncDefault(predicate);
-    //     return user != null;
-    // }
+    public async Task<Result> DeactivateUserAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("User not found");
+        user.IsActive = false;
+        await _userRepository.Update(user);
+        return Result.Success();
+    }
+
+    public async Task<Result> ActivateUserAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("User not found");
+        user.IsActive = true;
+        await _userRepository.Update(user);
+        return Result.Success();
+    }
+
+    public async Task<Result> CreateAdminAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("User not found");
+        
+        var currentUserRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == userId);
+       
+        await _userRoleRepository.Delete(currentUserRole);
+        
+        var userRole = new UserRole
+        {
+            UserId = user.Id,
+            RoleId = 1,
+            AssignedAt = DateTime.Now
+        };
+        await _userRoleRepository.Create(userRole);
+        return Result.Success();
+    }
 }

@@ -11,6 +11,9 @@ public class CreateTutorProfileDto
 
     [Range(0, 50, ErrorMessage = "Experience years must be between 0 and 50")]
     public int? ExperienceYears { get; set; }
+    
+    [Range(1, 7, ErrorMessage = "This  location does not exist")]
+    public int WorkingLocation { get; set; }
 
     [Required(ErrorMessage = "At least one subject is required")]
     [MinLength(1, ErrorMessage = "At least one subject is required")]

@@ -9,6 +9,8 @@ public class TutorProfile
     public VerificationStatus VerificationStatus { get; set; }
 
     public int? ExperienceYears { get; set; }
+    
+    public int WorkingLocation {get; set;}
 
     // Navigation properties
     public virtual User User { get; set; }
