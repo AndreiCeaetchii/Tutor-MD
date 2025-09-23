@@ -1,0 +1,59 @@
+version: "3.8"
+
+name: tutor-stack
+
+networks:
+  localdev:
+    name: localdev
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tutor-db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=Tutor
+    ports:
+      - "5432:5432"
+    networks:
+      - localdev
+
+  backend:
+    build:
+      context: ../Backend
+      dockerfile: src/Tutor.Api/Dockerfile
+    image: tutor-api:local
+    container_name: tutor-api
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=Tutor;Username=admin;Password=admin
+      - ASPNETCORE_URLS=https://+:8443;http://+:8080
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=admin
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ../Backend/https:/https/:ro
+    networks:
+      - localdev
+
+  frontend:
+    build:
+      context: ../FrontEnd
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=https://localhost:8443
+    image: tutor-frontend:local
+    container_name: tutor-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - localdev
+
+

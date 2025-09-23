@@ -101,16 +101,36 @@ public static class ApplicationSetup
             Console.WriteLine("Google authentication not configured. ClientId or ClientSecret missing.");
         }
 
+        var allowedOriginsEnv = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
+        var corsPolicyNameEnv = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
+
+        var corsPolicyName = string.IsNullOrWhiteSpace(corsPolicyNameEnv)
+            ? "AllowFrontend"
+            : corsPolicyNameEnv;
+
+        var allowedOrigins = string.IsNullOrWhiteSpace(allowedOriginsEnv)
+            ? Array.Empty<string>()
+            : allowedOriginsEnv
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowFrontend",
-                policy =>
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                if (allowedOrigins.Length > 0)
                 {
                     policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                }
+                else
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                }
+            });
         });
 
         return services;
