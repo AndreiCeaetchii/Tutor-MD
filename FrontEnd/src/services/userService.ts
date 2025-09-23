@@ -1,4 +1,3 @@
-// userService.ts
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 
@@ -7,12 +6,17 @@ export interface UploadPhotoResponse {
   photoUrl: string;
 }
 
-const API_URL = 'https://localhost:7123/api/users';
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'https://localhost:7123/api/users';
 
 export const uploadProfilePhoto = async (photoFile: File) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
+
+    if (!token) throw new Error('Access token not available. Please log in.');
 
     const formData = new FormData();
     formData.append('file', photoFile);
@@ -26,11 +30,9 @@ export const uploadProfilePhoto = async (photoFile: File) => {
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la încărcarea fotografiei de profil:',
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message || 'Failed to upload profile photo. Please try again.',
     );
-    throw error;
   }
 };
 
@@ -38,6 +40,8 @@ export const deleteProfilePhoto = async () => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
+
+    if (!token) throw new Error('Access token not available. Please log in.');
 
     const response = await axios.delete(`${API_URL}/delete-photo`, {
       headers: {
@@ -48,10 +52,8 @@ export const deleteProfilePhoto = async () => {
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la ștergerea fotografiei de profil:',
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message || 'Failed to delete profile photo. Please try again.',
     );
-    throw error;
   }
 };

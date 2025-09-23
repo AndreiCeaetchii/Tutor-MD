@@ -507,7 +507,7 @@
 
     // Aici este corectat: am adaugat workingLocation si createProfileDto
     const payload: TutorProfileData = {
-      verificationStatus: 'verified',
+      verificationStatus: 'Pending',
       experienceYears: form.value.experienceYears,
       subjects: subjectsPayload,
       createProfileDto: profileDto,

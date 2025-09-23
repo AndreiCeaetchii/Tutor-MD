@@ -24,14 +24,17 @@ export interface UpdateProfileDto {
   firstName: string;
   lastName: string;
   bio: string;
-  birthdate: string; // ISO string: e.g., "1995-05-08T00:00:00"
+  birthdate: string;
   grade: number;
   class: number;
   city: string;
   country: string;
 }
 
-const API_URL = 'https://localhost:7123/api/students';
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'https://localhost:7123/api';
 
 export const createStudentProfile = async (profileData: StudentProfileData) => {
   try {
@@ -42,7 +45,7 @@ export const createStudentProfile = async (profileData: StudentProfileData) => {
       throw new Error('Access token not available. Please log in.');
     }
 
-    const response = await axios.post(`${API_URL}/create-student`, profileData, {
+    const response = await axios.post(`${API_URL}/students/create-student`, profileData, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -69,12 +72,12 @@ export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
       throw new Error('Access token not available. Please log in.');
     }
 
-    const response = await axios.put(`${API_URL}/update-profile`, profileData, {
+    const response = await axios.put(`${API_URL}/students/update-profile`, profileData, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      withCredentials: true, // Keeps cookies if needed
+      withCredentials: true,
     });
 
     return response.data;
@@ -96,7 +99,7 @@ export const getStudentProfile = async () => {
       throw new Error('Access token not available. Please log in.');
     }
 
-    const response = await axios.get(`${API_URL}/student-profile`, {
+    const response = await axios.get(`${API_URL}/students/student-profile`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -108,11 +111,11 @@ export const getStudentProfile = async () => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la preluarea profilului de student:',
+        'Error retrieving student profile:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }
