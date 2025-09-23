@@ -1,7 +1,10 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 
-const API_URL = 'https://localhost:7123/api';
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'https://localhost:7123/api';
 
 const bookingAxios = axios.create({
   baseURL: API_URL,
