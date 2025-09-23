@@ -22,6 +22,7 @@ export interface TutorBooking {
   status: number;
   studentPhoto: string | null;
   tutorPhoto: string | null;
+  subject: string;
 }
 
 export const getBookingById = async (bookingId: number): Promise<TutorBooking> => {
@@ -46,9 +47,8 @@ export const getTutorBookings = async (): Promise<TutorBooking[]> => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    const tutorId = store.userId;
     
-    const response = await bookingAxios.get(`/tutors/${tutorId}/bookings`, {
+    const response = await bookingAxios.get(`/tutor/bookings`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
