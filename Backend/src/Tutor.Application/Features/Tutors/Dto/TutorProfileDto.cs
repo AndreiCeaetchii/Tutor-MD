@@ -10,9 +10,15 @@ public class TutorProfileDto
     public int UserId { get; set; }
     public VerificationStatus VerificationStatus { get; set; }
     public int? ExperienceYears { get; set; }
+    public int WorkingLocation { get; set; }
+
     public List<TutorSubjectDto> TutorSubjects { get; set; } = new List<TutorSubjectDto>();
     public required CreateProfileDto UserProfile { get; set; }
     
     public PhotoDto? Photo {get; set;}
+    
+    public decimal Rating {get; set;}
+    
+    public int ReviewCount { get; set; }
 }
 

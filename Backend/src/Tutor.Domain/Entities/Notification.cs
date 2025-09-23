@@ -7,7 +7,7 @@ public class Notification : Entity<int>
     public int RecipientUserId { get; set; }
     public int? ActorUserId { get; set; }
     public string Type { get; set; }
-    public string Payload { get; set; } // JSON
+    public string Payload { get; set; } 
     public NotificationStatus Status { get; set; }
 
     // Navigation properties

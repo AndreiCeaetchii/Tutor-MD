@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Hangfire;
+using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using Tutor.Api.Filters.Guards;
 using Tutor.Application.Common;
 using Tutor.Application.Interfaces;
+using Tutor.Application.Mappers;
 using Tutor.Application.Mappers.TutorMapper;
 using Tutor.Application.Services;
+using Tutor.Application.Services.Background;
 using Tutor.Domain.Interfaces;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Helpers;
@@ -36,12 +42,27 @@ public static class ApplicationSetup
         services.AddScoped<IUserRoleService, UserRoleService>();
         services.AddScoped<ITutorSubjectService, TutorSubjectService>();
         services.AddScoped<IPhotoService, PhotoService>();
-        
+        services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IAvailabilityService, AvailabilityService>();
+        services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IBookingNotificationService ,BookingNotificationService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
+        services.AddScoped<IMFAService, MFAService>();
+
+
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+        services.AddTransient<JobSchedulerService>();
 
 
 
         services.AddAutoMapper(typeof(TutorMappingProfile));
+        services.AddAutoMapper(typeof(StudentMappingProfile));
+        services.AddAutoMapper(typeof(AvailabilityMappingProfile));
+        services.AddAutoMapper(typeof(BookingMappingProfile));
+        services.AddAutoMapper(typeof(NotificationMappingProfile));
+
 
         services.AddAuthentication(options =>
             {
@@ -61,16 +82,24 @@ public static class ApplicationSetup
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]))
                 };
-            })
-            .AddGoogle(options =>
-            {
-                options.ClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID")
-                                   ?? configuration["Google:ClientId"];
-                options.ClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET")
-                                       ?? configuration["Google:ClientSecret"];
-                options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
             });
+        var googleClientId = configuration["Google:ClientId"];
+        var googleClientSecret = configuration["Google:ClientSecret"];
 
+        if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
+        {
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = googleClientId;
+                    options.ClientSecret = googleClientSecret;
+                    options.UserInformationEndpoint = configuration["Google:UserInfoEndpoint"];
+                });
+        }
+        else
+        {
+            Console.WriteLine("Google authentication not configured. ClientId or ClientSecret missing.");
+        }
         var allowedOriginsEnv = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
         var corsPolicyNameEnv = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
 
@@ -85,11 +114,11 @@ public static class ApplicationSetup
 
         services.AddCors(options =>
         {
-            options.AddPolicy(corsPolicyName, policy =>
+            options.AddPolicy("AllowFrontend", policy =>
             {
                 if (allowedOrigins.Length > 0)
                 {
-                    policy.WithOrigins(allowedOrigins)
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();

@@ -1,60 +1,151 @@
 <script setup lang="ts">
+  import { ref, computed } from 'vue';
   import { useAuth } from '../../services/useAuth.ts';
   import { useRouter } from 'vue-router';
   import BaseAuthForm from '../auth/AuthForm.vue';
-  import { userStore } from '../../store/userStore';
+  import Notification from '../ui/NotificationMessage.vue';
+  import { useUserStore } from '../../store/userStore.ts';
 
   interface LoginFormData {
     email: string;
     password: string;
-    role: string;
   }
 
-  const { login, errorMessage } = useAuth();
+  const { login, loginWithGoogle, errorMessage } = useAuth();
   const router = useRouter();
-  const store = userStore();
 
-  const handleSubmit = async (formData: LoginFormData) => {
-    console.log('Login form submitted:', formData);
+  const formData = ref<LoginFormData>({
+    email: '',
+    password: '',
+  });
+  
+  const touchedFields = ref<Set<string>>(new Set());
 
-    try {
-      // Apelăm funcția login din servicii
-      // const userData = await login(formData);
+  const emailError = computed(() => {
+    if (!touchedFields.value.has('email') || !formData.value.email) return '';
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailRegex.test(formData.value.email) ? '' : 'Please enter a valid email address';
+  });
 
-      // console.log(userData);
+  const passwordError = computed(() => {
+    if (!touchedFields.value.has('password') || formData.value.password) return '';
+    return 'Password is required';
+  });
 
-      // Actualizăm store-ul dacă login-ul a reușit
-      store.login({
-        id: '123',
-        email: formData.email,
-        role: formData.role as any,
-        token: 'sample-token',
-      });
+  const fieldErrors = computed(() => {
+    return {
+      email: emailError.value,
+      password: passwordError.value
+    };
+  });
 
-      // Redirecționare pe baza rolului
-      if (formData.role === 'tutor') {
-        router.push('/tutor-dashboard');
-      } else if (formData.role === 'student') {
-        router.push('/student-dashboard');
-      } else if (formData.role === 'admin') {
-        router.push('/admin-dashboard');
-      }
-    } catch (err) {
-      console.error('Login failed', err);
-    }
+  const handleFieldBlur = (field: string) => {
+    touchedFields.value.add(field);
   };
 
-  const handleSocialLogin = ({ provider }: { provider: string }) => {
-    console.log(`${provider} login clicked`);
+  const handleFieldInput = (field: string, value: string) => {
+    if (field === 'email') formData.value.email = value;
+    else if (field === 'password') formData.value.password = value;
+  };
+
+  const showSuccessNotification = ref(false);
+  const successMessage = ref('Login successful! ');
+
+  const showSuccess = () => {
+    successMessage.value = 'Login successful! ';
+    showSuccessNotification.value = true;
+    setTimeout(() => {
+      showSuccessNotification.value = false;
+    }, 3000);
+  };
+
+  const handleSubmit = async (data: LoginFormData) => {
+    touchedFields.value.add('email');
+    touchedFields.value.add('password');
+    
+    formData.value = data;
+    
+    if (emailError.value || passwordError.value) {
+      return;
+    }
+    
+    const result = await login(data);
+    if (!result.success) return; 
+
+    showSuccess();
+    
+    const userStore = useUserStore();
+    const userRole = userStore.userRole;
+    
+    console.log('Role used for redirection:', userRole);
+
+    setTimeout(() => {
+      if (userRole === 'tutor') {
+        console.log('Redirecting to tutor dashboard');
+        router.push('/tutor-dashboard');
+      }
+      else if (userRole === 'student') {
+        console.log('Redirecting to student dashboard');
+        router.push('/student-dashboard');
+      }
+      else if (userRole === 'admin') {
+        console.log('Redirecting to admin dashboard');
+        router.push('/admin-dashboard');
+      }
+      else {
+        console.log('No valid role found, redirecting to landing');
+        router.push('/landing');
+      }
+    }, 1000);
+  };
+
+  const handleSocialLogin = async ({ provider }: { provider: string; role?: string }) => {
+    if (provider !== 'google') return;
+    
+    const result = await loginWithGoogle(false);
+    if (!result.success) return;
+
+    showSuccess();
+    
+    const userStore = useUserStore();
+    const userRole = userStore.userRole;
+    
+    console.log('Role used for Google redirection:', userRole);
+    
+    setTimeout(() => {
+      if (userRole === 'tutor') {
+        console.log('Redirecting to tutor dashboard after Google login');
+        router.push('/tutor-dashboard');
+      }
+      else if (userRole === 'student') {
+        console.log('Redirecting to student dashboard after Google login');
+        router.push('/student-dashboard');
+      }
+      else if (userRole === 'admin') {
+        console.log('Redirecting to admin dashboard after Google login');
+        router.push('/admin-dashboard');
+      }
+      else {
+        console.log('No valid role found after Google login, redirecting to landing');
+        router.push('/landing');
+      }
+    }, 1000);
   };
 </script>
 
 <template>
+  <Notification 
+    :show="showSuccessNotification"
+    :message="successMessage"
+    type="success"
+    @close="showSuccessNotification = false"
+  />
+
   <BaseAuthForm
-    title="Tutor"
-    subtitle="Please sign in to continue"
-    :showRoleSelector="true"
-    submitButtonText="Sign in as Tutor"
+    title="Tutor.md"
+    subtitle="Please log in to continue"
+    :showRoleSelector="false"
+    submitButtonText="Log in"
     googleButtonText="Log in with Google"
     footerText="Don't have an account?"
     footerLinkText="Sign up"
@@ -62,6 +153,9 @@
     :isLogin="true"
     @submit="handleSubmit"
     @socialLogin="handleSocialLogin"
-    :errorMessage="errorMessage"
+    @fieldBlur="handleFieldBlur"
+    @fieldInput="handleFieldInput"
+    :fieldErrors="fieldErrors"
+    :errorMessage="errorMessage ?? undefined"
   />
 </template>

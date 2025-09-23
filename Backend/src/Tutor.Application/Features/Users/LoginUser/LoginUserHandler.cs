@@ -21,6 +21,8 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, Result<
     public async Task<Result<UserResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
         // Just delegate to the service
+        if (request.LoginUserDto.MfaCode is not null)
+            return await _authService.LoginAsync(request.LoginUserDto, request.LoginUserDto.MfaCode);
         return await _authService.LoginAsync(request.LoginUserDto);
     }
 }

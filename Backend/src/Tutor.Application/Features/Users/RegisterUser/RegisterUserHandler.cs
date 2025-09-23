@@ -20,7 +20,8 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, R
 
     public async Task<Result<UserResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        // Delegate the registration process to the service
+        if (request.RegisterUserDto.RoleId == 1)
+            return Result<UserResponseDto>.Error("You cannot create Admin account");
         return await _authService.RegisterAsync(request.RegisterUserDto);
     }
 }

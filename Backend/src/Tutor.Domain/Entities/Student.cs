@@ -7,6 +7,7 @@ public class Student
 {
     public int UserId { get; set; } // 1:1 with users
     public int? Grade { get; set; }
+    public int? Class {get; set;}
     // Navigation properties
     public virtual User User { get; set; }
     public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();

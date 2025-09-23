@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowRight, faSmile, faUmbrella, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faSmile, faCheckCircle, faClock } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faArrowRight, faSmile, faUmbrella, faShieldAlt);
+library.add(faArrowRight, faSmile, faCheckCircle, faClock);
 </script>
 
 <template>
-  <div class="bg-gradient-to-br from-purple-50 to-white p-8 flex justify-center items-center h-full overflow-y-auto">
+  <div class="flex items-center justify-center h-full p-8 overflow-y-auto bg-gradient-to-br from-purple-50 to-white">
     <div class="w-full max-w-lg mx-auto">
       <div class="mb-6">
         <svg width="60" height="25" viewBox="0 0 80 30" class="text-orange-500">
@@ -15,46 +15,46 @@ library.add(faArrowRight, faSmile, faUmbrella, faShieldAlt);
         </svg>
       </div>
       
-      <p class="text-base text-gray-700 font-medium mb-1">
+      <p class="mb-1 text-base font-medium text-gray-700">
         Why our working is so unique
       </p>
       
-      <h1 class="text-4xl font-bold text-gray-800 mb-10">
-        See how our working process easily adapt your need
+      <h1 class="mb-10 text-4xl font-bold text-gray-800">
+        How We Make Learning Easy
       </h1>
       
       <div class="flex items-start mb-8">
-        <div class="h-14 w-14 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+        <div class="flex items-center justify-center flex-shrink-0 bg-purple-100 rounded-full h-14 w-14">
           <font-awesome-icon :icon="['fas', 'smile']" class="text-2xl text-purple-500" />
         </div>
-        <div class="ml-4 flex-1"> 
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">User friendly hiring process</h3>
+        <div class="flex-1 ml-4"> 
+          <h3 class="mb-2 text-xl font-semibold text-gray-800">Easy to use</h3>
           <p class="text-gray-600">
-            Accuscamus etmaes iusto odiomae dignissimos ducimus quistames blanditiis praesentium voluptatum loramkes anuten.
+            Find and book your tutor in just a few clicks.
           </p>
         </div>
       </div>
       
       <div class="flex items-start mb-8">
-        <div class="h-14 w-14 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-          <font-awesome-icon :icon="['fas', 'umbrella']" class="text-2xl text-green-500" />
+        <div class="flex items-center justify-center flex-shrink-0 bg-green-100 rounded-full h-14 w-14">
+          <font-awesome-icon :icon="['fas', 'check-circle']" class="text-2xl text-green-500" />
         </div>
-        <div class="ml-4 flex-1"> 
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">Verified process with ease</h3>
+        <div class="flex-1 ml-4"> 
+          <h3 class="mb-2 text-xl font-semibold text-gray-800">Trust you can see</h3>
           <p class="text-gray-600">
-            Accuscamus etmaes iusto odiomae dignissimos ducimus quistames blanditiis praesentium voluptatum loramkes anuten.
+            Every tutor is verified, and every review is real.
           </p>
         </div>
       </div>
       
       <div class="flex items-start">
-        <div class="h-14 w-14 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-          <font-awesome-icon :icon="['fas', 'shield-alt']" class="text-2xl text-red-400" />
+        <div class="flex items-center justify-center flex-shrink-0 bg-red-100 rounded-full h-14 w-14">
+          <font-awesome-icon :icon="['fas', 'clock']" class="text-2xl text-red-400" />
         </div>
-        <div class="ml-4 flex-1">
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">Secure payment gateway integrated</h3>
+        <div class="flex-1 ml-4">
+          <h3 class="mb-2 text-xl font-semibold text-gray-800">Your schedule, your way</h3>
           <p class="text-gray-600">
-            Accuscamus etmaes iusto odiomae dignissimos ducimus quistames blanditiis praesentium voluptatum loramkes anuten.
+            Get real-time notifications and manage your lessons with ease.
           </p>
         </div>
       </div>

@@ -15,23 +15,7 @@ public class UserRoleService : IUserRoleService
     {
         _roleRepository = roleRepository;
     }
-
-    public async Task<Result<bool>> AssignTutorRoleAsync(int userId)
-    {
-        var existingRole = await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId);
-        if (existingRole is not null)
-            return Result<bool>.Error("User already has a role assigned");
-
-        var userRole = new UserRole 
-        { 
-            UserId = userId, 
-            RoleId = 2,
-            AssignedAt = DateTime.UtcNow
-        };
     
-        await _roleRepository.Create(userRole);
-        return Result<bool>.Success(true);
-    }
 
     public async Task<bool> HasRoleAsync(int userId, int roleId) =>
         await _roleRepository.FindAsyncDefault(ur => ur.UserId == userId && ur.RoleId == roleId) != null;

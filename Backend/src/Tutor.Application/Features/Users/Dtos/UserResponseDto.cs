@@ -11,5 +11,4 @@ public record UserResponseDto
 
     public required string Token { get; set; }
     
-    public int?  RoleId { get; set; }
 }

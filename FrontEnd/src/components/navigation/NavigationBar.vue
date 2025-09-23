@@ -1,87 +1,86 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { userStore } from "../../store/userStore";
+  import { computed } from 'vue';
+  import { useUserStore } from '../../store/userStore.ts';
+  import { useRoute } from 'vue-router';
 
-const store = userStore();
-const activeTab = ref("");
-const emit = defineEmits(['tabChange']);
+  const store = useUserStore();
+  const route = useRoute();
 
-const tutorTabs = [
-  { name: "Availability", icon: "calendar_month" },
-  { name: "Profile", icon: "person" },
-  { name: "Bookings", icon: "book" },
-  { name: "Reviews", icon: "star" },
-  { name: "Messages", icon: "chat" },
-];
+  const tutorTabs = [
+    { name: 'Availability', icon: 'calendar_month', path: '/tutor-dashboard/availability' },
+    { name: 'Profile', icon: 'person', path: '/tutor-dashboard/profile' },
+    { name: 'Bookings', icon: 'book', path: '/tutor-dashboard/bookings' },
+    { name: 'Reviews', icon: 'star', path: '/tutor-dashboard/reviews' },
+    { name: 'Messages', icon: 'chat', path: '/tutor-dashboard/messages' },
+  ];
 
-const studentTabs = [
-  { name: "Find Tutors", icon: "search" },
-  { name: "My Bookings", icon: "book" },
-  { name: "Reviews", icon: "star" },
-  { name: "Messages", icon: "chat" },
-  { name: "My Account", icon: "person" },
-];
+  const studentTabs = [
+    { name: 'Find Tutors', icon: 'search', path: '/student-dashboard/find' },
+    { name: 'My Bookings', icon: 'book', path: '/student-dashboard/bookings' },
+    { name: 'Reviews', icon: 'star', path: '/student-dashboard/reviews' },
+    { name: 'Messages', icon: 'chat', path: '/student-dashboard/messages' },
+    { name: 'My Account', icon: 'person', path: '/student-dashboard/account' },
+  ];
 
-const tabs = computed(() => {
-  return store.userRole === "tutor" ? tutorTabs : studentTabs;
-});
+  const tabs = computed(() => (store.userRole === 'tutor' ? tutorTabs : studentTabs));
 
-const initializeActiveTab = () => {
-  if (tabs.value.length > 0) {
-    activeTab.value = tabs.value[0].name;
-    emit('tabChange', activeTab.value);
-  }
-};
-
-initializeActiveTab();
-
-const setActiveTab = (tabName: string) => {
-  activeTab.value = tabName;
-  emit('tabChange', tabName);
-};
+  const isActive = (path: string) => route.path === path;
 </script>
 
 <template>
-  <div
-    class="navigation-bar bg-white rounded-full p-2 flex flex-wrap justify-center md:justify-between gap-2 shadow-sm"
-  >
-    <div
+  <div class="flex p-2 mb-6 bg-gray-100 rounded-full navigation-bar">
+    <router-link
       v-for="tab in tabs"
       :key="tab.name"
-      @click="setActiveTab(tab.name)"
-      class="tab-item flex items-center px-3 md:px-4 py-2 rounded-full cursor-pointer text-sm md:text-base"
-      :class="{
-        'bg-purple-50 text-purple-700': activeTab === tab.name,
-        'text-gray-600': activeTab !== tab.name,
-      }"
+      :to="tab.path"
+      class="flex items-center justify-center flex-1 px-4 py-2 text-center transition-colors rounded-full"
+      :class="
+        isActive(tab.path)
+          ? 'bg-white shadow-sm text-purple-700'
+          : 'text-gray-600 hover:bg-purple-50'
+      "
     >
-      <span class="material-icons text-sm md:text-base mr-1 md:mr-2">{{ tab.icon }}</span>
-      <span>{{ tab.name }}</span>
-    </div>
+      <span class="mr-1 text-sm material-icons md:text-base md:mr-2">{{ tab.icon }}</span>
+      <span class="text-sm md:text-base">{{ tab.name }}</span>
+    </router-link>
   </div>
 </template>
 
 <style scoped>
-.navigation-bar {
-  max-width: 1200px;
-  margin: 0 auto;
-  overflow-x: auto;
-}
-
-.tab-item {
-  transition: all 0.3s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.tab-item:hover {
-  background-color: #f9f5ff;
-}
-
-@media (max-width: 640px) {
   .navigation-bar {
-    justify-content: flex-start;
-    border-radius: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
   }
-}
+
+  button,
+  .router-link-active {
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  .router-link-active {
+    color: #7e22ce;
+  }
+
+  button:hover,
+  a:hover {
+    color: #7e22ce;
+  }
+
+  button.bg-white,
+  a.bg-white {
+    color: #7e22ce;
+  }
+
+  @media (max-width: 640px) {
+    .navigation-bar {
+      justify-content: flex-start;
+      border-radius: 1rem;
+    }
+
+    a {
+      flex: 0 0 auto;
+    }
+  }
 </style>

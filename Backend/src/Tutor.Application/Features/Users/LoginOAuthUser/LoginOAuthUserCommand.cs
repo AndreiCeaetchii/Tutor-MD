@@ -4,4 +4,4 @@ using Tutor.Application.Features.Users.Dtos;
 
 namespace Tutor.Application.Features.Users.LoginOAuthUser;
 
-public record LoginOAuthUserCommand(RegisterUserAuthDto loginUserAuthDto) : IRequest<Result<UserResponseDto>>;
+public record LoginOAuthUserCommand(LoginUserAuthDto loginUserAuthDto) : IRequest<Result<UserResponseDto>>;

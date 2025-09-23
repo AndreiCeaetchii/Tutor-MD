@@ -133,17 +133,14 @@ namespace Tutor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AvailabilityRuleId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("PriceSnapshot")
-                        .HasColumnType("decimal(8,2)");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
@@ -163,6 +160,8 @@ namespace Tutor.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AvailabilityRuleId");
 
                     b.HasIndex("StudentUserId");
 
@@ -322,8 +321,8 @@ namespace Tutor.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Bytes")
-                        .HasColumnType("integer");
+                    b.Property<long?>("Bytes")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -436,6 +435,9 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Class")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("Grade")
                         .HasColumnType("integer");
 
@@ -476,24 +478,6 @@ namespace Tutor.Infrastructure.Migrations
                     b.ToTable("SubjectCatalog");
                 });
 
-            modelBuilder.Entity("Tutor.Domain.Entities.Tutor", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ExperienceYears")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VerificationStatus")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Tutors");
-                });
-
             modelBuilder.Entity("Tutor.Domain.Entities.TutorAvailabilityRule", b =>
                 {
                     b.Property<int>("Id")
@@ -510,19 +494,14 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("integer");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time without time zone");
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time without time zone");
-
-                    b.Property<string>("Timezone")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("time");
 
                     b.Property<int>("TutorUserId")
                         .HasColumnType("integer");
@@ -535,6 +514,27 @@ namespace Tutor.Infrastructure.Migrations
                     b.HasIndex("TutorUserId");
 
                     b.ToTable("TutorAvailabilityRules");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.TutorProfile", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ExperienceYears")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("VerificationStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(0);
+
+                    b.Property<int>("WorkingLocation")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Tutors");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.TutorSubject", b =>
@@ -574,6 +574,12 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<DateTime?>("Birthdate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -604,6 +610,15 @@ namespace Tutor.Infrastructure.Migrations
 
                     b.Property<int?>("PhotoId")
                         .HasColumnType("integer");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TwoFactorRecoveryCodes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TwoFactorSecret")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -788,6 +803,12 @@ namespace Tutor.Infrastructure.Migrations
 
             modelBuilder.Entity("Tutor.Domain.Entities.Booking", b =>
                 {
+                    b.HasOne("Tutor.Domain.Entities.TutorAvailabilityRule", "TutorAvailabilityRule")
+                        .WithMany("Bookings")
+                        .HasForeignKey("AvailabilityRuleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Tutor.Domain.Entities.Student", "Student")
                         .WithMany("Bookings")
                         .HasForeignKey("StudentUserId")
@@ -800,7 +821,7 @@ namespace Tutor.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Tutor.Domain.Entities.Tutor", "Tutor")
+                    b.HasOne("Tutor.Domain.Entities.TutorProfile", "TutorProfile")
                         .WithMany("Bookings")
                         .HasForeignKey("TutorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -810,7 +831,9 @@ namespace Tutor.Infrastructure.Migrations
 
                     b.Navigation("Subject");
 
-                    b.Navigation("Tutor");
+                    b.Navigation("TutorAvailabilityRule");
+
+                    b.Navigation("TutorProfile");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.GoogleAuth", b =>
@@ -867,7 +890,7 @@ namespace Tutor.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Tutor.Domain.Entities.Tutor", "Tutor")
+                    b.HasOne("Tutor.Domain.Entities.TutorProfile", "TutorProfile")
                         .WithMany("Reviews")
                         .HasForeignKey("TutorUserId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -877,7 +900,7 @@ namespace Tutor.Infrastructure.Migrations
 
                     b.Navigation("Student");
 
-                    b.Navigation("Tutor");
+                    b.Navigation("TutorProfile");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.Student", b =>
@@ -891,26 +914,26 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Tutor.Domain.Entities.Tutor", b =>
-                {
-                    b.HasOne("Tutor.Domain.Entities.User", "User")
-                        .WithOne("Tutor")
-                        .HasForeignKey("Tutor.Domain.Entities.Tutor", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Tutor.Domain.Entities.TutorAvailabilityRule", b =>
                 {
-                    b.HasOne("Tutor.Domain.Entities.Tutor", "Tutor")
+                    b.HasOne("Tutor.Domain.Entities.TutorProfile", "TutorProfile")
                         .WithMany("AvailabilityRules")
                         .HasForeignKey("TutorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Tutor");
+                    b.Navigation("TutorProfile");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.TutorProfile", b =>
+                {
+                    b.HasOne("Tutor.Domain.Entities.User", "User")
+                        .WithOne("TutorProfile")
+                        .HasForeignKey("Tutor.Domain.Entities.TutorProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.TutorSubject", b =>
@@ -921,7 +944,7 @@ namespace Tutor.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Tutor.Domain.Entities.Tutor", "Tutor")
+                    b.HasOne("Tutor.Domain.Entities.TutorProfile", "TutorProfile")
                         .WithMany("TutorSubjects")
                         .HasForeignKey("TutorUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -929,7 +952,7 @@ namespace Tutor.Infrastructure.Migrations
 
                     b.Navigation("Subject");
 
-                    b.Navigation("Tutor");
+                    b.Navigation("TutorProfile");
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.User", b =>
@@ -991,7 +1014,12 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("TutorSubjects");
                 });
 
-            modelBuilder.Entity("Tutor.Domain.Entities.Tutor", b =>
+            modelBuilder.Entity("Tutor.Domain.Entities.TutorAvailabilityRule", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.TutorProfile", b =>
                 {
                     b.Navigation("AvailabilityRules");
 
@@ -1017,7 +1045,7 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Student")
                         .IsRequired();
 
-                    b.Navigation("Tutor")
+                    b.Navigation("TutorProfile")
                         .IsRequired();
 
                     b.Navigation("UserRoles");

@@ -12,11 +12,18 @@ public class User : Entity<int>
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Bio { get; set; }
+
+    public string? Country { get; set; }
+
+    public string? City { get; set; }
     public DateTime? Birthdate { get; set; }
     public int? PhotoId { get; set; }
     public bool IsActive { get; set; }
     public DateTime LastLoginAt { get; set; }
-    
+    public string? TwoFactorSecret { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public string? TwoFactorRecoveryCodes { get; set; }
+
     // Navigation properties
     public virtual Photo Photo { get; set; }
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
@@ -24,13 +31,14 @@ public class User : Entity<int>
     public virtual TutorProfile TutorProfile { get; set; }
     public virtual ICollection<Notification> ReceivedNotifications { get; set; } = new List<Notification>();
     public virtual ICollection<Notification> SentNotifications { get; set; } = new List<Notification>();
-    
-    public virtual Password Password    { get; set; }
-    
+
+    public virtual Password Password { get; set; }
+
     public virtual GoogleAuth GoogleAuth { get; set; }
 
     public User()
     {
         IsActive = true;
+        TwoFactorEnabled = false;
     }
 }
