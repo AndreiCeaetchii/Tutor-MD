@@ -48,7 +48,7 @@ export const getTutorBookings = async (): Promise<TutorBooking[]> => {
     const store = useUserStore();
     const token = store.accessToken;
     
-    const response = await bookingAxios.get(`/tutor/bookings`, {
+    const response = await bookingAxios.get(`/students/bookings`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
@@ -65,12 +65,12 @@ export const updateBookingStatus = async (bookingId: number, status: number): Pr
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
-    const response = await bookingAxios.put(`/tutors/booking/${bookingId}/status`, { status }, {
+
+    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`,  status, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;

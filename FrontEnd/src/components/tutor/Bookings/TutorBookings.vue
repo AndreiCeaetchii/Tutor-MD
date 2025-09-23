@@ -113,7 +113,7 @@ const handleAccept = async (bookingId: number) => {
 const handleReject = async (bookingId: number) => {
   try {
     loading.value = true;
-    await updateBookingStatus(bookingId, 3);
+    await updateBookingStatus(bookingId, 2);
     
     const booking = bookingStore.bookings.find(b => b.id === bookingId);
     if (booking) booking.status = 'cancelled';
