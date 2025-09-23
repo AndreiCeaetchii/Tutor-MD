@@ -69,8 +69,8 @@ const mapStatusToString = (status: number): string => {
   switch (status) {
     case 0: return 'pending';
     case 1: return 'confirmed';
-    case 2: return 'completed';
-    case 3: return 'cancelled';
+    case 2: return 'cancelled';
+    case 3: return 'completed';
     default: return 'unknown';
   }
 };

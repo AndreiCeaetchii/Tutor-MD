@@ -78,7 +78,7 @@ export const cancelStudentBooking = async (bookingId: number) => {
     const store = useUserStore();
     const token = store.accessToken;
 
-    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, {  }, {
+    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, 2, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
