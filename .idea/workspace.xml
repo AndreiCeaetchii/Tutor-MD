@@ -4,19 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="" />
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/ReviewCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/ReviewCard.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/TutorReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/TutorReview.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/WriteReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/WriteReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-</component>
-
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -36,6 +37,9 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="32GzyAUWVvVXOG9hYCN5anDESI8" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -107,7 +111,6 @@
       <workItem from="1758522875735" duration="13749000" />
       <workItem from="1758568547301" duration="7899000" />
       <workItem from="1758522875735" duration="13077000" />
-
     </task>
     <servers />
   </component>

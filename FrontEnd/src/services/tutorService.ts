@@ -1,4 +1,3 @@
-// tutorService.ts
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
@@ -30,7 +29,7 @@ export interface CreateProfileDto {
 }
 
 export interface TutorProfileData {
-  verificationStatus: 'verified';
+  verificationStatus: 'Pending';
   experienceYears: number;
   subjects: Subject[];
   createProfileDto: CreateProfileDto;
@@ -82,7 +81,6 @@ export const getTutorProfile = async (userId: number) => {
     return response.data;
   } catch (error: any) {
     if (error.response && error.response.status === 404) {
-      // Profilul nu există
       return null;
     }
     console.error('Eroare la preluarea profilului tutorului:', error.message);
@@ -96,7 +94,6 @@ export const editTutorProfile = async (profileData: any) => {
     const profileStore = useProfileStore();
     const token = store.accessToken;
 
-    // Asigură-te că profileData are structura corectă înainte de a fi trimisă
     const response = await axios.put(`${API_URL}/update-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
