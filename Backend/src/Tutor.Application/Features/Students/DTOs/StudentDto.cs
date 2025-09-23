@@ -5,11 +5,10 @@ namespace Tutor.Application.Features.Students.DTOs;
 
 public class StudentDto
 {
+    public int UserId { get; set; }
     public int? Grade { get; set; }
 
     public int? Class { get; set; }
     public required CreateProfileDto UserProfile { get; set; }
-
-    public required string Token { get; set; }
     public PhotoDto? Photo { get; set; }
 }

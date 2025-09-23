@@ -470,6 +470,20 @@
     },
   );
 
+  const workingLocationId = computed(() => {
+    const { myHome, studentHome, online } = form.value.teachingPreferences;
+
+    if (myHome && online && studentHome) return 7; // Home + Online + Student Home
+    if (myHome && online) return 4; // Home + Online
+    if (myHome && studentHome) return 5; // Home + Student Home
+    if (online && studentHome) return 6; // Online + Student Home
+    if (myHome) return 1; // Home
+    if (online) return 2; // Online
+    if (studentHome) return 3; // Student Home
+
+    return 0; // Nicio opțiune selectată
+  });
+
   const handleSubmit = async () => {
     const birthdateFormatted = form.value.birthdate ? `${form.value.birthdate}T00:00:00` : '';
 
@@ -491,11 +505,13 @@
       city: form.value.city,
     };
 
+    // Aici este corectat: am adaugat workingLocation si createProfileDto
     const payload: TutorProfileData = {
       verificationStatus: 'verified',
       experienceYears: form.value.experienceYears,
       subjects: subjectsPayload,
       createProfileDto: profileDto,
+      workingLocation: workingLocationId.value,
     };
 
     try {

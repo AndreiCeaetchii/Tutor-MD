@@ -248,7 +248,7 @@
   let originalProfile: any = null;
 
   const initializeProfile = async () => {
-    if (!userProfile.value?.username) {
+    if (!userProfile.value?.firstName) {
       try {
         const serverProfile = await getStudentProfile();
 

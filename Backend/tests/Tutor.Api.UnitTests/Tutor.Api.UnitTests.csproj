@@ -12,6 +12,8 @@
     <PackageReference Include="DotNetEnv" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="CloudinaryDotNet" />
+    <PackageReference Include="Hangfire" />
+    <PackageReference Include="Hangfire.MemoryStorage" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" />

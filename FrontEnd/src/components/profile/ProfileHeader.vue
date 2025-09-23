@@ -51,6 +51,7 @@
 
       <div class="mt-6 lg:mt-0 lg:self-start">
         <button
+          v-if="isOwnProfile"
           @click="profileStore.toggleEditing"
           class="bg-white text-[#5f22d9] font-semibold py-2 px-6 rounded-full shadow hover:bg-gray-100 transition-colors"
         >
@@ -73,8 +74,12 @@
     faMapMarkerAlt,
     faChalkboardTeacher,
   } from '@fortawesome/free-solid-svg-icons';
+  import { defineProps } from 'vue';
 
   library.add(faStar, faUserGraduate, faMedal, faMapMarkerAlt, faChalkboardTeacher);
+
+  const props = defineProps<{ hasIdFromUrl: boolean }>();
+  const isOwnProfile = computed(() => !props.hasIdFromUrl);
 
   const profileStore = useProfileStore();
 
