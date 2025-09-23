@@ -127,6 +127,8 @@ public static class TutorEndpoints
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
             .RequireAuthorization("AdminOrStudentPolicy") 
+            .Produces(StatusCodes.Status400BadRequest)
+
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/approve-tutor/{id}",
