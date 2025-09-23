@@ -78,7 +78,7 @@
           <th class="py-3 px-6">Type</th>
           <th class="py-3 px-6">Status</th>
           <th class="py-3 px-6">Join Date</th>
-          <th class="py-3 px-6">Bookings</th>
+          <th class="py-3 px-6">Reviews</th>
           <th class="py-3 px-6 text-center">Actions</th>
         </tr>
       </thead>

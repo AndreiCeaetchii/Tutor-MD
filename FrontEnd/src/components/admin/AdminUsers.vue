@@ -26,38 +26,45 @@
   const users = ref<User[]>([]);
   const isMobile = ref(window.innerWidth < 768);
 
-  // Funcție pentru a încărca tutorii
+  // Fetch tutors from the API and map them to the User interface
   const fetchTutors = async () => {
     try {
       const response = await getTutors();
-      // Mapează datele primite în structura cerută de AdminUserTable
+
       users.value = response.map((tutor: any) => {
         const fullName = `${tutor.userProfile.firstName.trim()} ${tutor.userProfile.lastName.trim()}`;
+
+        // Determine status based on verificationStatus
+        let status = 'Pending';
+        if (tutor.verificationStatus === 'Verified') {
+          status = 'Active';
+        } else if (tutor.verificationStatus === 'Suspended') {
+          status = 'Suspended';
+        }
+
         return {
           id: tutor.userId,
           name: fullName,
           email: tutor.userProfile.email,
           type: 'Tutor',
-          // presupunem că isActive === true => Active, altfel Pending
-          status: tutor.userProfile.isActive ? 'Active' : 'Pending',
-          // dacă nu ai joinDate în date, poți folosi birthdate sau o dată implicită
+          status,
           joinDate: tutor.userProfile.birthdate || new Date().toISOString(),
-          // aici folosim reviewCount ca exemplu de "bookings"
           bookings: tutor.reviewCount || 0,
         };
       });
     } catch (error) {
-      console.error('Eroare la încărcarea tutorilor:', error);
+      console.error('Error loading tutors:', error);
     }
   };
 
+  // Handle screen resize for mobile detection
   const handleResize = () => {
     isMobile.value = window.innerWidth < 768;
   };
 
   onMounted(() => {
     window.addEventListener('resize', handleResize);
-    fetchTutors(); // încarcă tutorii la montare
+    fetchTutors();
   });
 
   onUnmounted(() => {
@@ -75,6 +82,7 @@
     ),
   );
 
+  // Action handlers
   const onView = (user: User) => console.log(`View user: ${user.name}`);
   const onEdit = (user: User) => console.log(`Edit user: ${user.name}`);
   const onDelete = (user: User) => console.log(`Delete user: ${user.name}`);
@@ -86,6 +94,7 @@
   <div class="p-6">
     <h1 class="text-2xl font-bold mb-6">User Management</h1>
 
+    <!-- Stats cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
         <div>
@@ -117,6 +126,7 @@
       </div>
     </div>
 
+    <!-- User table -->
     <div v-if="!isMobile" class="bg-white p-6 rounded-lg shadow-md">
       <AdminUserTable
         :users="sortedUsers"
