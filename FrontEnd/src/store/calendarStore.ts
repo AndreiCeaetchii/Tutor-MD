@@ -133,10 +133,10 @@ export const useCalendarStore = defineStore('calendar', {
 
         Object.values(monthData.slotData).forEach((daySlots) => {
           daySlots.forEach((slot) => {
-            if (slot.status === 'available') {
-              availableSlots++;
-            } else if (slot.status === 'booked') {
+            if (slot.status === 'booked' || slot.activeStatus === true) {
               bookedSlots++;
+            } else {
+              availableSlots++;
             }
           });
         });
@@ -266,13 +266,17 @@ export const useCalendarStore = defineStore('calendar', {
               const startTime = slot.startTime.substring(0, 5);
               const endTime = slot.endTime.substring(0, 5);
 
+              // Check if the slot is booked and include booking details if available
               this.slotsByMonth[monthKey].slotData[day].push({
                 id: `api-${slot.id}`,
                 apiId: slot.id,
                 startTime,
                 endTime,
                 date: slot.date,
-                status: 'available',
+                // Use the status from API response instead of hardcoding to 'available'
+                status: slot.isBooked ? 'booked' : 'available',
+                // Include the student name if the slot is booked
+                studentName: slot.studentName || undefined,
                 activeStatus: slot.activeStatus,
               });
             });
@@ -321,7 +325,7 @@ export const useCalendarStore = defineStore('calendar', {
           date: this.formatDateForAPI(date),
           startTime: this.formatTimeForAPI(newSlotData.startTime),
           endTime: this.formatTimeForAPI(newSlotData.endTime),
-          activeStatus: true,
+          activeStatus: false,
         };
 
         const response = await createAvailability(apiData);
@@ -335,7 +339,7 @@ export const useCalendarStore = defineStore('calendar', {
           endTime: newSlotData.endTime,
           date: apiData.date,
           status: 'available',
-          activeStatus: true,
+          activeStatus: false,
         };
 
         if (!monthData.daysWithSlots.includes(day)) {

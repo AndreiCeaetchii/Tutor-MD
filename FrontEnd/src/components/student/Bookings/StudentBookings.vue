@@ -1,201 +1,91 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { useUserStore } from '../../../store/userStore';
-// import { useFindTutorStore } from '../../../store/findTutorStore';
+import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking } from '../../../services/studentBookings';
 
 const bookingStore = useBookingStore();
-const userStore = useUserStore();
-// const findTutorStore = useFindTutorStore();
 
-const selectedSubject = ref('');
-interface Tutor {
-  id: number;
-  firstName: string;
-  lastName: string;
-  subjects: { name: string }[];
-}
-const selectedTutor = ref<Tutor | null>(null);
-const selectedDate = ref('');
-const selectedTimeSlot = ref<any | null>(null);
-const description = ref('');
-const showForm = ref(false);
 const loading = ref(false);
-const formSubmitting = ref(false);
-
-const isSubjectDropdownOpen = ref(false);
-const isTutorDropdownOpen = ref(false);
-const isTimeDropdownOpen = ref(false);
-
 const statusFilter = ref('all');
-
-const availableTutors = computed(() => {
-  if (!selectedSubject.value) return [];
-  return [
-    { id: 101, firstName: "Alexandru", lastName: "Munteanu", subjects: [{ name: "Mathematics" }] },
-    { id: 102, firstName: "Maria", lastName: "Popescu", subjects: [{ name: "Physics" }, { name: "Mathematics" }] },
-    { id: 103, firstName: "Ion", lastName: "Ionescu", subjects: [{ name: "Computer Science" }] },
-    { id: 104, firstName: "Elena", lastName: "Codreanu", subjects: [{ name: "Chemistry" }, { name: "Biology" }] }
-  ].filter(tutor => tutor.subjects.some(s => s.name === selectedSubject.value));
-});
-
-const availableTimeSlots = computed(() => {
-  if (!selectedTutor.value || !selectedDate.value) return [];
-  return bookingStore.availableTimeSlots;
-});
 
 const filteredBookings = computed(() => {
   if (statusFilter.value === 'all') {
     return bookingStore.studentBookings;
   }
-  return bookingStore.studentBookings.filter(booking => booking.status === statusFilter.value);
+  return bookingStore.studentBookings.filter(booking => booking.status.toLowerCase() === statusFilter.value);
 });
 
-const subjects = computed(() => {
-  return [
-    { id: 1, name: "Mathematics" },
-    { id: 2, name: "Physics" },
-    { id: 3, name: "Chemistry" },
-    { id: 4, name: "Biology" },
-    { id: 5, name: "Computer Science" },
-    { id: 6, name: "English Language" },
-    { id: 7, name: "History" }
-  ];
-});
-
-const resetForm = () => {
-  selectedSubject.value = '';
-  selectedTutor.value = null;
-  selectedDate.value = '';
-  selectedTimeSlot.value = null;
-  description.value = '';
-  isSubjectDropdownOpen.value = false;
-  isTutorDropdownOpen.value = false;
-  isTimeDropdownOpen.value = false;
-};
-
-const openForm = () => {
-  resetForm();
-  showForm.value = true;
-  document.body.style.overflow = 'hidden';
-};
-
-const closeForm = (force = false) => {
-  if (formSubmitting.value && !force) return;
-  
-  showForm.value = false;
-  document.body.style.overflow = '';
-};
-
-const selectSubject = (subject: string, event?: Event) => {
-  if (event) {
-    event.stopPropagation();
-  }
-  selectedSubject.value = subject;
-  isSubjectDropdownOpen.value = false;
-  selectedTutor.value = null;
-  selectedDate.value = '';
-  selectedTimeSlot.value = null;
-};
-
-const selectTutor = (tutor: Tutor, event?: Event) => {
-  if (event) {
-    event.stopPropagation();
-  }
-  selectedTutor.value = tutor;
-  isTutorDropdownOpen.value = false;
-  selectedDate.value = '';
-  selectedTimeSlot.value = null;
-};
-
-const selectTimeSlot = (timeSlot: any, event?: Event) => {
-  if (event) {
-    event.stopPropagation();
-  }
-  selectedTimeSlot.value = timeSlot;
-  isTimeDropdownOpen.value = false;
-};
-
-const toggleSubjectDropdown = (event: Event) => {
-  event.stopPropagation();
-  isSubjectDropdownOpen.value = !isSubjectDropdownOpen.value;
-  isTutorDropdownOpen.value = false;
-  isTimeDropdownOpen.value = false;
-};
-
-const toggleTutorDropdown = (event: Event) => {
-  event.stopPropagation();
-  isTutorDropdownOpen.value = !isTutorDropdownOpen.value;
-  isSubjectDropdownOpen.value = false;
-  isTimeDropdownOpen.value = false;
-};
-
-const toggleTimeDropdown = (event: Event) => {
-  event.stopPropagation();
-  isTimeDropdownOpen.value = !isTimeDropdownOpen.value;
-  isSubjectDropdownOpen.value = false;
-  isTutorDropdownOpen.value = false;
-};
-
-const handleBackdropClick = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  
-  if (target.classList.contains('modal-backdrop') && !formSubmitting.value) {
-    closeForm();
-  }
-};
-
-const handleGlobalClick = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  
-  if (!target.closest('.dropdown-toggle') && !target.closest('.dropdown-menu')) {
-    isSubjectDropdownOpen.value = false;
-    isTutorDropdownOpen.value = false;
-    isTimeDropdownOpen.value = false;
-  }
-};
-
-const createBooking = async () => {
-  if (!selectedSubject.value || !selectedTutor.value || !selectedTimeSlot.value || !description.value) {
-    return;
-  }
-  
-  if (formSubmitting.value) {
-    return;
-  }
-
+const fetchStudentBookingsFromAPI = async () => {
   loading.value = true;
-  formSubmitting.value = true;
-
   try {
-    await bookingStore.createBooking({
-      tutorId: selectedTutor.value.id,
-      studentId: Number(userStore.userId) || 1,
-      tutorName: `${selectedTutor.value.firstName} ${selectedTutor.value.lastName}`,
-      subject: selectedSubject.value,
-      date: selectedDate.value,
-      startTime: selectedTimeSlot.value.startTime,
-      endTime: selectedTimeSlot.value.endTime,
-      message: description.value,
-    });
-
-    closeForm(true);
+    const apiBookings = await getStudentBookingsAPI();
     
-    resetForm();
+    const transformedBookings = apiBookings.map(booking => {
+      return {
+        id: booking.id,
+        studentName: "Current Student",
+        tutorName: booking.tutorName,
+        subject: booking.subjectName || 'Subject not specified',
+        subjectName: booking.subjectName || 'Subject not specified',
+        status: mapStatusToString(booking.status),
+        date: booking.date,
+        startTime: booking.startTime.substring(0, 5),
+        endTime: booking.endTime.substring(0, 5),
+        time: booking.startTime.substring(0, 5),
+        duration: calculateDuration(booking.startTime.substring(0, 5), booking.endTime.substring(0, 5)),
+        message: booking.description,
+        tutorImage: booking.tutorPhoto,
+        tutorId: booking.tutorUserId,
+      };
+    });
+    
+    bookingStore.studentBookings = transformedBookings;
   } catch (error) {
-    console.error("Failed to create booking:", error);
+    console.error('Error fetching student bookings:', error);
   } finally {
     loading.value = false;
-    formSubmitting.value = false;
   }
 };
 
 const cancelBooking = async (bookingId: number) => {
   try {
-    await bookingStore.cancelBooking(bookingId);
+    loading.value = true;
+    await cancelStudentBooking(bookingId);
+    
+    const booking = bookingStore.studentBookings.find(b => b.id === bookingId);
+    if (booking) {
+      booking.status = 'cancelled';
+    }
+    
+    await fetchStudentBookingsFromAPI();
   } catch (error) {
     console.error("Failed to cancel booking:", error);
+    alert(`Cancellation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  } finally {
+    loading.value = false;
   }
+};
+
+const mapStatusToString = (status: number): string => {
+  switch (status) {
+    case 0: return 'pending';
+    case 1: return 'confirmed';
+    case 2: return 'cancelled';
+    case 3: return 'completed';
+    default: return 'unknown';
+  }
+};
+
+const calculateDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return '';
+  
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  
+  let durationMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+  if (durationMinutes < 0) durationMinutes += 24 * 60;
+  
+  return `${durationMinutes} min`;
 };
 
 const formatDate = (dateString: string) => {
@@ -215,7 +105,7 @@ const getStatusClass = (status: string) => {
     'cancelled': 'bg-red-100 text-red-800',
     'completed': 'bg-blue-100 text-blue-800'
   };
-  return statusClasses[status as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800';
+  return statusClasses[status.toLowerCase() as keyof typeof statusClasses] || 'bg-gray-100 text-gray-800';
 };
 
 const getStatusText = (status: string) => {
@@ -223,40 +113,18 @@ const getStatusText = (status: string) => {
     'pending': 'Pending',
     'confirmed': 'Confirmed',
     'cancelled': 'Cancelled',
-    'completed': 'Completed'
+    'completed': 'Completed',
+    'all': 'All'
   };
   return statusMap[status as keyof typeof statusMap] || status;
 };
 
-const loadTutorTimeSlots = async () => {
-  if (selectedTutor.value && selectedDate.value) {
-    try {
-      await bookingStore.getAvailableTimeSlots(selectedTutor.value.id, selectedDate.value);
-    } catch (error) {
-      console.error("Failed to load available time slots:", error);
-    }
-  }
-};
-
-watch([selectedDate, selectedTutor], () => {
-  if (selectedDate.value && selectedTutor.value) {
-    loadTutorTimeSlots();
-  }
-});
-
 onMounted(async () => {
   try {
-    await bookingStore.fetchStudentBookings(Number(userStore.userId) || 1);
-    
-    document.addEventListener('click', handleGlobalClick);
+    await fetchStudentBookingsFromAPI();
   } catch (error) {
     console.error("Error loading bookings:", error);
   }
-});
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleGlobalClick);
-  document.body.style.overflow = '';
 });
 </script>
 
@@ -320,217 +188,10 @@ onUnmounted(() => {
           Cancelled
         </button>
       </div>
-      <button 
-        @click="openForm" 
-        class="px-4 py-2 text-white transition-colors bg-purple-600 rounded-full shadow-sm hover:bg-purple-700"
-      >
-        Schedule a session
-      </button>
     </div>
 
-    <div 
-      v-if="showForm" 
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-backdrop"
-      @click="handleBackdropClick"
-    >
-      <div 
-        class="w-full max-w-md p-6 bg-white rounded shadow-lg"
-        @click.stop
-      >
-        <div class="flex justify-between mb-4">
-          <h3 class="text-lg font-semibold">Schedule a tutoring session</h3>
-          <button 
-            @click="closeForm()" 
-            type="button" 
-            :disabled="formSubmitting"
-            class="text-gray-500 hover:text-gray-700"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="space-y-4">
-          <div class="relative">
-            <label class="block mb-1 text-gray-700">Select subject</label>
-            <div 
-              @click="toggleSubjectDropdown"
-              class="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded cursor-pointer dropdown-toggle"
-              :class="{'opacity-50 cursor-not-allowed': formSubmitting}"
-            >
-              <span :class="{'text-gray-400': !selectedSubject}">
-                {{ selectedSubject || 'Choose a subject' }}
-              </span>
-              <svg 
-                class="w-5 h-5 ml-2 text-gray-400" 
-                :class="{'transform rotate-180': isSubjectDropdownOpen}"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-            
-            <div 
-              v-if="isSubjectDropdownOpen && !formSubmitting" 
-              class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded shadow-lg dropdown-menu"
-              @click.stop
-            >
-              <div class="py-1 overflow-auto max-h-60">
-                <div 
-                  v-for="subject in subjects" 
-                  :key="subject.id"
-                  @click="(e) => selectSubject(subject.name, e)" 
-                  class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                >
-                  <span v-if="subject.name === selectedSubject" class="mr-2 text-blue-500">✓</span>
-                  <span v-else class="invisible mr-2">✓</span>
-                  {{ subject.name }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="selectedSubject" class="relative">
-            <label class="block mb-1 text-gray-700">Select tutor</label>
-            <div 
-              @click="toggleTutorDropdown" 
-              class="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded cursor-pointer dropdown-toggle"
-              :class="{'opacity-50 cursor-not-allowed': formSubmitting}"
-            >
-              <span :class="{'text-gray-400': !selectedTutor}">
-                {{ selectedTutor ? `${selectedTutor.firstName} ${selectedTutor.lastName}` : 'Choose a tutor' }}
-              </span>
-              <svg 
-                class="w-5 h-5 ml-2 text-gray-400" 
-                :class="{'transform rotate-180': isTutorDropdownOpen}"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-            
-            <div 
-              v-if="isTutorDropdownOpen && !formSubmitting" 
-              class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded shadow-lg dropdown-menu"
-              @click.stop
-            >
-              <div v-if="availableTutors.length === 0" class="px-4 py-2 text-sm text-red-500">
-                No tutors available for this subject.
-              </div>
-              <div v-else class="py-1 overflow-auto max-h-60">
-                <div 
-                  v-for="tutor in availableTutors" 
-                  :key="tutor.id"
-                  @click="(e) => selectTutor(tutor, e)" 
-                  class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                >
-                  <span v-if="selectedTutor && tutor.id === selectedTutor.id" class="mr-2 text-blue-500">✓</span>
-                  <span v-else class="invisible mr-2">✓</span>
-                  {{ tutor.firstName }} {{ tutor.lastName }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="selectedTutor">
-            <label class="block mb-1 text-gray-700">Select date</label>
-            <input 
-              type="date" 
-              v-model="selectedDate" 
-              class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              :min="new Date().toISOString().split('T')[0]"
-              :disabled="formSubmitting"
-              @click.stop
-            >
-          </div>
-
-          <div v-if="selectedDate" class="relative">
-            <label class="block mb-1 text-gray-700">Select time</label>
-            <div 
-              @click="toggleTimeDropdown" 
-              class="flex items-center justify-between w-full px-4 py-3 border border-gray-300 rounded cursor-pointer dropdown-toggle"
-              :class="{'opacity-50 cursor-not-allowed': formSubmitting}"
-            >
-              <span :class="{'text-gray-400': !selectedTimeSlot}">
-                {{ selectedTimeSlot ? `${selectedTimeSlot.startTime} - ${selectedTimeSlot.endTime}` : 'Choose a time' }}
-              </span>
-              <svg 
-                class="w-5 h-5 ml-2 text-gray-400" 
-                :class="{'transform rotate-180': isTimeDropdownOpen}"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-            
-            <div 
-              v-if="isTimeDropdownOpen && !formSubmitting" 
-              class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded shadow-lg dropdown-menu"
-              @click.stop
-            >
-              <div v-if="availableTimeSlots.length === 0" class="px-4 py-2 text-sm text-red-500">
-                No available times for this date. Please select another date.
-              </div>
-              <div v-else class="py-1 overflow-auto max-h-60">
-                <div 
-                  v-for="slot in availableTimeSlots" 
-                  :key="slot.id"
-                  @click="(e) => selectTimeSlot(slot, e)" 
-                  class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
-                >
-                  <span v-if="selectedTimeSlot && slot.id === selectedTimeSlot.id" class="mr-2 text-blue-500">✓</span>
-                  <span v-else class="invisible mr-2">✓</span>
-                  {{ slot.startTime }} - {{ slot.endTime }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="selectedTimeSlot">
-            <label class="block mb-1 text-gray-700">Description</label>
-            <textarea 
-              v-model="description" 
-              placeholder="Describe what you need help with..." 
-              class="w-full h-24 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              :disabled="formSubmitting"
-              @click.stop
-            ></textarea>
-          </div>
-
-          <div class="flex gap-2">
-            <button 
-                @click="closeForm()" 
-                type="button"
-                :disabled="formSubmitting"
-                class="flex items-center justify-center px-4 py-2 text-red-700 transition-colors bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100 disabled:opacity-50"
-            >
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-                Cancel
-            </button>
-            
-            <button 
-                @click="createBooking" 
-                type="button"
-                class="flex items-center justify-center px-4 py-2 text-white transition-colors bg-purple-600 rounded-full shadow-sm hover:bg-purple-700 disabled:bg-purple-300 disabled:cursor-not-allowed"
-                :disabled="!selectedSubject || !selectedTutor || !selectedTimeSlot || !description || formSubmitting"
-            >
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Accept
-            </button>
-          </div>
-        </div>
-      </div>
+    <div v-if="loading" class="flex justify-center mb-6">
+      <div class="w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
     </div>
 
     <div class="space-y-4">
@@ -542,7 +203,7 @@ onUnmounted(() => {
         <div class="p-5 border-b border-gray-100">
           <div class="flex items-start justify-between">
             <div>
-              <h3 class="text-lg font-semibold">{{ booking.subject }}</h3>
+              <h3 class="text-lg font-semibold">{{ booking.subjectName }}</h3>
               <p class="text-gray-600">With: {{ booking.tutorName }}</p>
               <div class="flex items-center mt-2 text-gray-500">
                 <span class="mr-1 text-sm text-purple-600 material-icons">calendar_today</span>
@@ -617,20 +278,6 @@ onUnmounted(() => {
 
 .btn-cancel:hover {
   background-color: #f3f4f6;
-}
-
-.btn-accept {
-  color: #ffffff;
-  background-color: #9333ea;
-}
-
-.btn-accept:hover {
-  background-color: #7e22ce;
-}
-
-.btn-accept:disabled {
-  background-color: #d8b4fe;
-  cursor: not-allowed;
 }
 
 .btn-chat {
