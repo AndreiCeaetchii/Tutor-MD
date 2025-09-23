@@ -16,6 +16,21 @@ export interface BookingRequest {
   status: string;
 }
 
+export interface StudentBooking {
+  id: number;
+  tutorUserId: number;
+  tutorName: string;
+  studentUserId: number;
+  subjectName: string;
+  price: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  description: string;
+  status: number; 
+  tutorPhoto: string | null;
+}
+
 export const createBooking = async (bookingData: BookingRequest) => {
   try {
     const store = useUserStore();
@@ -23,7 +38,6 @@ export const createBooking = async (bookingData: BookingRequest) => {
 
     console.log('Sending booking request:', bookingData);
     
-    // API call to create a booking
     const response = await bookingAxios.post('/students/booking/create', bookingData, {
       headers: {
         'Content-Type': 'application/json',
@@ -38,6 +52,42 @@ export const createBooking = async (bookingData: BookingRequest) => {
       throw new Error(error.response.data);
     }
     throw error;
+  }
+};
+
+export const getStudentBookings = async (): Promise<StudentBooking[]> => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+    
+    const response = await bookingAxios.get(`/students/bookings`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching student bookings:', error.response?.data || error);
+    throw new Error(error.response?.data || 'Failed to fetch student bookings');
+  }
+};
+
+export const cancelStudentBooking = async (bookingId: number): Promise<any> => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+    
+    const response = await bookingAxios.put(`/students/booking/${bookingId}/cancel`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Error canceling booking:', error.response?.data || error);
+    throw new Error(error.response?.data || 'Failed to cancel booking');
   }
 };
 
