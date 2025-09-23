@@ -134,9 +134,9 @@ public class AuthService : IAuthService
     public async Task<bool> VerifyMFAAsync(int userId, string code)
     {
         var user = await _userRepository.GetById(userId);
-        var decrytedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
+        var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
         
-        var result = _mfaService.VerifyCode(user.TwoFactorSecret, code);
+        var result = _mfaService.VerifyCode(decryptedSecret, code);
         if (result)
         {
             user.TwoFactorEnabled = true;
