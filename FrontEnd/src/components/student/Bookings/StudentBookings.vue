@@ -26,6 +26,7 @@ const fetchStudentBookingsFromAPI = async () => {
         studentName: "Current Student",
         tutorName: booking.tutorName,
         subject: booking.subjectName || 'Subject not specified',
+        subjectName: booking.subjectName || 'Subject not specified',
         status: mapStatusToString(booking.status),
         date: booking.date,
         startTime: booking.startTime.substring(0, 5),
@@ -202,7 +203,7 @@ onMounted(async () => {
         <div class="p-5 border-b border-gray-100">
           <div class="flex items-start justify-between">
             <div>
-              <h3 class="text-lg font-semibold">{{ booking.subject }}</h3>
+              <h3 class="text-lg font-semibold">{{ booking.subjectName }}</h3>
               <p class="text-gray-600">With: {{ booking.tutorName }}</p>
               <div class="flex items-center mt-2 text-gray-500">
                 <span class="mr-1 text-sm text-purple-600 material-icons">calendar_today</span>

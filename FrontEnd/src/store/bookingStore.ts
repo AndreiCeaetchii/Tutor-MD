@@ -10,6 +10,7 @@ export interface Booking {
   id: number;
   studentName: string;
   subject: string;
+  subjectName: string;
   status: string;
   date: string;
   startTime?: string;
@@ -93,6 +94,7 @@ export const useBookingStore = defineStore('booking', {
             studentName: "Current Student",
             tutorName: booking.tutorName,
             subject: booking.subjectName,
+            subjectName: booking.subjectName,
             status: mapApiStatusToString(booking.status),
             date: booking.date,
             startTime: booking.startTime.substring(0, 5),
@@ -152,6 +154,7 @@ export const useBookingStore = defineStore('booking', {
           studentName: "Current Student",
           tutorName: bookingData.tutorName || "Selected Tutor",
           subject: bookingData.subject || "",
+          subjectName: bookingData.subjectName || "",
           status: "Pending",
           date: bookingData.date || "",
           startTime: bookingData.startTime || "",

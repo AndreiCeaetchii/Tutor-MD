@@ -23,6 +23,7 @@ const fetchTutorBookings = async () => {
       id: booking.id,
       studentName: booking.studentName,
       subject: booking.subject || 'Subject not specified',
+      subjectName: booking.subject || 'Subject not specified',
       status: mapStatusToString(booking.status),
       date: booking.date,
       startTime: booking.startTime.substring(0, 5),
