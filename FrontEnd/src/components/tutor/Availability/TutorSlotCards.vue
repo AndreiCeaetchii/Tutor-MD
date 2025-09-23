@@ -4,14 +4,11 @@
 
   const store = useCalendarStore();
 
-  // Folosim statisticile specifice lunii curente
   const statistics = computed(() => {
     return store.getCurrentMonthStatistics();
   });
 
-  // Re-calculăm statisticile când se schimbă luna selectată
   watch(() => store.currentMonthKey, () => {
-    // Statisticile se vor actualiza automat prin computed
   });
 </script>
 

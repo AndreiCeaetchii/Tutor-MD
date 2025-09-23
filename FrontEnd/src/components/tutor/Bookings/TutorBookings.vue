@@ -1,77 +1,174 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
+import { getTutorBookings, updateBookingStatus } from '../../../services/teacherBookings';
+import NotificationMessage from '../../ui/NotificationMessage.vue';
 
 const bookingStore = useBookingStore();
-const activeFilter = ref('All');
+const statusFilter = ref('all');
+const loading = ref(false);
+const error = ref('');
 
-onMounted(() => {
-  if (bookingStore.bookings.length === 0) {
-    bookingStore.setBookings([
-      {
-        id: 1,
-        studentName: 'Alex Chen',
-        subject: 'Calculus',
-        status: 'Pending',
-        date: '2025-09-15',
-        time: '10:00',
-        duration: '60 min',
-        message: 'Hi! I need help with integration by parts and related problems. I have an exam next week.',
-        studentImage: 'https://i.pravatar.cc/150?img=11'
-      },
-      {
-        id: 2,
-        studentName: 'Maria Rodriguez',
-        subject: 'Statistics',
-        status: 'Accepted',
-        date: '2025-09-17',
-        time: '11:00',
-        duration: '90 min',
-        message: 'Looking for help with hypothesis testing and p-values.',
-        studentImage: 'https://i.pravatar.cc/150?img=11'
-      },
-      {
-        id: 3,
-        studentName: 'Arina Popescu',
-        subject: 'Algebra',
-        status: 'Completed',
-        date: '2025-09-18',
-        time: '12:00',
-        duration: '90 min',
-        message: 'Looking for help with hypothesis testing and p-values.',
-        studentImage: 'https://i.pravatar.cc/150?img=11'
-      }
-    ]);
+const showNotification = ref(false);
+const notificationType = ref('error');
+const notificationMessage = ref('');
+
+const fetchTutorBookings = async () => {
+  try {
+    loading.value = true;
+    
+    const apiBookings = await getTutorBookings();
+    
+    const transformedBookings = apiBookings.map(booking => ({
+      id: booking.id,
+      studentName: booking.studentName,
+      subject: booking.subject || 'Subject not specified',
+      status: mapStatusToString(booking.status),
+      date: booking.date,
+      startTime: booking.startTime.substring(0, 5),
+      endTime: booking.endTime.substring(0, 5),
+      time: booking.startTime.substring(0, 5),
+      duration: calculateDuration(booking.startTime, booking.endTime),
+      message: booking.description,
+      studentImage: booking.studentPhoto,
+      tutorName: booking.tutorName,
+      tutorId: booking.tutorUserId,
+      studentId: booking.studentUserId
+    }));
+    
+    bookingStore.bookings = transformedBookings;
+    console.log('Tutor bookings loaded:', bookingStore.bookings.length);
+    
+  } catch (err) {
+    console.error('Error fetching tutor bookings:', err);
+    error.value = err instanceof Error ? err.message : 'Failed to load bookings';
+    
+    notificationMessage.value = 'Failed to fetch tutor bookings';
+    notificationType.value = 'error';
+    showNotification.value = true;
+  } finally {
+    loading.value = false;
   }
+};
+
+const mapStatusToString = (status: number): string => {
+  switch (status) {
+    case 0: return 'pending';
+    case 1: return 'confirmed';
+    case 2: return 'completed';
+    case 3: return 'cancelled';
+    default: return 'unknown';
+  }
+};
+
+const calculateDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return '';
+  
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  
+  let durationMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+  if (durationMinutes < 0) durationMinutes += 24 * 60;
+  
+  return `${durationMinutes} min`;
+};
+
+onMounted(async () => {
+  await fetchTutorBookings();
 });
 
-const pendingCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Pending').length);
-const acceptedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Accepted').length);
-const completedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Completed').length);
-const pastReviewsCount = computed(() => bookingStore.bookings.filter(b => b.status === 'Completed').length);
+// const pendingCount = computed(() => bookingStore.bookings.filter(b => b.status === 'pending').length);
+// const acceptedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'confirmed').length);
+// const completedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'completed').length);
+// const cancelledCount = computed(() => bookingStore.bookings.filter(b => b.status === 'cancelled').length);
 
 const filteredBookings = computed(() => {
-  if (activeFilter.value === 'All') return bookingStore.bookings;
-  if (activeFilter.value === 'Past Reviews') {
-    return bookingStore.bookings.filter(b => b.status === 'Completed');
-  }
-  return bookingStore.bookings.filter(b => b.status === activeFilter.value);
+  if (statusFilter.value === 'all') return bookingStore.bookings;
+  return bookingStore.bookings.filter(b => b.status === statusFilter.value);
 });
 
-const setFilter = (filter: string) => {
-  activeFilter.value = filter;
+const handleAccept = async (bookingId: number) => {
+  try {
+    loading.value = true;
+    await updateBookingStatus(bookingId, 1);
+    
+    const booking = bookingStore.bookings.find(b => b.id === bookingId);
+    if (booking) booking.status = 'confirmed';
+    
+    notificationMessage.value = 'Booking accepted successfully';
+    notificationType.value = 'success';
+    showNotification.value = true;
+  } catch (err) {
+    console.error('Error accepting booking:', err);
+    error.value = err instanceof Error ? err.message : 'Failed to accept booking';
+    
+    notificationMessage.value = 'Failed to accept booking';
+    notificationType.value = 'error';
+    showNotification.value = true;
+  } finally {
+    loading.value = false;
+  }
 };
 
-const handleAccept = (bookingId: number) => {
-  bookingStore.updateBookingStatus(bookingId, 'Accepted');
+const handleReject = async (bookingId: number) => {
+  try {
+    loading.value = true;
+    await updateBookingStatus(bookingId, 2);
+    
+    const booking = bookingStore.bookings.find(b => b.id === bookingId);
+    if (booking) booking.status = 'cancelled';
+    
+    notificationMessage.value = 'Booking rejected successfully';
+    notificationType.value = 'success';
+    showNotification.value = true;
+  } catch (err) {
+    console.error('Error rejecting booking:', err);
+    error.value = err instanceof Error ? err.message : 'Failed to reject booking';
+    
+    notificationMessage.value = 'Failed to reject booking';
+    notificationType.value = 'error';
+    showNotification.value = true;
+  } finally {
+    loading.value = false;
+  }
 };
 
-const handleReject = (bookingId: number) => {
-  bookingStore.updateBookingStatus(bookingId, 'Cancelled');
+const handleMarkComplete = async (bookingId: number) => {
+  try {
+    loading.value = true;
+    await updateBookingStatus(bookingId, 2);
+    
+    const booking = bookingStore.bookings.find(b => b.id === bookingId);
+    if (booking) booking.status = 'completed';
+    
+    notificationMessage.value = 'Booking marked as completed';
+    notificationType.value = 'success';
+    showNotification.value = true;
+  } catch (err) {
+    console.error('Error completing booking:', err);
+    error.value = err instanceof Error ? err.message : 'Failed to complete booking';
+    
+    notificationMessage.value = 'Failed to mark booking as complete';
+    notificationType.value = 'error';
+    showNotification.value = true;
+  } finally {
+    loading.value = false;
+  }
 };
 
-const handleMarkComplete = (bookingId: number) => {
-  bookingStore.updateBookingStatus(bookingId, 'Completed');
+const closeNotification = () => {
+  showNotification.value = false;
+};
+
+const getStatusText = (status: string) => {
+  const statusMap = {
+    'pending': 'Pending',
+    'confirmed': 'Confirmed',
+    'cancelled': 'Cancelled',
+    'completed': 'Completed',
+    'all': 'All'
+  };
+  return statusMap[status as keyof typeof statusMap] || status;
 };
 
 function formatDate(dateStr: string): string {
@@ -88,54 +185,103 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function formatTimeInterval(time: string, duration: string): string {
-  const [hour, minute] = time.split(':').map(Number);
-  const durationMin = parseInt(duration);
-  const start = new Date(0, 0, 0, hour, minute);
-  const end = new Date(start.getTime() + durationMin * 60000);
+function formatTimeInterval(startTime?: string, endTime?: string, duration?: string): string {
+  if (!startTime || !endTime) return 'Time not specified';
+  
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+  
   const pad = (n: number) => n.toString().padStart(2, '0');
-  return `${pad(start.getHours())}:${pad(start.getMinutes())} - ${pad(end.getHours())}:${pad(end.getMinutes())} (${duration})`;
+  return `${pad(startHour)}:${pad(startMinute)} - ${pad(endHour)}:${pad(endMinute)} ${duration ? `(${duration})` : ''}`;
 }
 </script>
 
 <template>
-  <div class="p-4 tutor-bookings">
-    <div class="grid grid-cols-2 gap-3 mb-6 sm:grid-cols-4 sm:gap-4 sm:mb-8">
-      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
-        <div class="text-xl font-bold sm:text-2xl text-amber-500">{{ pendingCount }}</div>
-        <div class="text-sm text-gray-600 sm:text-base">Pending</div>
-      </div>
-      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
-        <div class="text-xl font-bold text-blue-500 sm:text-2xl">{{ acceptedCount }}</div>
-        <div class="text-sm text-gray-600 sm:text-base">Accepted</div>
-      </div>
-      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
-        <div class="text-xl font-bold text-green-500 sm:text-2xl">{{ completedCount }}</div>
-        <div class="text-sm text-gray-600 sm:text-base">Completed</div>
-      </div>
-      <div class="p-3 text-center bg-white rounded-lg shadow-sm sm:p-4">
-        <div class="text-xl font-bold text-gray-500 sm:text-2xl">{{ pastReviewsCount }}</div>
-        <div class="text-sm text-gray-600 sm:text-base">Past Reviews</div>
-      </div>
-    </div>
-
-    <h2 class="mb-4 text-lg font-semibold sm:text-xl">Booking Requests</h2>
-
-    <div class="mb-6 overflow-x-auto">
-      <div class="flex p-1 mb-2 bg-gray-100 rounded-full sm:p-2 sm:mb-6 min-w-max">
+  <div class="container px-4 py-6 mx-auto tutor-bookings">
+    <NotificationMessage
+      :show="showNotification"
+      :message="notificationMessage"
+      :type="notificationType"
+      :duration="5000"
+      position="top-right"
+      @close="closeNotification"
+    />
+    
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex border-b border-gray-200">
         <button 
-          v-for="filter in ['All', 'Pending', 'Accepted', 'Completed', 'Past Reviews', 'Cancelled']" 
-          :key="filter"
-          @click="setFilter(filter)"
-          class="flex-1 px-3 py-1.5 sm:px-4 sm:py-2 text-sm sm:text-base text-center transition-colors rounded-full whitespace-nowrap"
-          :class="activeFilter === filter ? 'bg-white shadow-sm' : 'text-gray-600 hover:bg-gray-200'"
+          @click="statusFilter = 'all'" 
+          :class="[
+            'py-2 px-3 border-b-2', 
+            statusFilter === 'all' 
+              ? 'border-purple-500 text-purple-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
         >
-          {{ filter }}
+          All
+        </button>
+        <button 
+          @click="statusFilter = 'pending'" 
+          :class="[
+            'py-2 px-3 border-b-2', 
+            statusFilter === 'pending' 
+              ? 'border-purple-500 text-purple-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Pending
+        </button>
+        <button 
+          @click="statusFilter = 'confirmed'" 
+          :class="[
+            'py-2 px-3 border-b-2', 
+            statusFilter === 'confirmed' 
+              ? 'border-purple-500 text-purple-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Confirmed
+        </button>
+        <button 
+          @click="statusFilter = 'completed'" 
+          :class="[
+            'py-2 px-3 border-b-2', 
+            statusFilter === 'completed' 
+              ? 'border-purple-500 text-purple-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Completed
+        </button>
+        <button 
+          @click="statusFilter = 'cancelled'" 
+          :class="[
+            'py-2 px-3 border-b-2', 
+            statusFilter === 'cancelled' 
+              ? 'border-purple-500 text-purple-600' 
+              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+          ]"
+        >
+          Cancelled
         </button>
       </div>
     </div>
+    
+    <div v-if="loading" class="flex justify-center mb-6">
+      <div class="w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
+    </div>
 
-    <div class="space-y-4">
+    <div v-if="!loading && filteredBookings.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
+      <div class="flex items-center justify-center w-24 h-24 mb-4 border-4 border-gray-200 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <p class="text-lg font-medium text-gray-500">No bookings found</p>
+      <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+    </div>
+
+    <div v-else class="space-y-4">
       <div 
         v-for="booking in filteredBookings" 
         :key="booking.id"
@@ -158,13 +304,13 @@ function formatTimeInterval(time: string, duration: string): string {
             <span 
               class="px-2 py-1 text-xs rounded-full sm:text-sm"
               :class="{
-                'bg-amber-100 text-amber-800': booking.status === 'Pending',
-                'bg-blue-100 text-blue-800': booking.status === 'Accepted',
-                'bg-green-100 text-green-800': booking.status === 'Completed',
-                'bg-red-100 text-red-800': booking.status === 'Cancelled'
+                'bg-amber-100 text-amber-800': booking.status === 'pending',
+                'bg-blue-100 text-blue-800': booking.status === 'confirmed',
+                'bg-green-100 text-green-800': booking.status === 'completed',
+                'bg-red-100 text-red-800': booking.status === 'cancelled'
               }"
             >
-              {{ booking.status }}
+              {{ getStatusText(booking.status) }}
             </span>
           </div>
         </div>
@@ -176,7 +322,7 @@ function formatTimeInterval(time: string, duration: string): string {
           </div>
           <div class="flex items-center">
             <span class="mr-2 text-sm text-gray-400 material-icons sm:text-base">schedule</span>
-            <span>{{ formatTimeInterval(booking.time, booking.duration) }}</span>
+            <span>{{ formatTimeInterval(booking.startTime, booking.endTime, booking.duration) }}</span>
           </div>
         </div>
 
@@ -187,10 +333,11 @@ function formatTimeInterval(time: string, duration: string): string {
         <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
           <div></div>
           <div class="flex flex-wrap justify-end w-full gap-2 sm:w-auto">
-            <template v-if="booking.status === 'Pending'">
+            <template v-if="booking.status === 'pending'">
               <button 
                 @click="handleReject(booking.id)" 
                 class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+                :disabled="loading"
               >
                 <span class="mr-1 text-xs text-red-500 material-icons sm:text-sm">close</span>
                 Reject
@@ -198,15 +345,17 @@ function formatTimeInterval(time: string, duration: string): string {
               <button 
                 @click="handleAccept(booking.id)" 
                 class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-green-600 rounded-full hover:bg-green-700"
+                :disabled="loading"
               >
                 <span class="mr-1 text-xs material-icons sm:text-sm">check</span>
                 Accept
               </button>
             </template>
-            <template v-if="booking.status === 'Accepted'">
+            <template v-if="booking.status === 'confirmed'">
               <button 
                 @click="handleMarkComplete(booking.id)" 
                 class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-blue-600 rounded-full hover:bg-blue-700"
+                :disabled="loading"
               >
                 <span class="mr-1 text-xs material-icons sm:text-sm">task_alt</span>
                 Mark Complete
@@ -231,5 +380,9 @@ function formatTimeInterval(time: string, duration: string): string {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+}
+
+.material-icons {
+  font-size: 18px;
 }
 </style>
