@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/profile/CreateProfile.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/ProfilePage.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/tutorService.ts" afterDir="false" />
-    </list>
+    <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
