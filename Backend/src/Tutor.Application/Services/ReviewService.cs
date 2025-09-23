@@ -144,7 +144,7 @@ public class ReviewService : IReviewService
         {
             Id = review.Id,
             StudentUserId = review.StudentUserId,
-            UserName = review.Student?.User?.FirstName + " " + review.Student?.User?.LastName,
+            UserName = userName,
             Rating = review.Rating,
             Description = review.Description,
             CreatedAt = review.CreatedAt

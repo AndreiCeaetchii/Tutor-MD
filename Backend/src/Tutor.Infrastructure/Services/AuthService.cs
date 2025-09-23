@@ -1,5 +1,8 @@
 ﻿using Ardalis.Result;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
@@ -18,13 +21,15 @@ public class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly IGenericRepository2<UserRole> _userRoleRepository;
     private readonly IGenericRepository<Role, int> _roleRepository;
+    private readonly IMFAService _mfaService;
 
     public AuthService(
         IGenericRepository<User, int> userRepository,
         IGenericRepository2<UserRole> userRoleRepository,
         IPasswordHasher passwordHasher,
         ITokenService tokenService,
-        IGenericRepository<Role,int> roleRepository,
+        IGenericRepository<Role, int> roleRepository,
+        IMFAService mfaService,
         IGenericRepository<Password, int> passwordRepository)
     {
         _userRepository = userRepository;
@@ -33,9 +38,10 @@ public class AuthService : IAuthService
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _passwordRepository = passwordRepository;
+        _mfaService = mfaService;
     }
 
-    public async Task<Result<UserResponseDto>> LoginAsync(LoginUserDto loginDto)
+    public async Task<Result<UserResponseDto>> LoginAsync(LoginUserDto loginDto, string mfaCode = null)
     {
         var user = await _userRepository.FindAsyncDefault(u => u.Email == loginDto.Email);
         if (user == null) return Result<UserResponseDto>.Error("Invalid Email");
@@ -46,14 +52,21 @@ public class AuthService : IAuthService
         if (!_passwordHasher.VerifyPassword(loginDto.Password, password.PasswordHash))
             return Result<UserResponseDto>.Error("Invalid Password");
 
-    
 
         var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (usersRole == null)
             return Result<UserResponseDto>.Error("No roles found for this email");
-        
+
         var role = await _roleRepository.FindAsyncDefault(u => u.Id == usersRole.RoleId);
-        
+        if (user.TwoFactorEnabled)
+        {
+            if (string.IsNullOrEmpty(mfaCode))
+                return Result<UserResponseDto>.Error("MFA_REQUIRED");
+
+            if (!_mfaService.VerifyCode(user.TwoFactorSecret, mfaCode))
+                return Result<UserResponseDto>.Error("Invalid Mfa code");
+        }
+
         var token = _tokenService.GenerateToken(user, role);
         var response = user.ToResponseDto(token);
 
@@ -85,16 +98,11 @@ public class AuthService : IAuthService
         var usersRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
         if (usersRole != null)
             return Result<UserResponseDto>.Error("User already has an role");
-        var currentUserRole = new UserRole
-        {
-            UserId = user.Id,
-            RoleId = registerDto.RoleId,
-            AssignedAt = DateTime.Now
-        };
+        var currentUserRole = new UserRole { UserId = user.Id, RoleId = registerDto.RoleId, AssignedAt = DateTime.Now };
         await _userRoleRepository.Create(currentUserRole);
-        
+
         var role = await _roleRepository.FindAsyncDefault(u => u.Id == currentUserRole.RoleId);
-        
+
         var token = _tokenService.GenerateToken(user, role);
         if (string.IsNullOrEmpty(token))
             return Result<UserResponseDto>.Error("Token generation failed");
@@ -102,5 +110,50 @@ public class AuthService : IAuthService
         var response = user.ToResponseDto(token);
 
         return Result<UserResponseDto>.Success(response);
+    }
+
+    public async Task<Result<EnableMFAResponse>> EnableMFAAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        var (secretKey, qrCodeImage) = _mfaService.GenerateSetup(user.Email);
+        var recoveryCodes = _mfaService.GenerateRecoveryCodes();
+
+        user.TwoFactorSecret = _mfaService.Encrypt(secretKey);
+        List<string> hashedCodes =  new List<string>();
+        foreach (var recoveryCode in recoveryCodes)
+            hashedCodes.Add(_mfaService.Hash(recoveryCode));
+        user.TwoFactorRecoveryCodes = JsonSerializer.Serialize(hashedCodes);
+        await _userRepository.Update(user);
+
+        return Result.Success(new EnableMFAResponse
+        {
+            QrCodeImage = qrCodeImage, SecretKey = secretKey, RecoveryCodes = recoveryCodes
+        });
+    }
+
+    public async Task<bool> VerifyMFAAsync(int userId, string code)
+    {
+        var user = await _userRepository.GetById(userId);
+        var decrytedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
+        
+        var result = _mfaService.VerifyCode(user.TwoFactorSecret, code);
+        if (result)
+        {
+            user.TwoFactorEnabled = true;
+            await _userRepository.Update(user);
+        }
+
+        return result;
+    }
+
+    public async Task<bool> DisableMFAAsync(int userId)
+    {
+        var user = await _userRepository.GetById(userId);
+        user.TwoFactorEnabled = false;
+        user.TwoFactorSecret = null;
+        user.TwoFactorRecoveryCodes = null;
+
+        await _userRepository.Update(user);
+        return true;
     }
 }

@@ -19,6 +19,7 @@ public interface ITutorService
         decimal? maxPrice = null,
         string? sortBy = null,
         bool sortDescending = false);
+    Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsyncForAdmin();
     Task<Result<TutorProfileDto>> ApproveTutorAsync(int userId);
     Task<Result<TutorProfileDto>> DeclineTutorAsync(int userId);
     Task<Result<TutorProfileDto>> UpdateTutorAsync(int userId, UpdateTutorProfileDto updateTutorProfileDto);

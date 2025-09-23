@@ -49,6 +49,7 @@ public static class ApplicationSetup
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
+        services.AddScoped<IMFAService, MFAService>();
 
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
