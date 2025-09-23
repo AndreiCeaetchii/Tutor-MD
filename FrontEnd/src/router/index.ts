@@ -25,9 +25,18 @@ import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 import StudentChat from '../components/student/Chat/StudentChat.vue';
-// import StudentSearchPage from '../pages/StudentSearchPage.vue';
 
 import GuestPage from '../pages/GuestPage.vue';
+
+import AdminDashboard from '../pages/AdminDashboard.vue';
+import AdminUsers from '../components/admin/AdminUsers.vue';
+import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
+
+const AdminOverview = { template: '<div>Admin Overview</div>' };
+const AdminBookings = { template: '<div>Admin Bookings</div>' };
+const AdminNotifications = { template: '<div>Admin Notifications</div>' };
+const AdminReviews = { template: '<div>Admin Reviews</div>' };
+const AdminSettings = { template: '<div>Admin Settings</div>' };
 
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
@@ -70,6 +79,22 @@ const routes = [
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },
       { path: 'messages', component: TutorChat },
+    ],
+  },
+
+  {
+    path: '/admin-dashboard',
+    component: AdminDashboard,
+    //meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      { path: '', redirect: '/admin-dashboard/overview' },
+      { path: 'overview', component: AdminOverview },
+      { path: 'users', component: AdminUsers },
+      { path: 'bookings', component: AdminBookings },
+      { path: 'notifications', component: AdminNotifications },
+      { path: 'analytics', component: AdminAnalytics },
+      { path: 'reviews', component: AdminReviews },
+      { path: 'settings', component: AdminSettings },
     ],
   },
 
@@ -120,6 +145,7 @@ router.beforeEach((to, _, next) => {
     if (to.meta.role && to.meta.role !== userRole) {
       if (userRole === 'tutor') next('/tutor-dashboard');
       else if (userRole === 'student') next('/student-dashboard');
+      else if (userRole === 'admin') next('/admin-dashboard');
       else next('/landing');
       return;
     }
@@ -130,6 +156,7 @@ router.beforeEach((to, _, next) => {
   if (to.meta.requiresGuest && hasToken) {
     if (userRole === 'tutor') next('/tutor-dashboard');
     else if (userRole === 'student') next('/student-dashboard');
+    else if (userRole === 'admin') next('/admin-dashboard');
     else next('/landing');
     return;
   }
