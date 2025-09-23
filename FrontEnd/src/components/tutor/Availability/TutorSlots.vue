@@ -7,7 +7,7 @@ import { useRoute } from 'vue-router';
 import TimeSlotModal from '../../modals/TutorTimeSlotModal.vue';
 import StudentBookingModal from '../../modals/StudentBookingModal.vue';
 import { createBooking as createBookingApi } from '../../../services/studentBookings';
-// import { updateAvailability } from '../../../services/tutorAvailability';
+import { updateAvailability } from '../../../services/tutorAvailability';
 
 const props = defineProps<{
   date: Date;
@@ -68,19 +68,44 @@ const fetchAvailability = async () => {
     error.value = '';
     
     if (isViewingAsStudent.value) {
-      const tutorId = Number(route.params.id);
-      const originalUserId = userStore.userId;
-      // @ts-ignore - Temporarily set userId for the API call
-      userStore.userId = tutorId;
-      await store.fetchAvailability();
-      
-      if (bookingSuccess.value) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      try {
         await store.fetchAvailability();
+        
+        try {
+          const bookedSlots = JSON.parse(localStorage.getItem('bookedSlots') || '[]');
+          const currentDay = store.currentDay;
+          const currentMonthKey = store.currentMonthKey;
+          
+          const userBookings = bookedSlots.filter((booking: any) => 
+            booking.day === currentDay && 
+            booking.monthKey === currentMonthKey &&
+            booking.studentName === currentUserName.value
+          );
+          
+          if (userBookings.length > 0 && 
+              store.slotsByMonth[currentMonthKey] && 
+              store.slotsByMonth[currentMonthKey].slotData[currentDay]) {
+            
+            userBookings.forEach((booking: any) => {
+              const slotIndex = store.slotsByMonth[currentMonthKey].slotData[currentDay]
+                .findIndex(slot => slot.apiId === booking.slotApiId);
+              
+              if (slotIndex >= 0) {
+                store.slotsByMonth[currentMonthKey].slotData[currentDay][slotIndex].studentName = currentUserName.value;
+              }
+            });
+          }
+        } catch (e) {
+          console.error('Error processing localStorage bookings:', e);
+        }
+        
+        if (bookingSuccess.value) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          await store.fetchAvailability();
+        }
+      } catch (err) {
+        throw err;
       }
-      
-      // @ts-ignore - Restore original userId
-      userStore.userId = originalUserId;
     } else {
       await store.fetchAvailability();
     }
@@ -153,22 +178,21 @@ const createBooking = async (bookingData: any) => {
     const bookingResponse = await createBookingApi(bookingRequest);
     console.log('Booking created successfully:', bookingResponse);
 
-    // Functie pentru a actualiza availability la slotul rezervat
-    // try {
-    //   await updateAvailability({
-    //     id: selectedSlotForBooking.value.apiId,
-    //     date: selectedSlotForBooking.value.date || store.formatDateForAPI(store.selectedDate),
-    //     startTime: selectedSlotForBooking.value.startTime + ":00",
-    //     endTime: selectedSlotForBooking.value.endTime + ":00",
-    //     activeStatus: false
-    //   });
-    // } catch (availabilityErr: any) {
-    //   if (availabilityErr.response && availabilityErr.response.status === 403) {
-    //     console.log('Permission denied to update availability. This is expected for students.');
-    //   } else {
-    //     console.error('Error updating availability:', availabilityErr);
-    //   }
-    // }
+    try {
+      await updateAvailability({
+        id: selectedSlotForBooking.value.apiId,
+        date: selectedSlotForBooking.value.date || store.formatDateForAPI(store.selectedDate),
+        startTime: selectedSlotForBooking.value.startTime + ":00",
+        endTime: selectedSlotForBooking.value.endTime + ":00",
+        activeStatus: true //era false
+      });
+    } catch (availabilityErr: any) {
+      if (availabilityErr.response && availabilityErr.response.status === 403) {
+        console.log('Permission denied to update availability. This is expected for students.');
+      } else {
+        console.error('Error updating availability:', availabilityErr);
+      }
+    }
     
     const day = store.currentDay;
     const monthKey = store.currentMonthKey;
@@ -181,7 +205,7 @@ const createBooking = async (bookingData: any) => {
       if (slotIndex >= 0) {
         store.slotsByMonth[monthKey].slotData[day][slotIndex].status = 'booked';
         store.slotsByMonth[monthKey].slotData[day][slotIndex].studentName = currentUserName.value;
-        // store.slotsByMonth[monthKey].slotData[day][slotIndex].activeStatus = false;
+        store.slotsByMonth[monthKey].slotData[day][slotIndex].activeStatus = true; //false
         
         const bookingInfo = {
           slotApiId: selectedSlotForBooking.value.apiId,
@@ -322,12 +346,12 @@ const editSlot = (slot: any) => {
             <span 
               :class="[
                 'px-3 py-1 text-sm font-medium rounded-full',
-                slot.status === 'booked' ? 
+                slot.activeStatus === true ? 
                   (isViewingAsStudent && currentUserName === slot.studentName ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800') 
                   : 'bg-gray-100 text-gray-800'
               ]"
             >
-              <span v-if="slot.status === 'booked'">
+              <span v-if="slot.activeStatus === true">
                 <span v-if="isViewingAsStudent && currentUserName === slot.studentName">
                   Booked by You
                 </span>
@@ -335,14 +359,14 @@ const editSlot = (slot: any) => {
                   Reserved
                 </span>
                 <span v-else>
-                  Booked - {{ slot.studentName || 'Student' }}
+                  Booked by - {{ slot.studentName || 'Student' }}
                 </span>
               </span>
               <span v-else>Available</span>
             </span>
             
             <button 
-              v-if="isViewingAsStudent && slot.status === 'available'"
+              v-if="isViewingAsStudent && slot.activeStatus === false"
               @click="openBookingModal(slot)"
               :disabled="loading"
               class="px-4 py-1 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -352,7 +376,7 @@ const editSlot = (slot: any) => {
 
             <template v-if="!isViewingAsStudent">
               <button 
-                v-if="slot.status === 'available'"
+                v-if="slot.activeStatus === false"
                 @click="editSlot(slot)" 
                 :disabled="loading"
                 class="flex items-center justify-center w-10 h-10 text-gray-600 rounded-full hover:bg-white hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
@@ -363,7 +387,7 @@ const editSlot = (slot: any) => {
               </button>
               
               <button 
-                v-if="slot.status === 'available'"
+                v-if="slot.activeStatus === false"
                 @click="deleteSlot(slot.id)" 
                 :disabled="loading"
                 class="flex items-center justify-center w-10 h-10 text-gray-600 bg-red-100 rounded-full hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
