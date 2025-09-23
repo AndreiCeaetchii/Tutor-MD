@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router';
 import TimeSlotModal from '../../modals/TutorTimeSlotModal.vue';
 import StudentBookingModal from '../../modals/StudentBookingModal.vue';
 import { createBooking as createBookingApi } from '../../../services/studentBookings';
+// import { updateAvailability } from '../../../services/tutorAvailability';
 
 const props = defineProps<{
   date: Date;
@@ -151,6 +152,23 @@ const createBooking = async (bookingData: any) => {
     
     const bookingResponse = await createBookingApi(bookingRequest);
     console.log('Booking created successfully:', bookingResponse);
+
+    // Functie pentru a actualiza availability la slotul rezervat
+    // try {
+    //   await updateAvailability({
+    //     id: selectedSlotForBooking.value.apiId,
+    //     date: selectedSlotForBooking.value.date || store.formatDateForAPI(store.selectedDate),
+    //     startTime: selectedSlotForBooking.value.startTime + ":00",
+    //     endTime: selectedSlotForBooking.value.endTime + ":00",
+    //     activeStatus: false
+    //   });
+    // } catch (availabilityErr: any) {
+    //   if (availabilityErr.response && availabilityErr.response.status === 403) {
+    //     console.log('Permission denied to update availability. This is expected for students.');
+    //   } else {
+    //     console.error('Error updating availability:', availabilityErr);
+    //   }
+    // }
     
     const day = store.currentDay;
     const monthKey = store.currentMonthKey;
@@ -163,6 +181,7 @@ const createBooking = async (bookingData: any) => {
       if (slotIndex >= 0) {
         store.slotsByMonth[monthKey].slotData[day][slotIndex].status = 'booked';
         store.slotsByMonth[monthKey].slotData[day][slotIndex].studentName = currentUserName.value;
+        // store.slotsByMonth[monthKey].slotData[day][slotIndex].activeStatus = false;
         
         const bookingInfo = {
           slotApiId: selectedSlotForBooking.value.apiId,
