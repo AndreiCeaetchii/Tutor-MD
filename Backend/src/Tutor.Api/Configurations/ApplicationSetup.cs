@@ -100,7 +100,6 @@ public static class ApplicationSetup
         {
             Console.WriteLine("Google authentication not configured. ClientId or ClientSecret missing.");
         }
-        
         var allowedOriginsEnv = Environment.GetEnvironmentVariable("ALLOWED_ORIGINS");
         var corsPolicyNameEnv = Environment.GetEnvironmentVariable("CORS_POLICY_NAME");
 
@@ -115,11 +114,11 @@ public static class ApplicationSetup
 
         services.AddCors(options =>
         {
-            options.AddPolicy(corsPolicyName, policy =>
+            options.AddPolicy("AllowFrontend", policy =>
             {
                 if (allowedOrigins.Length > 0)
                 {
-                    policy.WithOrigins(allowedOrigins)
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
                           .AllowAnyHeader()
                           .AllowAnyMethod()
                           .AllowCredentials();
