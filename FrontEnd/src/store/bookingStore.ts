@@ -32,7 +32,6 @@ export interface TimeSlot {
   isAvailable: boolean;
 }
 
-// Helper function to convert numeric status to string
 const mapApiStatusToString = (statusCode: number): string => {
   switch (statusCode) {
     case 0: return 'Pending';
@@ -44,7 +43,7 @@ const mapApiStatusToString = (statusCode: number): string => {
 };
 
 const calculateDuration = (startTime: string, endTime: string): string => {
-  if (!startTime || !endTime) return '';
+  if (!startTime || !endTime) return 'Duration unavailable';
   
   const [startHour, startMinute] = startTime.split(':').map(Number);
   const [endHour, endMinute] = endTime.split(':').map(Number);
@@ -88,7 +87,6 @@ export const useBookingStore = defineStore('booking', {
       try {
         const apiBookings = await getStudentBookingsAPI();
         
-        // Transform API bookings to match our Booking interface
         const transformedBookings: Booking[] = apiBookings.map(booking => {
           return {
             id: booking.id,
@@ -99,7 +97,7 @@ export const useBookingStore = defineStore('booking', {
             date: booking.date,
             startTime: booking.startTime.substring(0, 5),
             endTime: booking.endTime.substring(0, 5),
-            time: booking.startTime.substring(0, 5), // Pentru compatibilitate
+            time: booking.startTime.substring(0, 5),
             duration: calculateDuration(booking.startTime.substring(0, 5), booking.endTime.substring(0, 5)),
             message: booking.description,
             tutorImage: booking.tutorPhoto,
@@ -119,7 +117,6 @@ export const useBookingStore = defineStore('booking', {
     },
     
     getAvailableTimeSlots(tutorId: number, date: string) {
-      // Keep mock implementation for now, or replace with API call if available
       this.availableTimeSlots = [
         { id: 1, startTime: "09:00", endTime: "10:00", isAvailable: true },
         { id: 2, startTime: "10:00", endTime: "11:00", isAvailable: true },
@@ -140,7 +137,6 @@ export const useBookingStore = defineStore('booking', {
       this.error = null;
       
       try {
-        // Create the API booking request
         const bookingRequest: BookingRequest = {
           tutorUserId: bookingData.tutorId,
           subjectId: bookingData.subjectId, 
@@ -149,10 +145,8 @@ export const useBookingStore = defineStore('booking', {
           status: 'Pending'
         };
         
-        // Call the API to create the booking
         const response = await createBookingAPI(bookingRequest);
         
-        // Create a booking object for the UI
         const newBooking: Booking = {
           id: response.id || Date.now(),
           studentName: "Current Student",
@@ -162,14 +156,13 @@ export const useBookingStore = defineStore('booking', {
           date: bookingData.date || "",
           startTime: bookingData.startTime || "",
           endTime: bookingData.endTime || "",
-          time: bookingData.startTime || "", // Pentru compatibilitate
+          time: bookingData.startTime || "",
           duration: calculateDuration(bookingData.startTime || "", bookingData.endTime || ""),
           message: bookingData.message || bookingData.description || "",
           tutorId: bookingData.tutorId,
           studentId: bookingData.studentId
         };
         
-        // Add to local store for immediate UI update
         this.studentBookings.unshift(newBooking);
         
         return newBooking;
@@ -187,10 +180,8 @@ export const useBookingStore = defineStore('booking', {
       this.error = null;
       
       try {
-        // Call the API to cancel the booking
         await cancelStudentBooking(bookingId);
         
-        // Update the local state
         const index = this.studentBookings.findIndex(b => b.id === bookingId);
         if (index !== -1) {
           this.studentBookings[index].status = 'Cancelled';

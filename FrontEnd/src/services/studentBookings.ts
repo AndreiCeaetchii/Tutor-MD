@@ -73,15 +73,16 @@ export const getStudentBookings = async (): Promise<StudentBooking[]> => {
   }
 };
 
-export const cancelStudentBooking = async (bookingId: number): Promise<any> => {
+export const cancelStudentBooking = async (bookingId: number) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
-    const response = await bookingAxios.put(`/students/booking/${bookingId}/cancel`, {}, {
+
+    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, {  }, {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;
