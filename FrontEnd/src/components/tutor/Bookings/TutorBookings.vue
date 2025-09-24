@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { getTutorBookings, updateBookingStatus } from '../../../services/teacherBookings';
-import NotificationMessage from '../../ui/NotificationMessage.vue';
+import { getTutorBookings, updateBookingStatus } from '../../../services/tutorBookings';
 
 const bookingStore = useBookingStore();
 const statusFilter = ref('all');
@@ -14,9 +13,8 @@ const notificationType = ref('error');
 const notificationMessage = ref('');
 
 const fetchTutorBookings = async () => {
+  loading.value = true;
   try {
-    loading.value = true;
-    
     const apiBookings = await getTutorBookings();
     
     const transformedBookings = apiBookings.map(booking => ({
@@ -41,11 +39,6 @@ const fetchTutorBookings = async () => {
     
   } catch (err) {
     console.error('Error fetching tutor bookings:', err);
-    error.value = err instanceof Error ? err.message : 'Failed to load bookings';
-    
-    notificationMessage.value = 'Failed to fetch tutor bookings';
-    notificationType.value = 'error';
-    showNotification.value = true;
   } finally {
     loading.value = false;
   }
@@ -151,10 +144,6 @@ const handleMarkComplete = async (bookingId: number) => {
   }
 };
 
-const closeNotification = () => {
-  showNotification.value = false;
-};
-
 const getStatusText = (status: string) => {
   const statusMap = {
     'pending': 'Pending',
@@ -193,15 +182,6 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
 
 <template>
   <div class="container px-4 py-6 mx-auto tutor-bookings">
-    <NotificationMessage
-      :show="showNotification"
-      :message="notificationMessage"
-      :type="notificationType"
-      :duration="5000"
-      position="top-right"
-      @close="closeNotification"
-    />
-    
     <div class="flex items-center justify-between mb-6">
       <div class="flex border-b border-gray-200">
         <button 
