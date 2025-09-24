@@ -33,6 +33,7 @@
     "vue3-google-login": "^2.0.34"
   },
   "devDependencies": {
+    "@types/chart.js": "^2.9.41",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.17",
