@@ -1,7 +1,10 @@
 using DotNetEnv;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -78,6 +81,12 @@ builder.Services.AddMediatRSetup();
 // Exception handler
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
+//Anti forgery
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN"; 
+});
+
 
 builder.Logging.ClearProviders();
 
@@ -111,21 +120,50 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+app.UseHsts();
+app.UseResponseCompression();
+app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+app.Use(async (context, next) =>
+{
+    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+
+    if (HttpMethods.IsPost(context.Request.Method) ||
+        HttpMethods.IsPut(context.Request.Method) ||
+        HttpMethods.IsDelete(context.Request.Method))
+    {
+        try
+        {
+            await antiforgery.ValidateRequestAsync(context);
+        }
+        catch (AntiforgeryValidationException)
+        {
+            var problem = Results.Problem(
+                title: "Forbidden",
+                detail: "Invalid or missing CSRF token.",
+                statusCode: StatusCodes.Status403Forbidden,
+                instance: context.Request.Path
+            );
+
+            await problem.ExecuteAsync(context);
+            return; // stop pipeline
+        }
+    }
+
+    await next();
+});
+app.UseSwaggerSetup();
+app.UseHangfireDashboard();
 app.MapUserEndpoints();
 app.MapTutorEndpoints();
 app.MapStudentEndpoints();
 app.MapAdminEndpoints();
 
-app.UseRouting();
-// app.UseAntiforgery(); 
-app.UseSwaggerSetup();
-app.UseHsts();
-app.UseHangfireDashboard(); 
-app.UseResponseCompression();
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
-app.UseAuthentication();
-app.UseAuthorization();
 
 
 await app.RunAsync();

@@ -204,8 +204,6 @@ public class TutorService : ITutorService
         var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (profile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
-        if (profile.VerificationStatus != VerificationStatus.Pending)
-            return Result<TutorProfileDto>.NotFound("Tutor profile already Verified");
         profile.VerificationStatus = VerificationStatus.Verified;
         await _tutorProfileRepository.Update(profile);
 

@@ -1,9 +1,11 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Security.Claims;
 using Tutor.Application.Features.Admin.ActivateDeactivateStatus;
@@ -35,34 +37,35 @@ public static class UserEndpoints
         var group = builder.MapGroup("api/users")
             .WithTags("users");
 
-        group.MapPost("/register", async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto, HttpContext context) =>
-            {
-                var command = new RegisterUserCommand(registerUserDto);
-                var result = await mediator.Send(command);
-                
-                if (result.IsSuccess)
+        group.MapPost("/register",
+                async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto, HttpContext context) =>
                 {
-                    var refreshToken = result.Value.RefreshToken;
-                    result.Value.RefreshToken = null;
-                    var cookieOptions = new CookieOptions
+                    var command = new RegisterUserCommand(registerUserDto);
+                    var result = await mediator.Send(command);
+
+                    if (result.IsSuccess)
                     {
-                        HttpOnly = true,
-                        Secure = true, // Only send over HTTPS
-                        SameSite = SameSiteMode.Strict,
-                        Expires = result.Value.RefreshTokenExpiryTime, // Use the expiry time from response
-                        Path = "/", // Available across the entire site
-                        IsEssential = true // Important for GDPR compliance
-                    };
-            
-                    context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-            
-                    return Results.Ok(result.Value);
-                }
-                else
-                {
-                    return Results.BadRequest(result.Errors);
-                }
-            })
+                        var refreshToken = result.Value.RefreshToken;
+                        result.Value.RefreshToken = null;
+                        var cookieOptions = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true, // Only send over HTTPS
+                            SameSite = SameSiteMode.Strict,
+                            Expires = result.Value.RefreshTokenExpiryTime, // Use the expiry time from response
+                            Path = "/", // Available across the entire site
+                            IsEssential = true // Important for GDPR compliance
+                        };
+
+                        context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+
+                        return Results.Ok(result.Value);
+                    }
+                    else
+                    {
+                        return Results.BadRequest(result.Errors);
+                    }
+                })
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterUser");
@@ -84,9 +87,9 @@ public static class UserEndpoints
                         Path = "/", // Available across the entire site
                         IsEssential = true // Important for GDPR compliance
                     };
-            
+
                     context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-            
+
                     return Results.Ok(result.Value);
                 }
                 else
@@ -122,7 +125,7 @@ public static class UserEndpoints
                     var cookieOptions = new CookieOptions
                     {
                         HttpOnly = true,
-                        Secure = true, 
+                        Secure = true,
                         SameSite = SameSiteMode.Strict,
                         Expires = newRefreshTokenExpiry,
                         Path = "/",
@@ -161,9 +164,9 @@ public static class UserEndpoints
                             Path = "/", // Available across the entire site
                             IsEssential = true // Important for GDPR compliance
                         };
-            
+
                         context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-            
+
                         return Results.Ok(result.Value);
                     }
                     else
@@ -175,7 +178,7 @@ public static class UserEndpoints
             .WithName("RegisterAuthUser");
 
         group.MapPost("/login-auth",
-                async (IMediator mediator, [FromBody] LoginUserAuthDto loginUserAuthDto,HttpContext context) =>
+                async (IMediator mediator, [FromBody] LoginUserAuthDto loginUserAuthDto, HttpContext context) =>
                 {
                     var command = new LoginOAuthUserCommand(loginUserAuthDto);
                     var result = await mediator.Send(command);
@@ -186,15 +189,15 @@ public static class UserEndpoints
                         var cookieOptions = new CookieOptions
                         {
                             HttpOnly = true,
-                            Secure = true, 
+                            Secure = true,
                             SameSite = SameSiteMode.Strict,
-                            Expires = result.Value.RefreshTokenExpiryTime, 
-                            Path = "/", 
-                            IsEssential = true 
+                            Expires = result.Value.RefreshTokenExpiryTime,
+                            Path = "/",
+                            IsEssential = true
                         };
-            
+
                         context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
-            
+
                         return Results.Ok(result.Value);
                     }
                     else
@@ -204,7 +207,7 @@ public static class UserEndpoints
                 }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginAuthUser");
-        
+
         group.MapPut("/enable-mfa",
                 async (IMediator mediator, HttpContext httpContext) =>
                 {
@@ -222,11 +225,12 @@ public static class UserEndpoints
                         : Results.BadRequest(result.Errors);
                 }).Produces<EnableMFAResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .WithName("EnableMfa");
         group.MapPut("/verify-enable-mfa",
-                async (IMediator mediator, HttpContext httpContext,[FromBody]VerifyMFACodeRequest verifyMFACodeRequest ) =>
+                async (IMediator mediator, HttpContext httpContext,
+                    [FromBody] VerifyMFACodeRequest verifyMFACodeRequest) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -234,7 +238,7 @@ public static class UserEndpoints
 
                     if (!int.TryParse(userIdClaim, out var userId))
                         return Results.BadRequest("Invalid UserId in token");
-                    var command = new VerifyMfaCommand(userId,verifyMFACodeRequest);
+                    var command = new VerifyMfaCommand(userId, verifyMFACodeRequest);
                     var result = await mediator.Send(command);
 
                     return result.IsSuccess
@@ -242,12 +246,12 @@ public static class UserEndpoints
                         : Results.BadRequest(result.Errors);
                 }).Produces<bool>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .WithName("VerifyMfa");
-        
+
         group.MapPut("/disable-mfa",
-                async (IMediator mediator, HttpContext httpContext ) =>
+                async (IMediator mediator, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -263,33 +267,37 @@ public static class UserEndpoints
                         : Results.BadRequest(result.Errors);
                 }).Produces<bool>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .WithName("DisableMfa");
-        
-        
-        
+
+
         group.MapPost("/add-photo",
                 [Authorize] async (IMediator mediator, [FromForm] IFormFile file, HttpContext httpContext) =>
                 {
+                    // Then your business logic
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
                         return Results.Unauthorized();
 
                     if (!int.TryParse(userIdClaim, out var userId))
                         return Results.BadRequest("Invalid UserId in token");
+
                     var command = new AddPhotoCommand(userId, file);
                     var result = await mediator.Send(command);
+
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
             .WithName("AddPhoto")
             .Produces<PhotoDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status401Unauthorized)
+            .Produces(StatusCodes.Status403Forbidden)
             .DisableAntiforgery();
+
         group.MapDelete("/delete-photo",
                 async (IMediator mediator, HttpContext httpContext) =>
                 {
@@ -310,27 +318,27 @@ public static class UserEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-        
-        group.MapGet("/notification/count",
-            async (IMediator mediator, HttpContext httpContext) =>
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Results.Unauthorized();
 
-                if (!int.TryParse(userIdClaim, out var userId))
-                    return Results.BadRequest("Invalid UserId in token");
-                var command = new GetNotificationCountCommand(userId);
-                var result = await mediator.Send(command);
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            })
+        group.MapGet("/notification/count",
+                async (IMediator mediator, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new GetNotificationCountCommand(userId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
             .WithName("GetNotificationCount")
             .RequireAuthorization("TutorOrStudentPolicy")
             .Produces<NotificationCountDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("/notifications",
                 async (IMediator mediator, HttpContext httpContext) =>
                 {
@@ -351,9 +359,9 @@ public static class UserEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces<NotificationsDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPut("/notification/read/{notificationId}",
-                async (IMediator mediator, HttpContext httpContext, int  notificationId) =>
+                async (IMediator mediator, HttpContext httpContext, int notificationId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -374,19 +382,19 @@ public static class UserEndpoints
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/changestatus",
-            async (IMediator mediator, [FromBody] ActivateDeactivateDto activateDeactivateDto) =>
-            {
-                var command = new ActivateDeactivateStatusCommand(activateDeactivateDto);
-                var result = await mediator.Send(command);
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            })  .WithName("ChangeIsActiveStatus")
+                async (IMediator mediator, [FromBody] ActivateDeactivateDto activateDeactivateDto) =>
+                {
+                    var command = new ActivateDeactivateStatusCommand(activateDeactivateDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("ChangeIsActiveStatus")
             .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-       
+
         group.MapPost("/admin/create",
                 async (IMediator mediator, [FromBody] UserIdDto userIdDto) =>
                 {
@@ -395,13 +403,17 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                })  .WithName("CreateAdmin")
+                }).WithName("CreateAdmin")
             .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
+        group.MapGet("/csrf-token", (IAntiforgery antiforgery, HttpContext context) =>
+        {
+            var tokens = antiforgery.GetAndStoreTokens(context);
+            return Results.Ok(new { csrfToken = tokens.RequestToken });
+        }).WithName("GetCsrfToken");
 
-        
 
         var healthGroup = builder.MapGroup("health")
             .WithTags("health");
