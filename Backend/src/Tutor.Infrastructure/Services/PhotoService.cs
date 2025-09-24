@@ -25,9 +25,7 @@ public class PhotoService : IPhotoService
         IGenericRepository<User, int> userRepository, IMapper mapper)
     {
         var account = new Account(config.Value.CloudName, config.Value.ApiKey, config.Value.ApiSecret);
-    
-        Console.WriteLine(config.Value.CloudName);
-
+        
         _cloudinary = new Cloudinary(account);
         _photoRepository = photoRepository;
         _userRepository = userRepository;

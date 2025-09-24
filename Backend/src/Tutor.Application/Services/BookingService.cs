@@ -130,6 +130,7 @@ public class BookingService : IBookingService
             StudentUserId = booking.StudentUserId,
             StudentName = $"{student?.FirstName} {student?.LastName}",
             Price = price,
+            SubjectName = tutorSubject.Subject.Name,
             StartTime = booking.TutorAvailabilityRule.StartTime,
             EndTime = booking.TutorAvailabilityRule.EndTime,
             Date = booking.TutorAvailabilityRule.Date,

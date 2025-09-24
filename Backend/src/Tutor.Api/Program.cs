@@ -2,14 +2,15 @@ using DotNetEnv;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Tutor.Api.Configurations;
+using Tutor.Api.Endpoints;
 using System;
 using System.Threading;
 using Tutor.Api.Common;
-using Tutor.Api.Configurations;
-using Tutor.Api.Endpoints;
 using Tutor.Api.Filters.Guards;
 using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
@@ -95,12 +96,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync();
     await SubjectSeeder.SeedAsync(context);
     await RoleSeeder.SeedAsync(context);
     var scheduler = scope.ServiceProvider.GetRequiredService<JobSchedulerService>();
     await scheduler.StartAsync(CancellationToken.None);
 }
-
 
 // Configure the HTTP request pipeline.
 app.UseResponseCompression();
@@ -113,6 +114,7 @@ if (app.Environment.IsDevelopment())
 app.MapUserEndpoints();
 app.MapTutorEndpoints();
 app.MapStudentEndpoints();
+app.MapAdminEndpoints();
 
 app.UseRouting();
 // app.UseAntiforgery(); 

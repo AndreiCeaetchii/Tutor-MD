@@ -12,6 +12,7 @@ public class BookingDto
     public string StudentName { get; set; }
     public decimal Price { get; set; }
     
+    public string SubjectName {  get; set; }
     public DateOnly Date { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }
