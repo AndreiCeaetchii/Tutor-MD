@@ -43,9 +43,9 @@
 
   const cities = computed(() => {
     if (form.value.createProfileDto.country === 'Romania') {
-      return ['Bucharest', 'Cluj-Napoca', 'Iași'];
+      return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
     } else if (form.value.createProfileDto.country === 'Moldova') {
-      return ['Chișinău', 'Bălți', 'Tiraspol'];
+      return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Orhei'];
     }
     return [];
   });
@@ -72,15 +72,14 @@
     };
 
     try {
-      const response = await createStudentProfile(payload);
-      console.log('Profil de student creat cu succes:', response);
+      await createStudentProfile(payload);
 
       studentProfileStore.updateGradeAndClass(form.value.grade, form.value.class);
       studentProfileStore.updateUserProfile(payload.createProfileDto);
 
       router.push('/student-dashboard');
     } catch (error) {
-      console.error('Eroare la crearea profilului de student:', error);
+      console.error('Error creating student profile:', error);
     }
   };
 </script>

@@ -8,7 +8,6 @@
 
   onMounted(() => {
     tutorStore.fetchTutors();
-    console.log('TutorList component mounted, fetching tutors...', tutorStore.paginatedTutors);
   });
 
   const handleTutorSaveChange = (tutorId: number, isSaved: boolean) => {

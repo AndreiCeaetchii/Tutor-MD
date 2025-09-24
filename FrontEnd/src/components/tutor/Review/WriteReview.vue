@@ -34,13 +34,12 @@
 
       await createReview(reviewData);
 
-      console.log('Recenzia a fost trimisă cu succes!');
       closeModal();
       rating.value = 0;
       reviewText.value = '';
     } catch (error) {
-      console.error('Eroare la trimiterea recenziei:', error);
-      alert('A apărut o eroare la trimiterea recenziei. Vă rugăm să încercați din nou.');
+      console.error('Error creating review:', error);
+      alert('An error occurred while creating the review. Please try again.');
     } finally {
       isLoading.value = false;
     }

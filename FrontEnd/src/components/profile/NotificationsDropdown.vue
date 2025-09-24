@@ -4,7 +4,7 @@
       <Bell class="w-5 h-5 text-gray-600 transition-colors hover:text-gray-900" />
       <span
         v-if="unreadCount > 0"
-        class="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2"
+        class="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"
         >{{ unreadCount }}</span
       >
     </button>
@@ -19,9 +19,9 @@
       <div
         v-if="showNotificationsMenu"
         ref="notificationsMenu"
-        class="absolute right-0 z-50 w-80 py-2 mt-2 bg-white shadow-2xl rounded-xl"
+        class="absolute right-0 z-50 py-2 mt-2 bg-white shadow-2xl w-80 rounded-xl"
       >
-        <div class="flex justify-between items-center px-4 py-2 border-b border-gray-100">
+        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
           <p class="text-sm font-semibold text-gray-900">Notificări ({{ notifications.length }})</p>
           <button
             @click="markAllAsRead"
@@ -32,11 +32,11 @@
           </button>
         </div>
 
-        <div v-if="isLoading" class="px-4 py-2 text-center text-sm text-gray-500">
+        <div v-if="isLoading" class="px-4 py-2 text-sm text-center text-gray-500">
           Se încarcă notificările...
         </div>
 
-        <div v-else-if="notifications.length > 0" class="py-1 max-h-96 overflow-y-auto">
+        <div v-else-if="notifications.length > 0" class="py-1 overflow-y-auto max-h-96">
           <a
             v-for="notification in notifications"
             :key="notification.id"
@@ -56,16 +56,16 @@
               <div class="flex-1">
                 <p
                   :class="{ 'font-semibold text-gray-900': notification.status === 0 }"
-                  class="font-normal flex items-center gap-2 transition-colors duration-200 group-hover:text-violet-600"
+                  class="flex items-center gap-2 font-normal transition-colors duration-200 group-hover:text-violet-600"
                 >
                   {{ getNotificationTitle(notification) }}
                   <span
                     v-if="notification.status === 0"
-                    class="h-2 w-2 bg-red-500 rounded-full"
+                    class="w-2 h-2 bg-red-500 rounded-full"
                   ></span>
                 </p>
                 <p
-                  class="text-xs text-gray-500 mt-1 transition-colors duration-200 group-hover:text-violet-600"
+                  class="mt-1 text-xs text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                 >
                   {{ parseNotificationPayload(notification.payload) }}
                 </p>
@@ -73,7 +73,7 @@
             </div>
           </a>
         </div>
-        <div v-else class="px-4 py-2 text-center text-sm text-gray-500">
+        <div v-else class="px-4 py-2 text-sm text-center text-gray-500">
           Nu ai nicio notificare nouă.
         </div>
       </div>
@@ -145,7 +145,7 @@
         await markNotificationAsRead(id);
         notification.status = 1;
       } catch (error) {
-        console.error('Eroare la marcarea notificării ca citită:', error);
+        console.error('Error marking notification as read:', error);
       }
     }
   }
@@ -172,7 +172,7 @@
       const response = await getUserNotifications();
       notifications.value = response.notifications;
     } catch (error) {
-      console.error('Eroare la preluarea notificărilor:', error);
+      console.error('Error fetching notifications:', error);
     } finally {
       isLoading.value = false;
     }
@@ -180,7 +180,6 @@
 
   onMounted(() => {
     document.addEventListener('click', handleClickOutside);
-    // Încărcăm notificările la montarea inițială
     if (userStore.accessToken) {
       fetchNotifications();
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto rounded-2xl bg-white shadow-lg p-6">
+  <div class="max-w-6xl p-6 mx-auto bg-white shadow-lg rounded-2xl">
     <template v-if="profileStore.isEditing">
       <ProfileHeaderEdit :editedProfile="editedProfile" @save-profile="saveChanges" />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
@@ -89,7 +89,7 @@
       };
       profileStore.setProfileDetails(profileData);
     } catch (error) {
-      console.error('Eroare la preluarea profilului:', error);
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -140,7 +140,6 @@
           });
           subject.isNew = false;
         } else if (subject.isModified) {
-          console.log(subject);
           await updateSubject({
             subjectId: subject.subjectId ?? 0,
             subjectName: subject.name,
@@ -158,7 +157,7 @@
       });
       profileStore.toggleEditing();
     } catch (error) {
-      console.error('Eroare la salvarea modificărilor profilului:', error);
+      console.error('Error saving profile changes:', error);
     }
   };
 </script>

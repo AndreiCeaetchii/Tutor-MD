@@ -38,7 +38,6 @@ const fetchTutorBookings = async () => {
     }));
     
     bookingStore.bookings = transformedBookings;
-    console.log('Tutor bookings loaded:', bookingStore.bookings.length);
     
   } catch (err) {
     console.error('Error fetching tutor bookings:', err);

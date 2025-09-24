@@ -73,29 +73,29 @@
   <div v-if="!isMobile" class="overflow-x-auto">
     <table class="min-w-full bg-white rounded-lg shadow-md">
       <thead>
-        <tr class="w-full bg-gray-50 text-left text-gray-500 uppercase text-sm leading-normal">
-          <th class="py-3 px-6">User</th>
-          <th class="py-3 px-6">Type</th>
-          <th class="py-3 px-6">Status</th>
-          <th class="py-3 px-6">Join Date</th>
-          <th class="py-3 px-6">Reviews</th>
-          <th class="py-3 px-6 text-center">Actions</th>
+        <tr class="w-full text-sm leading-normal text-left text-gray-500 uppercase bg-gray-50">
+          <th class="px-6 py-3">User</th>
+          <th class="px-6 py-3">Type</th>
+          <th class="px-6 py-3">Status</th>
+          <th class="px-6 py-3">Join Date</th>
+          <th class="px-6 py-3">Reviews</th>
+          <th class="px-6 py-3 text-center">Actions</th>
         </tr>
       </thead>
-      <tbody class="text-gray-600 text-sm font-light">
+      <tbody class="text-sm font-light text-gray-600">
         <tr v-for="user in users" :key="user.id" class="border-b border-gray-200 hover:bg-gray-100">
-          <td class="py-3 px-6 text-left whitespace-nowrap">
+          <td class="px-6 py-3 text-left whitespace-nowrap">
             <div class="flex items-center">
               <div class="mr-3">
                 <img :src="DefaultImg" alt="Profile" class="w-10 h-10 rounded-full" />
               </div>
               <div>
                 <p class="font-medium">{{ user.name }}</p>
-                <p class="text-gray-500 text-xs">{{ user.email }}</p>
+                <p class="text-xs text-gray-500">{{ user.email }}</p>
               </div>
             </div>
           </td>
-          <td class="py-3 px-6 text-left">
+          <td class="px-6 py-3 text-left">
             <span class="flex items-center">
               <span class="mr-2">
                 <font-awesome-icon
@@ -110,7 +110,7 @@
               {{ user.type }}
             </span>
           </td>
-          <td class="py-3 px-6 text-left">
+          <td class="px-6 py-3 text-left">
             <span
               :class="[
                 'py-1 px-3 rounded-full text-xs font-semibold',
@@ -120,10 +120,10 @@
               {{ user.status }}
             </span>
           </td>
-          <td class="py-3 px-6 text-left">{{ user.joinDate }}</td>
-          <td class="py-3 px-6 text-left">{{ user.bookings }}</td>
-          <td class="py-3 px-6 text-center">
-            <div class="flex item-center justify-center space-x-2">
+          <td class="px-6 py-3 text-left">{{ user.joinDate }}</td>
+          <td class="px-6 py-3 text-left">{{ user.bookings }}</td>
+          <td class="px-6 py-3 text-center">
+            <div class="flex justify-center space-x-2 item-center">
               <button
                 @click="emit('view', user)"
                 class="w-6 h-6 transform hover:text-purple-500 hover:scale-110"
@@ -143,7 +143,7 @@
                   />
                 </button>
                 <span
-                  class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-black text-white text-xs rounded py-1 px-2 pointer-events-none whitespace-nowrap"
+                  class="absolute px-2 py-1 mb-2 text-xs text-white transition-transform duration-200 transform scale-0 -translate-x-1/2 bg-black rounded pointer-events-none bottom-full left-1/2 group-hover:scale-100 whitespace-nowrap"
                 >
                   {{ user.status === 'Active' ? 'Restrict access' : 'Accept profile' }}
                 </span>
@@ -165,28 +165,28 @@
     <div
       v-for="user in users"
       :key="user.id"
-      class="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
+      class="flex flex-col items-start justify-between p-4 bg-white rounded-lg shadow-md sm:flex-row sm:items-center"
     >
       <div class="flex items-center mb-4 sm:mb-0">
-        <img :src="DefaultImg" alt="Profile" class="w-10 h-10 rounded-full mr-4" />
+        <img :src="DefaultImg" alt="Profile" class="w-10 h-10 mr-4 rounded-full" />
         <div>
-          <h3 class="font-bold text-lg">{{ user.name }}</h3>
+          <h3 class="text-lg font-bold">{{ user.name }}</h3>
           <p class="text-sm text-gray-500">{{ user.email }}</p>
         </div>
       </div>
       <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-        <div class="flex flex-col text-sm text-gray-700 mb-2 sm:mb-0">
+        <div class="flex flex-col mb-2 text-sm text-gray-700 sm:mb-0">
           <p><span class="font-semibold">Type:</span> {{ user.type }}</p>
           <p><span class="font-semibold">Join Date:</span> {{ user.joinDate }}</p>
           <p><span class="font-semibold">Bookings:</span> {{ user.bookings }}</p>
         </div>
-        <div class="flex flex-col items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <div class="flex flex-col items-start space-y-2 sm:items-center sm:space-y-0 sm:space-x-2">
           <span
             :class="['py-1 px-3 rounded-full text-xs font-semibold', getStatusClasses(user.status)]"
           >
             {{ user.status }}
           </span>
-          <div class="flex space-x-2 mt-2 sm:mt-0">
+          <div class="flex mt-2 space-x-2 sm:mt-0">
             <button
               @click="emit('view', user)"
               class="w-6 h-6 transform hover:text-purple-500 hover:scale-110"
@@ -206,7 +206,7 @@
                 />
               </button>
               <span
-                class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 transform scale-0 group-hover:scale-100 transition-transform duration-200 bg-black text-white text-xs rounded py-1 px-2 pointer-events-none whitespace-nowrap"
+                class="absolute px-2 py-1 mb-2 text-xs text-white transition-transform duration-200 transform scale-0 -translate-x-1/2 bg-black rounded pointer-events-none bottom-full left-1/2 group-hover:scale-100 whitespace-nowrap"
               >
                 {{ user.status === 'Active' ? 'Restrict access' : 'Accept profile' }}
               </span>

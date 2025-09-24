@@ -175,8 +175,7 @@ const createBooking = async (bookingData: any) => {
       status: 'Pending'
     };
     
-    const bookingResponse = await createBookingApi(bookingRequest);
-    console.log('Booking created successfully:', bookingResponse);
+    await createBookingApi(bookingRequest);
 
     try {
       await updateAvailability({
@@ -188,7 +187,6 @@ const createBooking = async (bookingData: any) => {
       });
     } catch (availabilityErr: any) {
       if (availabilityErr.response && availabilityErr.response.status === 403) {
-        console.log('Permission denied to update availability. This is expected for students.');
       } else {
         console.error('Error updating availability:', availabilityErr);
       }
