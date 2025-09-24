@@ -140,7 +140,6 @@
           });
           subject.isNew = false;
         } else if (subject.isModified) {
-          console.log(subject);
           await updateSubject({
             subjectId: subject.subjectId ?? 0,
             subjectName: subject.name,

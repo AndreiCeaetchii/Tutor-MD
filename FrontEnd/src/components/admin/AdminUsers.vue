@@ -1,100 +1,190 @@
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, computed } from 'vue';
-  import AdminUserTable from './AdminUserTable.vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { getTutors } from '../../services/tutorService.ts';
-  import {
-    faUsers,
-    faUserCheck,
-    faUserClock,
-    faUserTimes,
-  } from '@fortawesome/free-solid-svg-icons';
+import { ref, computed, onMounted } from 'vue';
+import AdminUserTable from './AdminUserTable.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { useRouter } from 'vue-router';
+import {
+  getTutorsForAdmin,
+  approveTutor,
+  declineTutor,
+  changeUserStatus,
+  getAllStudents,
+} from '../../services/adminService.ts';
+import {
+  faUsers,
+  faUserCheck,
+  faUserClock,
+  faUserTimes,
+  faSort,
+  faSortUp,
+  faSortDown,
+} from '@fortawesome/free-solid-svg-icons';
 
-  library.add(faUsers, faUserCheck, faUserClock, faUserTimes);
+library.add(faUsers, faUserCheck, faUserClock, faUserTimes, faSort, faSortUp, faSortDown);
 
-  interface User {
-    id: number;
-    name: string;
-    email: string;
-    type: string;
-    status: string;
-    joinDate: string;
-    bookings: number;
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  type: string;
+  status: string;
+  joinDate: string;
+  bookings: number;
+  isActive: boolean;
+}
+
+const users = ref<User[]>([]);
+const sortBy = ref<string>('joinDate');
+const sortDirection = ref<string>('desc');
+const router = useRouter();
+
+const fetchAllUsers = async () => {
+  try {
+    const [tutorsResponse, studentsResponse] = await Promise.all([
+      getTutorsForAdmin(),
+      getAllStudents(),
+    ]);
+
+    const tutorUsers = tutorsResponse.map((tutor: any) => {
+      const fullName = `${tutor.userProfile.firstName.trim()} ${tutor.userProfile.lastName.trim()}`;
+      let status = 'Pending';
+      if (tutor.verificationStatus === 'Verified') {
+        status = 'Active';
+      } else if (tutor.verificationStatus === 'Suspended') {
+        status = 'Suspended';
+      }
+
+      return {
+        id: tutor.userId,
+        name: fullName,
+        email: tutor.userProfile.email,
+        type: 'Tutor',
+        status,
+        joinDate: tutor.userProfile.birthdate || new Date().toISOString(),
+        bookings: tutor.reviewCount || 0,
+        isActive: tutor.userProfile.isActive,
+      };
+    });
+
+    const studentUsers = studentsResponse.map((student: any) => {
+      const fullName = `${student.userProfile.firstName.trim()} ${student.userProfile.lastName.trim()}`;
+
+      let status = 'Active';
+
+      return {
+        id: student.userId,
+        name: fullName,
+        email: student.userProfile.email,
+        type: 'Student',
+        status,
+        joinDate: student.userProfile.birthdate || new Date().toISOString(),
+        bookings: 0,
+        isActive: student.userProfile.isActive,
+      };
+    });
+
+    users.value = [...tutorUsers, ...studentUsers];
+
+  } catch (error) {
+    console.error('Error loading all users:', error);
+  }
+};
+
+onMounted(() => {
+  fetchAllUsers();
+});
+
+const handleSort = (column: string) => {
+  if (sortBy.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortBy.value = column;
+    sortDirection.value = 'asc';
+  }
+};
+
+const totalUsers = computed(() => users.value.length);
+const activeUsers = computed(() => users.value.filter((u) => u.isActive).length);
+const pendingUsers = computed(() => users.value.filter((u) => u.type === 'Tutor' && u.status === 'Pending').length);
+const suspendedUsers = computed(() => users.value.filter((u) => u.status === 'Suspended' || u.status === 'Deactivated').length);
+
+const sortedAndFilteredUsers = computed(() => {
+  const sorted = [...users.value].sort((a, b) => {
+    let aValue = a[sortBy.value as keyof User];
+    let bValue = b[sortBy.value as keyof User];
+
+    if (sortBy.value === 'joinDate') {
+      aValue = new Date(aValue).getTime() as any;
+      bValue = new Date(bValue).getTime() as any;
+    }
+
+    if (aValue < bValue) return sortDirection.value === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+  return sorted;
+});
+
+const onView = (user: User) => router.push(`/tutor/${user.id}/profile`);
+
+const onDecline = async (user: User) => {
+  try {
+    if (user.type === 'Tutor') {
+      await declineTutor(user.id);
+      console.log(`Tutor ${user.name} has been declined.`);
+    } else {
+      await changeUserStatus(user.id, false);
+      console.log(`Student ${user.name} has been deactivated.`);
+    }
+    await fetchAllUsers();
+  } catch (error) {
+    console.error(`Failed to decline/deactivate user ${user.name}:`, error);
+  }
+};
+
+const onApprove = async (user: User) => {
+  if (user.type === 'Student') {
+    console.log('Action not available for students.');
+    return;
   }
 
-  const users = ref<User[]>([]);
-  const isMobile = ref(window.innerWidth < 768);
-
-  // Fetch tutors from the API and map them to the User interface
-  const fetchTutors = async () => {
-    try {
-      const response = await getTutors();
-
-      users.value = response.map((tutor: any) => {
-        const fullName = `${tutor.userProfile.firstName.trim()} ${tutor.userProfile.lastName.trim()}`;
-
-        // Determine status based on verificationStatus
-        let status = 'Pending';
-        if (tutor.verificationStatus === 'Verified') {
-          status = 'Active';
-        } else if (tutor.verificationStatus === 'Suspended') {
-          status = 'Suspended';
-        }
-
-        return {
-          id: tutor.userId,
-          name: fullName,
-          email: tutor.userProfile.email,
-          type: 'Tutor',
-          status,
-          joinDate: tutor.userProfile.birthdate || new Date().toISOString(),
-          bookings: tutor.reviewCount || 0,
-        };
-      });
-    } catch (error) {
-      console.error('Error loading tutors:', error);
+  try {
+    if (user.type === 'Tutor') {
+      await approveTutor(user.id);
+      console.log(`Tutor ${user.name} has been approved.`);
     }
-  };
+    await fetchAllUsers();
+  } catch (error) {
+    console.error(`Failed to approve user ${user.name}:`, error);
+  }
+};
 
-  // Handle screen resize for mobile detection
-  const handleResize = () => {
-    isMobile.value = window.innerWidth < 768;
-  };
+const onActivate = async (user: User) => {
+  try {
+    await changeUserStatus(user.id, true);
+    console.log(`User ${user.name} has been activated.`);
+    await fetchAllUsers();
+  } catch (error) {
+    console.error(`Failed to activate user ${user.name}:`, error);
+  }
+};
 
-  onMounted(() => {
-    window.addEventListener('resize', handleResize);
-    fetchTutors();
-  });
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', handleResize);
-  });
-
-  const totalUsers = computed(() => users.value.length);
-  const activeUsers = computed(() => users.value.filter((u) => u.status === 'Active').length);
-  const pendingUsers = computed(() => users.value.filter((u) => u.status === 'Pending').length);
-  const suspendedUsers = computed(() => users.value.filter((u) => u.status === 'Suspended').length);
-
-  const sortedUsers = computed(() =>
-    [...users.value].sort(
-      (a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime(),
-    ),
-  );
-
-  // Action handlers
-  const onView = (user: User) => console.log(`View user: ${user.name}`);
-  const onEdit = (user: User) => console.log(`Edit user: ${user.name}`);
-  const onDelete = (user: User) => console.log(`Delete user: ${user.name}`);
-  const onActivate = (user: User) => console.log(`Activate user: ${user.name}`);
-  const onDeactivate = (user: User) => console.log(`Deactivate user: ${user.name}`);
+const onDeactivate = async (user: User) => {
+  try {
+    await changeUserStatus(user.id, false);
+    console.log(`User ${user.name} has been deactivated.`);
+    await fetchAllUsers();
+  } catch (error) {
+    console.error(`Failed to deactivate user ${user.name}:`, error);
+  }
+};
 </script>
 
 <template>
   <div class="p-6">
     <h1 class="text-2xl font-bold mb-6">User Management</h1>
 
-    <!-- Stats cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
         <div>
@@ -119,23 +209,27 @@
       </div>
       <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
         <div>
-          <p class="text-gray-500 uppercase text-xs font-bold">Suspended</p>
+          <p class="text-gray-500 uppercase text-xs font-bold">Suspended/Deactivated</p>
           <h3 class="text-3xl font-bold text-red-600">{{ suspendedUsers }}</h3>
         </div>
         <font-awesome-icon icon="fa-solid fa-user-times" class="text-4xl text-red-600" />
       </div>
     </div>
 
-    <!-- User table -->
-    <div v-if="!isMobile" class="bg-white p-6 rounded-lg shadow-md">
-      <AdminUserTable
-        :users="sortedUsers"
-        @view="onView"
-        @edit="onEdit"
-        @delete="onDelete"
-        @activate="onActivate"
-        @deactivate="onDeactivate"
-      />
+    <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
+      <div class="min-w-full md:min-w-[800px]">
+        <AdminUserTable
+          :users="sortedAndFilteredUsers"
+          :sort-by="sortBy"
+          :sort-direction="sortDirection"
+          @sort="handleSort"
+          @view="onView"
+          @deactivate="onDecline"
+          @activate="onApprove"
+          @suspend="onDeactivate"
+          @restore="onActivate"
+        />
+      </div>
     </div>
   </div>
 </template>

@@ -36,7 +36,6 @@ export function useAuth() {
 
   const store = useUserStore();
 
-  // --- Centralized API base ---
   const API_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
     (window as any)?.VITE_API_BASE_URL ||

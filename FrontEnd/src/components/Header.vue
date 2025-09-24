@@ -292,8 +292,10 @@
   const userName = computed(() => {
     if (userRole.value === 'student') {
       return studentProfileStore.userProfile?.username || '';
-    } else {
+    } else if (userRole.value === 'tutor'){
       return profileStore.userName || '';
+    } else {
+      return '';
     }
   });
 
