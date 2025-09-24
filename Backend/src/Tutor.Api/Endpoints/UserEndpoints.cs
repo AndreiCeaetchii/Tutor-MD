@@ -21,6 +21,7 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Features.Users.EnableMfa;
 using Tutor.Application.Features.Users.LoginOAuthUser;
 using Tutor.Application.Features.Users.LoginUser;
+using Tutor.Application.Features.Users.RefreshToken;
 using Tutor.Application.Features.Users.RegisterOAuthUser;
 using Tutor.Application.Features.Users.RegisterUser;
 using Tutor.Application.Features.Users.VerifyMFA;
@@ -34,53 +35,172 @@ public static class UserEndpoints
         var group = builder.MapGroup("api/users")
             .WithTags("users");
 
-        group.MapPost("/register", async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto) =>
+        group.MapPost("/register", async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto, HttpContext context) =>
             {
                 var command = new RegisterUserCommand(registerUserDto);
                 var result = await mediator.Send(command);
-
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
+                
+                if (result.IsSuccess)
+                {
+                    var refreshToken = result.Value.RefreshToken;
+                    result.Value.RefreshToken = null;
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // Only send over HTTPS
+                        SameSite = SameSiteMode.Strict,
+                        Expires = result.Value.RefreshTokenExpiryTime, // Use the expiry time from response
+                        Path = "/", // Available across the entire site
+                        IsEssential = true // Important for GDPR compliance
+                    };
+            
+                    context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            
+                    return Results.Ok(result.Value);
+                }
+                else
+                {
+                    return Results.BadRequest(result.Errors);
+                }
             })
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterUser");
 
-        group.MapPost("/login", async (IMediator mediator, [FromBody] LoginUserDto loginUserDto) =>
+        group.MapPost("/login", async (IMediator mediator, [FromBody] LoginUserDto loginUserDto, HttpContext context) =>
             {
                 var command = new LoginUserCommand(loginUserDto);
                 var result = await mediator.Send(command);
-
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
+                if (result.IsSuccess)
+                {
+                    var refreshToken = result.Value.RefreshToken;
+                    result.Value.RefreshToken = null;
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, // Only send over HTTPS
+                        SameSite = SameSiteMode.Strict,
+                        Expires = result.Value.RefreshTokenExpiryTime, // Use the expiry time from response
+                        Path = "/", // Available across the entire site
+                        IsEssential = true // Important for GDPR compliance
+                    };
+            
+                    context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            
+                    return Results.Ok(result.Value);
+                }
+                else
+                {
+                    return Results.BadRequest(result.Errors);
+                }
             }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginUser");
+        group.MapPut("/refresh", async (IMediator mediator, HttpContext context) =>
+            {
+                var refreshToken = context.Request.Cookies["refreshToken"];
+                var authHeader = context.Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("bearer "))
+                {
+                    return Results.BadRequest("Valid Authorization header with Bearer token is required");
+                }
+
+                var accessToken = authHeader.Substring("Bearer ".Length).Trim();
+                if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                {
+                    return Results.BadRequest("Access token and refresh token are required");
+                }
+
+                var command = new RefreshTokenCommand(accessToken, refreshToken);
+                var result = await mediator.Send(command);
+
+                if (result.IsSuccess)
+                {
+                    var newRefreshToken = result.Value.RefreshToken;
+                    var newRefreshTokenExpiry = result.Value.RefreshTokenExpiryTime;
+                    result.Value.RefreshToken = null;
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true, 
+                        SameSite = SameSiteMode.Strict,
+                        Expires = newRefreshTokenExpiry,
+                        Path = "/",
+                        IsEssential = true
+                    };
+                    context.Response.Cookies.Append("refreshToken", newRefreshToken, cookieOptions);
+
+                    return Results.Ok(result.Value);
+                }
+                else
+                {
+                    context.Response.Cookies.Delete("refreshToken");
+                    return Results.BadRequest(result.Errors);
+                }
+            }).Produces<TokenResponseDto>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithName("RefreshUser");
+
 
         group.MapPost("/register-auth",
-                async (IMediator mediator, [FromBody] RegisterUserAuthDto registerUserAuthDto) =>
+                async (IMediator mediator, [FromBody] RegisterUserAuthDto registerUserAuthDto, HttpContext context) =>
                 {
                     var command = new RegisterUserWithOAuthCommand(registerUserAuthDto);
                     var result = await mediator.Send(command);
 
-                    return result.IsSuccess
-                        ? Results.Ok(result.Value)
-                        : Results.BadRequest(result.Errors);
+                    if (result.IsSuccess)
+                    {
+                        var refreshToken = result.Value.RefreshToken;
+                        result.Value.RefreshToken = null;
+                        var cookieOptions = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true, // Only send over HTTPS
+                            SameSite = SameSiteMode.Strict,
+                            Expires = result.Value.RefreshTokenExpiryTime, // Use the expiry time from response
+                            Path = "/", // Available across the entire site
+                            IsEssential = true // Important for GDPR compliance
+                        };
+            
+                        context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            
+                        return Results.Ok(result.Value);
+                    }
+                    else
+                    {
+                        return Results.BadRequest(result.Errors);
+                    }
                 }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterAuthUser");
 
         group.MapPost("/login-auth",
-                async (IMediator mediator, [FromBody] LoginUserAuthDto loginUserAuthDto) =>
+                async (IMediator mediator, [FromBody] LoginUserAuthDto loginUserAuthDto,HttpContext context) =>
                 {
                     var command = new LoginOAuthUserCommand(loginUserAuthDto);
                     var result = await mediator.Send(command);
-
-                    return result.IsSuccess
-                        ? Results.Ok(result.Value)
-                        : Results.BadRequest(result.Errors);
+                    if (result.IsSuccess)
+                    {
+                        var refreshToken = result.Value.RefreshToken;
+                        result.Value.RefreshToken = null;
+                        var cookieOptions = new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Secure = true, 
+                            SameSite = SameSiteMode.Strict,
+                            Expires = result.Value.RefreshTokenExpiryTime, 
+                            Path = "/", 
+                            IsEssential = true 
+                        };
+            
+                        context.Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+            
+                        return Results.Ok(result.Value);
+                    }
+                    else
+                    {
+                        return Results.BadRequest(result.Errors);
+                    }
                 }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginAuthUser");

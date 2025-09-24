@@ -11,4 +11,5 @@ public interface IAuthService
     Task<Result<EnableMFAResponse>> EnableMFAAsync(int userId);
     Task<bool> VerifyMFAAsync(int userId, string code);
     Task<bool> DisableMFAAsync(int userId);
+    Task<Result<TokenResponseDto>> RefreshTokenAsync(string accessToken, string refreshToken);
 }
