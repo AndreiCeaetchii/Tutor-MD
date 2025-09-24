@@ -13,6 +13,9 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="CloudinaryDotNet" />
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+    <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="Google.Apis.Auth.AspNetCore" />
+    <PackageReference Include="Google.Apis.Calendar.v3" />
     <PackageReference Include="Hangfire" />
     <PackageReference Include="Hangfire.MemoryStorage" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" />

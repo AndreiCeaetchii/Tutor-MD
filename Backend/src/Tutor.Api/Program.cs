@@ -129,34 +129,34 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.Use(async (context, next) =>
-{
-    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
-
-    if (HttpMethods.IsPost(context.Request.Method) ||
-        HttpMethods.IsPut(context.Request.Method) ||
-        HttpMethods.IsDelete(context.Request.Method))
-    {
-        try
-        {
-            await antiforgery.ValidateRequestAsync(context);
-        }
-        catch (AntiforgeryValidationException)
-        {
-            var problem = Results.Problem(
-                title: "Forbidden",
-                detail: "Invalid or missing CSRF token.",
-                statusCode: StatusCodes.Status403Forbidden,
-                instance: context.Request.Path
-            );
-
-            await problem.ExecuteAsync(context);
-            return; // stop pipeline
-        }
-    }
-
-    await next();
-});
+// app.Use(async (context, next) =>
+// {
+//     var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+//
+//     if (HttpMethods.IsPost(context.Request.Method) ||
+//         HttpMethods.IsPut(context.Request.Method) ||
+//         HttpMethods.IsDelete(context.Request.Method))
+//     {
+//         try
+//         {
+//             await antiforgery.ValidateRequestAsync(context);
+//         }
+//         catch (AntiforgeryValidationException)
+//         {
+//             var problem = Results.Problem(
+//                 title: "Forbidden",
+//                 detail: "Invalid or missing CSRF token.",
+//                 statusCode: StatusCodes.Status403Forbidden,
+//                 instance: context.Request.Path
+//             );
+//
+//             await problem.ExecuteAsync(context);
+//             return; // stop pipeline
+//         }
+//     }
+//
+//     await next();
+// });
 app.UseSwaggerSetup();
 app.UseHangfireDashboard();
 app.MapUserEndpoints();
