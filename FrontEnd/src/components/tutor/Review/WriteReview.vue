@@ -1,11 +1,17 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { createReview } from '../../../services/reviewService.ts';
+  import NotificationMessage from '../../ui/NotificationMessage.vue';
 
   const isModalOpen = ref(false);
   const rating = ref(0);
   const reviewText = ref('');
   const isLoading = ref(false);
+  
+  // Notification state
+  const showNotification = ref(false);
+  const notificationMessage = ref('');
+  const notificationType = ref('error');
 
   // Aici trebuie ID-ul real al rezervării.
   const bookingId = 1;
@@ -18,9 +24,15 @@
     rating.value = star;
   };
 
+  const closeNotification = () => {
+    showNotification.value = false;
+  };
+
   const handleSubmit = async () => {
     if (rating.value === 0 || reviewText.value.trim() === '') {
-      alert('Vă rugăm să oferiți o notă și să scrieți o recenzie.');
+      notificationMessage.value = 'Please provide a rating and review text.';
+      notificationType.value = 'warning';
+      showNotification.value = true;
       return;
     }
 
@@ -37,9 +49,15 @@
       closeModal();
       rating.value = 0;
       reviewText.value = '';
+      
+      notificationMessage.value = 'Review submitted successfully!';
+      notificationType.value = 'success';
+      showNotification.value = true;
     } catch (error) {
       console.error('Error creating review:', error);
-      alert('An error occurred while creating the review. Please try again.');
+      notificationMessage.value = 'An error occurred while creating the review. Please try again.';
+      notificationType.value = 'error';
+      showNotification.value = true;
     } finally {
       isLoading.value = false;
     }
@@ -121,5 +139,15 @@
         </div>
       </div>
     </div>
+
+    <NotificationMessage
+      :show="showNotification"
+      :message="notificationMessage"
+      :type="notificationType"
+      :duration="5000"
+      position="top-right"
+      @close="closeNotification"
+    />
+    
   </div>
 </template>

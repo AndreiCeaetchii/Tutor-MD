@@ -5,7 +5,7 @@ export type UserRole = 'tutor' | 'student' | 'admin';
 interface UserState {
   accessToken: string | null;
   userId: string | null;
-  role: string | null;
+  role: UserRole | null;
   email: string | null;
 }
 
@@ -22,7 +22,7 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.accessToken,
   },
   actions: {
-    setUser(token: string, id: string, role: string, email: string) {
+    setUser(token: string, id: string, role: UserRole, email: string) {
 
       this.accessToken = token;
       this.userId = id;
@@ -33,6 +33,7 @@ export const useUserStore = defineStore('user', {
       this.accessToken = null;
       this.userId = null;
       this.role = null;
+      this.email = null;
     },
 
     updateRole(newRole: UserRole) {

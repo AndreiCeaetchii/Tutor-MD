@@ -158,7 +158,7 @@
           <h3 class="font-bold text-gray-800">Languages</h3>
           <div class="flex flex-wrap gap-2 mt-2 text-sm">
             <div
-              v-for="(index) in editedProfile.languages"
+              v-for="(index) in editedProfile.languages.length"
               :key="index"
               class="relative flex items-center bg-purple-100 text-[#5f22d9] rounded-full pr-8 pl-3 py-1"
             >
