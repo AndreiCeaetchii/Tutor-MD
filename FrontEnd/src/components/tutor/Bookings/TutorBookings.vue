@@ -268,12 +268,13 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
 
     <div v-if="!loading && filteredBookings.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
       <div class="flex items-center justify-center w-24 h-24 mb-4 border-4 border-gray-200 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <p class="text-lg font-medium text-gray-500">No bookings found</p>
-      <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+  <p class="text-lg font-medium text-gray-500">No bookings found</p>
+  <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+  <p v-else class="mt-2 text-gray-400">Your booking history will appear here once you schedule sessions with students</p>
     </div>
 
     <div v-else class="space-y-4">
