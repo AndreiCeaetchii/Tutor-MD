@@ -81,7 +81,7 @@ const pageNumbers = computed(() => {
             page === currentPage
               ? 'bg-purple-700 text-white'
               : 'text-gray-700 hover:bg-purple-100',
-            typeof page === 'number' && (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 || window.innerWidth >= 640)
+            typeof page === 'number' && (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1 || windowWidth >= 640)
               ? 'flex'
               : 'hidden sm:flex'
           ]"

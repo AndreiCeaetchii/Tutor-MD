@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, onMounted, onUnmounted } from 'vue';
   import { useFindTutorStore } from '../../../store/findTutorStore';
   import debounce from 'lodash/debounce';
 
@@ -75,23 +75,31 @@
     }
   }
 
-  if (typeof window !== 'undefined') {
-    window.addEventListener('mousedown', handleClickOutside);
-  }
+  onMounted(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('mousedown', handleClickOutside);
+    }
+  });
+
+  onUnmounted(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('mousedown', handleClickOutside);
+    }
+  });
 </script>
 
 <template>
-  <div class="w-full p-4 bg-white rounded-lg shadow md:w-72">
-    <div class="relative mb-6" id="education-dropdown">
-      <label class="block mb-2 font-semibold text-gray-700">Education level</label>
+  <div class="w-full p-3 bg-white rounded-lg shadow md:p-4">
+    <div class="relative mb-5 md:mb-6" id="education-dropdown">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Education level</label>
       <button
-        class="flex items-center justify-between w-full px-4 py-2 text-gray-700 bg-white border rounded cursor-pointer focus:outline-none"
+        class="flex items-center justify-between w-full px-3 py-1 text-gray-700 bg-white border rounded cursor-pointer md:px-4 md:py-2 focus:outline-none"
         @click="showDropdown = !showDropdown"
         type="button"
       >
-        <span>{{ tutorStore.educationLevel || 'Select education level' }}</span>
+        <span class="text-sm truncate md:text-base">{{ tutorStore.educationLevel || 'Select education level' }}</span>
         <svg
-          class="w-5 h-5 ml-2 text-gray-400"
+          class="flex-shrink-0 w-4 h-4 ml-2 text-gray-400 md:w-5 md:h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -106,14 +114,14 @@
       </button>
       <div
         v-if="showDropdown"
-        class="absolute left-0 z-10 w-full mt-2 overflow-y-auto bg-white border rounded-lg shadow-lg max-h-56"
+        class="absolute left-0 z-10 w-full mt-1 overflow-y-auto bg-white border rounded-lg shadow-lg md:mt-2 max-h-48 md:max-h-56"
       >
         <ul>
           <li
             v-for="level in educationLevels"
             :key="level"
             @click="selectEducationLevel(level)"
-            class="px-6 py-3 text-base text-gray-700 cursor-pointer hover:bg-gray-100"
+            class="px-3 py-1 text-xs text-gray-700 cursor-pointer md:px-4 md:py-2 md:text-sm lg:text-base hover:bg-gray-100"
           >
             {{ level }}
           </li>
@@ -121,112 +129,106 @@
       </div>
     </div>
 
-    <div class="mb-6">
-      <label class="block mb-2 font-semibold text-gray-700">Choose subjects</label>
-      <div class="flex flex-col gap-2 pr-2 overflow-y-auto max-h-40">
+    <div class="mb-5 md:mb-6">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Choose subjects</label>
+      <div class="flex flex-col gap-1 pr-1 overflow-y-auto md:pr-2 max-h-36 md:max-h-40 lg:max-h-48">
         <label
           v-for="subject in subjects"
           :key="subject"
-          class="flex items-center gap-2 text-gray-600 cursor-pointer"
+          class="flex items-center gap-1 py-1 text-xs text-gray-600 cursor-pointer md:gap-2 md:text-sm lg:text-base"
         >
           <input
             type="checkbox"
             :value="subject"
             v-model="tutorStore.selectedSubjects"
-            class="w-4 h-4 rounded accent-purple-600"
+            class="flex-shrink-0 w-3 h-3 rounded md:w-4 md:h-4 accent-purple-600"
           />
-          {{ subject }}
+          <span class="truncate">{{ subject }}</span>
         </label>
       </div>
     </div>
 
-    <div class="mb-6">
-      <label class="block mb-2 font-semibold text-gray-700">Price range</label>
-      <div class="flex items-center gap-2">
+    <div class="mb-5 md:mb-6">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Price range</label>
+      <div class="flex items-center w-full">
         <input
           type="number"
           v-model="localPriceMin"
-          class="w-20 px-2 py-1 border rounded"
+          class="w-full px-2 py-1 text-sm border rounded flex-1 min-w-[60px] md:text-base"
           min="0"
           placeholder="Min"
         />
-        <span>-</span>
+        <span class="flex-shrink-0 mx-2">-</span>
         <input
           type="number"
           v-model="localPriceMax"
-          class="w-20 px-2 py-1 border rounded"
+          class="w-full px-2 py-1 text-sm border rounded flex-1 min-w-[60px] md:text-base"
           min="0"
           placeholder="Max"
         />
       </div>
     </div>
 
-    <div class="mb-6">
-      <label class="block mb-2 font-semibold text-gray-700">Rating</label>
-      <div class="flex flex-col gap-2">
-        <label v-for="star in ratings" :key="star" class="flex items-center gap-2 cursor-pointer">
+    <div class="mb-5 md:mb-6">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Rating</label>
+      <div class="flex flex-col gap-1 md:gap-2">
+        <label v-for="star in ratings" :key="star" class="flex items-center gap-1 cursor-pointer md:gap-2">
           <input
             type="checkbox"
             :value="star"
             v-model="tutorStore.selectedRatings"
-            class="w-4 h-4 rounded accent-purple-600"
+            class="flex-shrink-0 w-3 h-3 rounded md:w-4 md:h-4 accent-purple-600"
           />
-          <span class="flex items-center">
+          <span class="flex flex-wrap items-center">
             <span
               v-for="i in 5"
               :key="i"
-              class="text-xl"
+              class="text-sm md:text-lg lg:text-xl"
               :class="i <= star ? 'text-yellow-400' : 'text-gray-300'"
               >&#9733;</span
             >
-            <span class="ml-2 font-semibold text-gray-700">{{ star }}.0</span>
-            <span class="ml-1 text-gray-400">/5.0</span>
+            <span class="ml-1 text-xs font-semibold text-gray-700 md:ml-2 md:text-sm">{{ star }}.0</span>
+            <span class="ml-0.5 md:ml-1 text-xs md:text-sm text-gray-400">/5.0</span>
           </span>
         </label>
       </div>
     </div>
 
-    <div class="mb-6">
-      <label class="block mb-2 font-semibold text-gray-700">Location</label>
+    <div class="mb-5 md:mb-6">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Location</label>
       <input
         type="text"
         v-model="tutorStore.location"
-        class="w-full px-3 py-2 mb-2 border rounded"
+        class="w-full px-2 py-1 mb-1 text-sm border rounded md:px-3 md:py-2 md:mb-2 md:text-base"
         placeholder="Enter city or country"
       />
     </div>
 
-    <div class="mb-6">
-      <label class="block mb-2 font-semibold text-gray-700">Teaching Services</label>
-      <div class="flex flex-col gap-2">
+    <div class="mb-5 md:mb-6">
+      <label class="block mb-1 font-semibold text-gray-700 md:mb-2">Teaching Services</label>
+      <div class="flex flex-col gap-1 md:gap-2">
         <label
           v-for="service in services"
           :key="service"
-          class="flex items-center gap-2 text-gray-600 cursor-pointer"
+          class="flex items-center gap-1 text-xs text-gray-600 cursor-pointer md:gap-2 md:text-sm lg:text-base"
         >
           <input
             type="checkbox"
             :value="service"
             v-model="tutorStore.serviceTypes"
-            class="w-4 h-4 rounded accent-purple-600"
+            class="flex-shrink-0 w-3 h-3 rounded md:w-4 md:h-4 accent-purple-600"
           />
           {{ service }}
         </label>
       </div>
     </div>
 
-    <div class="flex gap-2 mt-4">
-      <button
-        @click="tutorStore.debouncedSearch()"
-        class="flex-1 py-2 text-white transition bg-purple-700 rounded hover:bg-purple-800"
-      >
-        Apply filters
-      </button>
+    <div class="flex flex-col gap-2 mt-3 md:flex-row md:mt-4">
       <button
         @click="tutorStore.clearFilters()"
-        class="flex-1 py-2 text-gray-700 transition bg-gray-100 rounded hover:bg-gray-200"
+        class="py-1 text-sm text-purple-600 transition bg-purple-200 rounded md:py-2 md:px-2 md:text-base hover:bg-purple-200"
       >
-        Clear all filters
+        Clear filters
       </button>
     </div>
   </div>
