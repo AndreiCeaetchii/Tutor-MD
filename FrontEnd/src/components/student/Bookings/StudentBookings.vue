@@ -19,8 +19,21 @@ const fetchStudentBookingsFromAPI = async () => {
   loading.value = true;
   try {
     const apiBookings = await getStudentBookingsAPI();
-    
-    const transformedBookings = apiBookings.map(booking => {
+
+    const sortedBookings = [...apiBookings].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateB.getTime() !== dateA.getTime()) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      const timeA = a.startTime;
+      const timeB = b.startTime;
+      return timeB.localeCompare(timeA);
+    });
+
+    const transformedBookings = sortedBookings.map(booking => {
       return {
         id: booking.id,
         studentName: "Current Student",

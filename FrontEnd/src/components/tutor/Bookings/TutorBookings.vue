@@ -17,7 +17,20 @@ const fetchTutorBookings = async () => {
   try {
     const apiBookings = await getTutorBookings();
     
-    const transformedBookings = apiBookings.map(booking => ({
+    const sortedBookings = [...apiBookings].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateB.getTime() !== dateA.getTime()) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      const timeA = a.startTime;
+      const timeB = b.startTime;
+      return timeB.localeCompare(timeA);
+    });
+
+    const transformedBookings = sortedBookings.map(booking => ({
       id: booking.id,
       studentName: booking.studentName,
       subject: booking.subject || 'Subject not specified',
@@ -48,8 +61,8 @@ const mapStatusToString = (status: number): string => {
   switch (status) {
     case 0: return 'pending';
     case 1: return 'confirmed';
-    case 2: return 'completed';
-    case 3: return 'cancelled';
+    case 2: return 'cancelled';
+    case 3: return 'completed';
     default: return 'unknown';
   }
 };
@@ -124,7 +137,7 @@ const handleReject = async (bookingId: number) => {
 const handleMarkComplete = async (bookingId: number) => {
   try {
     loading.value = true;
-    await updateBookingStatus(bookingId, 2);
+    await updateBookingStatus(bookingId, 3);
     
     const booking = bookingStore.bookings.find(b => b.id === bookingId);
     if (booking) booking.status = 'completed';
