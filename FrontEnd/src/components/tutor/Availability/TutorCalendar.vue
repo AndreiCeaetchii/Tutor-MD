@@ -103,8 +103,6 @@
     return store.slotData[day]?.length || 0;
   };
 
-
-  // True dacă ziua are sloturi din trecut care au fost editate
   const isEditedPastSlotDay = (day: number) => {
     return store.daysWithEditedSlots?.includes(day);
   };

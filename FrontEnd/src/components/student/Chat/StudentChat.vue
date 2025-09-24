@@ -38,7 +38,6 @@ watch(
   { immediate: true }
 );
 
-// Sample data for conversations
 const conversations = ref<Conversation[]>([
   {
     id: '1',
@@ -129,12 +128,11 @@ const conversations = ref<Conversation[]>([
   }
 ]);
 
-const activeConversation = ref<Conversation | null>(conversations.value[0]); // Auto-select first conversation
+const activeConversation = ref<Conversation | null>(conversations.value[0]);
 const newMessage = ref('');
 const showConversationList = ref(true);
 
 const selectConversation = (conversation: Conversation) => {
-  // Mark as read when selected
   if (conversation.unread) {
     conversation.unread = false;
   }
@@ -167,7 +165,6 @@ const sendMessage = () => {
 
 <template>
   <div class="flex md:flex-row flex-col rounded-2xl shadow-lg overflow-hidden bg-white md:h-[600px]">
-    <!-- Left sidebar - Conversation list -->
     <div 
       class="w-full border-r border-gray-200 md:w-1/3 md:block"
       :class="{'hidden': !showConversationList}"
@@ -224,14 +221,12 @@ const sendMessage = () => {
         </div>
       </div>
     </div>
-    
-    <!-- Right side - Chat area -->
+  
     <div 
       class="flex flex-col h-full md:flex-1"
       :class="{'hidden md:flex': showConversationList, 'w-full': !showConversationList}"
     >
       <div v-if="activeConversation" class="flex flex-col h-full">
-        <!-- Chat header -->
         <div class="flex items-center p-4 border-b border-gray-200">
           <button 
             @click="backToConversations" 
@@ -257,7 +252,6 @@ const sendMessage = () => {
           </div>
         </div>
         
-        <!-- Messages -->
         <div class="flex-1 p-4 overflow-y-auto bg-white" ref="messagesContainer">
           <div class="flex flex-col gap-3">
             <div 
@@ -278,7 +272,7 @@ const sendMessage = () => {
             </div>
           </div>
         </div>
-        <!-- Message input -->
+        
         <div class="sticky bottom-0 z-10 px-2 py-2 bg-white border-t border-gray-200 sm:px-4 sm:py-3">
           <div class="flex items-center w-full gap-1 sm:gap-2">
             <button class="flex items-center justify-center flex-shrink-0 p-1 text-gray-500 sm:p-2 hover:text-purple-600">
@@ -319,7 +313,6 @@ const sendMessage = () => {
   font-size: 24px;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
 }

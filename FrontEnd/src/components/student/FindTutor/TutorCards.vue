@@ -59,8 +59,7 @@
   function goToProfile() {
     router.push(`/tutor/${props.id}/profile`);
   }
-
-  // Proprietate calculată pentru a determina ce opțiuni de locație să se afișeze
+  
   const visibleLocations = computed(() => {
     const locationId = props.workingLocation;
     return {

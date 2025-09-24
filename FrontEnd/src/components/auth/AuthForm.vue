@@ -154,7 +154,6 @@
       <p class="text-sm text-gray-500">{{ subtitle }}</p>
     </div>
 
-    <!-- Role selector with error handling -->
     <div v-if="showRoleSelector" class="mb-4 sm:mb-5">
       <div class="flex flex-wrap justify-center gap-3">
         <button
@@ -179,7 +178,6 @@
       </p>
     </div>
 
-    <!-- Global error message -->
     <div v-if="errorMessage" class="p-3 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500 rounded">
       {{ errorMessage }}
     </div>
@@ -187,7 +185,6 @@
     <form @submit.prevent="handleSubmit">
       <slot name="fields-before"></slot>
 
-      <!-- Email field with error handling - Fixed event handler -->
       <div class="mb-3 sm:mb-4">
         <label for="email" class="block mb-1 text-sm font-medium text-gray-700">Email</label>
         <input
@@ -210,7 +207,6 @@
         </p>
       </div>
 
-      <!-- Phone number field with error handling - Fixed event handler -->
       <div v-if="isSignupForm && showPhoneNumber" class="mb-4 sm:mb-5">
         <label for="phone" class="block mb-1 text-sm font-medium text-gray-700">Phone Number</label>
         <div class="flex">
@@ -241,7 +237,6 @@
         </p>
       </div>
 
-      <!-- Password field with error handling - Fixed event handler -->
       <div class="mb-4 sm:mb-5">
         <label for="password" class="block mb-1 text-sm font-medium text-gray-700">Password</label>
         <div class="relative">

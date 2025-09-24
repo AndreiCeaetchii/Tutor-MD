@@ -184,7 +184,7 @@ const createBooking = async (bookingData: any) => {
         date: selectedSlotForBooking.value.date || store.formatDateForAPI(store.selectedDate),
         startTime: selectedSlotForBooking.value.startTime + ":00",
         endTime: selectedSlotForBooking.value.endTime + ":00",
-        activeStatus: true //era false
+        activeStatus: true,
       });
     } catch (availabilityErr: any) {
       if (availabilityErr.response && availabilityErr.response.status === 403) {
@@ -205,7 +205,7 @@ const createBooking = async (bookingData: any) => {
       if (slotIndex >= 0) {
         store.slotsByMonth[monthKey].slotData[day][slotIndex].status = 'booked';
         store.slotsByMonth[monthKey].slotData[day][slotIndex].studentName = currentUserName.value;
-        store.slotsByMonth[monthKey].slotData[day][slotIndex].activeStatus = true; //false
+        store.slotsByMonth[monthKey].slotData[day][slotIndex].activeStatus = true;
         
         const bookingInfo = {
           slotApiId: selectedSlotForBooking.value.apiId,

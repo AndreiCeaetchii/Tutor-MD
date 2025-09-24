@@ -78,11 +78,6 @@ onMounted(async () => {
   await fetchTutorBookings();
 });
 
-// const pendingCount = computed(() => bookingStore.bookings.filter(b => b.status === 'pending').length);
-// const acceptedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'confirmed').length);
-// const completedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'completed').length);
-// const cancelledCount = computed(() => bookingStore.bookings.filter(b => b.status === 'cancelled').length);
-
 const filteredBookings = computed(() => {
   if (statusFilter.value === 'all') return bookingStore.bookings;
   return bookingStore.bookings.filter(b => b.status === statusFilter.value);

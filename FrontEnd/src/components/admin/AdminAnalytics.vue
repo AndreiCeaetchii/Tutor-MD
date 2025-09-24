@@ -3,10 +3,8 @@
   import { DoughnutChart, LineChart } from 'vue-chart-3';
   import { Chart, registerables } from 'chart.js';
 
-  // Înregistrează toate elementele Chart.js
   Chart.register(...registerables);
 
-  // Date false pentru graficul de creștere lunară
   const monthlyGrowthData = ref([
     { month: 'Jan', value: 3000 },
     { month: 'Feb', value: 3500 },
@@ -14,7 +12,6 @@
     { month: 'Apr', value: 4500 },
   ]);
 
-  // Date false pentru graficul de distribuție pe materii
   const subjectDistributionData = ref([
     { subject: 'Mathematics', value: 35, color: '#a55eea' },
     { subject: 'Physics', value: 22, color: '#3498db' },
@@ -23,7 +20,6 @@
     { subject: 'Other', value: 10, color: '#9b59b6' },
   ]);
 
-  // Proprietate calculată pentru a formata datele pentru graficul de linii
   const monthlyChartData = computed(() => {
     const labels = monthlyGrowthData.value.map((d) => d.month);
     const data = monthlyGrowthData.value.map((d) => d.value);
@@ -43,7 +39,6 @@
     };
   });
 
-  // Proprietate calculată pentru a formata datele pentru graficul cu gogoașă
   const subjectChartData = computed(() => {
     const labels = subjectDistributionData.value.map((d) => `${d.subject} (${d.value}%)`);
     const data = subjectDistributionData.value.map((d) => d.value);
@@ -60,7 +55,6 @@
     };
   });
 
-  // Opțiuni de stil pentru graficul cu gogoașă
   const subjectChartOptions = ref({
     responsive: true,
     cutout: '60%',
@@ -74,14 +68,14 @@
 
 <template>
   <div class="p-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Monthly Growth Trends</h2>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="p-6 bg-white rounded-lg shadow-md">
+        <h2 class="mb-4 text-xl font-semibold text-gray-800">Monthly Growth Trends</h2>
         <LineChart :chartData="monthlyChartData" class="w-full" />
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Subject Distribution</h2>
+      <div class="p-6 bg-white rounded-lg shadow-md">
+        <h2 class="mb-4 text-xl font-semibold text-gray-800">Subject Distribution</h2>
         <DoughnutChart
           :chartData="subjectChartData"
           :options="subjectChartOptions"

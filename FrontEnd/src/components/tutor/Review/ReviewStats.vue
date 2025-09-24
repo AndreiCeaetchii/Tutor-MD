@@ -1,3 +1,19 @@
+<script setup lang="ts">
+  import { ref, computed } from 'vue';
+
+  const ratings = ref([
+    { stars: 5, count: 4 },
+    { stars: 4, count: 2 },
+    { stars: 3, count: 0 },
+    { stars: 2, count: 0 },
+    { stars: 1, count: 0 },
+  ]);
+
+  const totalReviews = computed(() => {
+    return ratings.value.reduce((sum, rating) => sum + rating.count, 0);
+  });
+</script>
+
 <template>
   <div class="content-container">
     <div
@@ -78,22 +94,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref, computed } from 'vue';
-
-  const ratings = ref([
-    { stars: 5, count: 4 },
-    { stars: 4, count: 2 },
-    { stars: 3, count: 0 },
-    { stars: 2, count: 0 },
-    { stars: 1, count: 0 },
-  ]);
-
-  const totalReviews = computed(() => {
-    return ratings.value.reduce((sum, rating) => sum + rating.count, 0);
-  });
-</script>
 
 <style scoped>
 .content-container {

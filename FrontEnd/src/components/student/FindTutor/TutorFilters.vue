@@ -5,7 +5,6 @@
 
   const tutorStore = useFindTutorStore();
 
-  // Variabile locale pentru price range cu debounce
   const localPriceMin = ref(tutorStore.priceMin);
   const localPriceMax = ref(tutorStore.priceMax);
 
@@ -18,7 +17,6 @@
 
   const showDropdown = ref(false);
 
-  // Lista de subiecte
   const subjects = [
     'English',
     'Informatics',
@@ -51,7 +49,6 @@
     debouncedUpdatePriceRange();
   });
 
-  // Funcție pentru a seta valorile inițiale când se resetează filtrele
   watch(
     () => tutorStore.priceMin,
     (newVal) => {
@@ -220,7 +217,7 @@
 
     <div class="flex gap-2 mt-4">
       <button
-        @click="tutorStore.applyFilters()"
+        @click="tutorStore.debouncedSearch()"
         class="flex-1 py-2 text-white transition bg-purple-700 rounded hover:bg-purple-800"
       >
         Apply filters

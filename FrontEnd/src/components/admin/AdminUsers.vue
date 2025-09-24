@@ -26,7 +26,6 @@
   const users = ref<User[]>([]);
   const isMobile = ref(window.innerWidth < 768);
 
-  // Fetch tutors from the API and map them to the User interface
   const fetchTutors = async () => {
     try {
       const response = await getTutors();
@@ -34,7 +33,6 @@
       users.value = response.map((tutor: any) => {
         const fullName = `${tutor.userProfile.firstName.trim()} ${tutor.userProfile.lastName.trim()}`;
 
-        // Determine status based on verificationStatus
         let status = 'Pending';
         if (tutor.verificationStatus === 'Verified') {
           status = 'Active';
@@ -57,7 +55,6 @@
     }
   };
 
-  // Handle screen resize for mobile detection
   const handleResize = () => {
     isMobile.value = window.innerWidth < 768;
   };
@@ -82,7 +79,6 @@
     ),
   );
 
-  // Action handlers
   const onView = (user: User) => console.log(`View user: ${user.name}`);
   const onEdit = (user: User) => console.log(`Edit user: ${user.name}`);
   const onDelete = (user: User) => console.log(`Delete user: ${user.name}`);
@@ -92,34 +88,32 @@
 
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">User Management</h1>
-
-    <!-- Stats cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
+    <h1 class="mb-6 text-2xl font-bold">User Management</h1>
+    <div class="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
         <div>
-          <p class="text-gray-500 uppercase text-xs font-bold">Total Users</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Total Users</p>
           <h3 class="text-3xl font-bold text-purple-600">{{ totalUsers }}</h3>
         </div>
         <font-awesome-icon icon="fa-solid fa-users" class="text-4xl text-purple-600" />
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
+      <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
         <div>
-          <p class="text-gray-500 uppercase text-xs font-bold">Active Users</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Active Users</p>
           <h3 class="text-3xl font-bold text-green-600">{{ activeUsers }}</h3>
         </div>
         <font-awesome-icon icon="fa-solid fa-user-check" class="text-4xl text-green-600" />
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
+      <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
         <div>
-          <p class="text-gray-500 uppercase text-xs font-bold">Pending Approval</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Pending Approval</p>
           <h3 class="text-3xl font-bold text-yellow-600">{{ pendingUsers }}</h3>
         </div>
         <font-awesome-icon icon="fa-solid fa-user-clock" class="text-4xl text-yellow-600" />
       </div>
-      <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
+      <div class="flex items-center justify-between p-6 bg-white rounded-lg shadow-md">
         <div>
-          <p class="text-gray-500 uppercase text-xs font-bold">Suspended</p>
+          <p class="text-xs font-bold text-gray-500 uppercase">Suspended</p>
           <h3 class="text-3xl font-bold text-red-600">{{ suspendedUsers }}</h3>
         </div>
         <font-awesome-icon icon="fa-solid fa-user-times" class="text-4xl text-red-600" />
@@ -127,7 +121,7 @@
     </div>
 
     <!-- User table -->
-    <div v-if="!isMobile" class="bg-white p-6 rounded-lg shadow-md">
+    <div v-if="!isMobile" class="p-6 bg-white rounded-lg shadow-md">
       <AdminUserTable
         :users="sortedUsers"
         @view="onView"

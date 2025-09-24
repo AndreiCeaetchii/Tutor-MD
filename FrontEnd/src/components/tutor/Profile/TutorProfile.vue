@@ -15,7 +15,6 @@ interface TutorProfile {
   profileImage: string;
 }
 
-// State variables
 const isEditing = ref(false);
 const showSuccess = ref(false);
 const newSubject = ref('');
@@ -38,7 +37,6 @@ const initialProfile: TutorProfile = {
 const profile = reactive<TutorProfile>({ ...initialProfile });
 let originalProfile: TutorProfile | null = null;
 
-// Methods
 const handleSave = () => {
   console.log('Profile saved:', profile);
   isEditing.value = false;
@@ -75,7 +73,6 @@ const removeLanguage = (index: number) => {
   profile.languages.splice(index, 1);
 };
 
-// New image upload handler
 const handleImageUpload = (event: Event) => {
   const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
@@ -103,7 +100,6 @@ watch(isEditing, (newValue) => {
 
 <template>
   <div class="profile-container">
-    <!-- Success notification as a toast -->
     <transition name="fade">
       <div 
         v-if="showSuccess" 
@@ -145,7 +141,6 @@ watch(isEditing, (newValue) => {
           </div>
         </div>
         
-        <!-- Action buttons -->
         <div class="flex gap-2 mt-4 sm:mt-0">
           <button
             v-if="isEditing"
@@ -181,7 +176,6 @@ watch(isEditing, (newValue) => {
         </div>
       </div>
 
-      <!-- Form fields in a responsive grid layout -->
       <div class="space-y-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
           <div class="field-group">
@@ -349,7 +343,6 @@ watch(isEditing, (newValue) => {
           </div>
         </div>
       </div>
-      <!-- Removed the success message from here -->
     </div>
   </div>
 </template>
