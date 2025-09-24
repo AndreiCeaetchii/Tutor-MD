@@ -229,7 +229,6 @@ export const useCalendarStore = defineStore('calendar', {
         }
 
         if (this.hasTutorWithNoAvailability(userId)) {
-          console.log(`Tutor ${userId} is known to have no availability yet, skipping API call`);
           this.loading = false;
           return;
         }
@@ -288,7 +287,6 @@ export const useCalendarStore = defineStore('calendar', {
 
             if (errorMessage.includes('does not have any availability')) {
               this.addTutorWithNoAvailability(userId);
-              console.log(`Tutor ${userId} has no availability yet, marking for future reference`);
             } else {
               throw error;
             }

@@ -38,8 +38,6 @@ export const createBooking = async (bookingData: BookingRequest) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-
-    console.log('Sending booking request:', bookingData);
     
     const response = await bookingAxios.post('/students/booking/create', bookingData, {
       headers: {

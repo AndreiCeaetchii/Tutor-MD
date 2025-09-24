@@ -75,7 +75,6 @@ export const useStudentProfileStore = defineStore('studentProfile', {
       this.class = 0;
       this.userProfile = {
         phone: '',
-        // username: this.userProfile.username,
         username: '',
         firstName: '',
         lastName: '',

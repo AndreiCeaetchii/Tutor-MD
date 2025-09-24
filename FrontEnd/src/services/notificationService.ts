@@ -38,11 +38,11 @@ export const getUserNotifications = async (): Promise<NotificationsResponse> => 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la preluarea notificărilor:',
+        'Error fetching notifications:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }
@@ -71,11 +71,11 @@ export const markNotificationAsRead = async (notificationId: number): Promise<vo
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la marcarea notificării ca citită:',
+        'Error marking notification as read:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }

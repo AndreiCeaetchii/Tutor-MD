@@ -176,7 +176,7 @@ export const useFindTutorStore = defineStore('tutor', {
           categories: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
         }));
       } catch (err: any) {
-        this.error = err.message || 'Eroare necunoscută la încărcarea tutorilor';
+        this.error = err.message || 'An error occurred while fetching tutors.';
         console.error('fetchTutors error:', err);
       } finally {
         this.loading = false;
