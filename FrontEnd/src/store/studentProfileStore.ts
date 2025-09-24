@@ -64,13 +64,19 @@ export const useStudentProfileStore = defineStore('studentProfile', {
       this.grade = newGrade;
       this.class = newClass;
     },
+    updateUsername(newUsername: string) {
+      if (this.userProfile) {
+        this.userProfile.username = newUsername;
+      }
+    },
 
     clearProfile() {
       this.grade = 0;
       this.class = 0;
       this.userProfile = {
         phone: '',
-        username: this.userProfile.username,
+        // username: this.userProfile.username,
+        username: '',
         firstName: '',
         lastName: '',
         bio: '',

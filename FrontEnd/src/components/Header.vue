@@ -62,12 +62,26 @@
   const userRole = computed(() => store.userRole);
 
   const userName = computed(() => {
-    if (userRole.value === 'student') {
-      return studentProfileStore.userProfile?.username || '';
-    } else {
-      return profileStore.userName || '';
+  if (userRole.value === 'student') {
+    if (studentProfileStore.userProfile?.username) {
+      return studentProfileStore.userProfile.username;
     }
-  });
+    
+    if (store.email) {
+      const emailPart = store.email.split('@')[0];
+      
+      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+      
+      studentProfileStore.updateUsername(cleanEmailPart);
+      
+      return cleanEmailPart;
+    }
+    
+    return 'user';
+  } else {
+    return profileStore.userName || '';
+  }
+});
 
   const email = computed(() => store.email);
 
