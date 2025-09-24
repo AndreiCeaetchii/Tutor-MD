@@ -345,13 +345,18 @@ const editSlot = (slot: any) => {
               :class="[
                 'px-3 py-1 text-sm font-medium rounded-full',
                 slot.activeStatus === true ? 
-                  (isViewingAsStudent && currentUserName === slot.studentName ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800') 
+                  (isViewingAsStudent && currentUserName === slot.studentName ? 'bg-green-100 text-green-800' : 
+                  (slot.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) 
                   : 'bg-gray-100 text-gray-800'
               ]"
             >
               <span v-if="slot.activeStatus === true">
                 <span v-if="isViewingAsStudent && currentUserName === slot.studentName">
-                  Booked by You
+                  <template v-if="slot.status === 'completed'">Done</template>
+                  <template v-else>Booked by You</template>
+                </span>
+                <span v-else-if="slot.status === 'completed'">
+                  Done
                 </span>
                 <span v-else-if="isViewingAsStudent">
                   Reserved
@@ -374,9 +379,9 @@ const editSlot = (slot: any) => {
 
             <template v-if="!isViewingAsStudent">
               <button 
-                v-if="slot.activeStatus === false"
+                v-if="slot.activeStatus === false || slot.status === 'completed'"
                 @click="editSlot(slot)" 
-                :disabled="loading"
+                :disabled="loading || slot.status === 'completed'"
                 class="flex items-center justify-center w-10 h-10 text-gray-600 rounded-full hover:bg-white hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -385,9 +390,9 @@ const editSlot = (slot: any) => {
               </button>
               
               <button 
-                v-if="slot.activeStatus === false"
+                v-if="slot.activeStatus === false || slot.status === 'completed'"
                 @click="deleteSlot(slot.id)" 
-                :disabled="loading"
+                :disabled="loading || slot.status === 'completed'"
                 class="flex items-center justify-center w-10 h-10 text-gray-600 bg-red-100 rounded-full hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
