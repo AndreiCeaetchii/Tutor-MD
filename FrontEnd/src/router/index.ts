@@ -58,10 +58,10 @@ const routes = [
     component: StudentDashboard,
     meta: { requiresAuth: true, role: 'student' },
     children: [
-      { path: '', redirect: '/student-dashboard/find' },
-      { path: 'find', component: FindTutor },
+      { path: '', redirect: '/student-dashboard/find-tutors' },
+      { path: 'find-tutors', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
-      { path: 'reviews', component: FavouriteTutors },
+      { path: 'favourite-tutors', component: FavouriteTutors },
       { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
     ],
