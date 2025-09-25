@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import SearchBar from './SearchBar.vue';
 import TutorFilters from './TutorFilters.vue';
 import TutorList from './TutorList.vue';
@@ -7,10 +7,14 @@ import TutorList from './TutorList.vue';
 
 // const findTutorStore = useFindTutorStore();
 const showFilters = ref(false);
+
+onMounted(() => {
+  window.scrollTo(0, 0);
+});
 </script>
 
 <template>
-  <div class="container px-4 mx-auto">
+  <div class="container min-h-screen px-4 pb-16 mx-auto">
 
     <div class="w-full mt-8 mb-6">
       <SearchBar />

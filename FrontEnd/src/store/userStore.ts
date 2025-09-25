@@ -5,7 +5,7 @@ export type UserRole = 'tutor' | 'student' | 'admin';
 interface UserState {
   accessToken: string | null;
   userId: string | null;
-  role: string | null;
+  role: UserRole | null;
   email: string | null;
 }
 
@@ -22,17 +22,7 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.accessToken,
   },
   actions: {
-    setUser(token: string, id: string, role: string, email: string) {
-      const isNew = this.accessToken !== token || this.userId !== id || this.role !== role;
-
-      if (isNew) {
-        console.log('[Store Debug] Setting new user:');
-        console.log('AccessToken:', token);
-        console.log('UserId:', id);
-        console.log('Role:', role);
-      } else {
-        console.log('[Store Debug] Values are the same, nothing new to set.');
-      }
+    setUser(token: string, id: string, role: UserRole, email: string) {
 
       this.accessToken = token;
       this.userId = id;
@@ -40,16 +30,15 @@ export const useUserStore = defineStore('user', {
       this.email = email;
     },
     clearUser() {
-      console.log('[Store Debug] Clearing user...');
       this.accessToken = null;
       this.userId = null;
       this.role = null;
+      this.email = null;
     },
 
     updateRole(newRole: UserRole) {
-      console.log(`[Store Debug] Updating role from ${this.role} → ${newRole}`);
       this.role = newRole;
     },
   },
-  persist: true, // activează persistența automată în localStorage
+  persist: true,
 });

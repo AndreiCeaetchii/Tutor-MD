@@ -3,7 +3,7 @@
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faThumbsUp } from '@fortawesome/free-solid-svg-icons';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import type { TutorReview } from '../../services/studentService'; // Asigură-te că calea e corectă
+  import type { TutorReview } from '../../../services/reviewService';
 
   library.add(faThumbsUp);
 
@@ -11,10 +11,8 @@
     review: TutorReview;
   }>();
 
-  // Pentru a gestiona starea locală de "like"
   const isLiked = ref(false);
 
-  // Funcție pentru formatarea datei
   const formattedDate = computed(() => {
     if (props.review.createdAt) {
       const date = new Date(props.review.createdAt);
@@ -23,15 +21,12 @@
     return '';
   });
 
-  // Funcție pentru a afișa un număr de stele
   const ratingStars = computed(() => {
     return props.review.rating;
   });
 
   const toggleLike = () => {
     isLiked.value = !isLiked.value;
-    // Poti implementa logica de actualizare a bazei de date aici, de exemplu:
-    // await api.toggleReviewLike(props.review.id, isLiked.value);
   };
 </script>
 
@@ -41,7 +36,7 @@
   >
     <div class="flex items-center space-x-4">
       <div
-        class="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-600 font-semibold"
+        class="flex items-center justify-center w-10 h-10 font-semibold text-gray-600 bg-gray-200 rounded-full"
       >
         {{ props.review.userName.charAt(0) }}
       </div>

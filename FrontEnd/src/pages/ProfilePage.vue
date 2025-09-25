@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto rounded-2xl bg-white shadow-lg p-6">
+  <div class="max-w-6xl p-6 mx-auto bg-white shadow-lg rounded-2xl">
     <template v-if="profileStore.isEditing">
       <ProfileHeaderEdit :editedProfile="editedProfile" @save-profile="saveChanges" />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
@@ -15,10 +15,10 @@
   import { ref, onMounted, watch } from 'vue';
   import { useProfileStore } from '../store/profileStore.ts';
   import type { ProfileState } from '../store/profileStore.ts';
-  import ProfileHeader from '../components/profile/ProfileHeader.vue';
-  import ProfileDetails from '../components/profile/ProfileDetails.vue';
-  import ProfileHeaderEdit from '../components/profile/ProfileHeaderEdit.vue';
-  import ProfileDetailsEdit from '../components/profile/ProfileDetailsEdit.vue';
+  import ProfileHeader from '../components/tutor/Profile/ProfileHeader.vue';
+  import ProfileDetails from '../components/tutor/Profile/ProfileDetails.vue';
+  import ProfileHeaderEdit from '../components/tutor/Profile/ProfileHeaderEdit.vue';
+  import ProfileDetailsEdit from '../components/tutor/Profile/ProfileDetailsEdit.vue';
   import {
     addSubject,
     updateSubject,
@@ -89,7 +89,7 @@
       };
       profileStore.setProfileDetails(profileData);
     } catch (error) {
-      console.error('Eroare la preluarea profilului:', error);
+      console.error('Error fetching profile:', error);
     }
   };
 
@@ -157,7 +157,7 @@
       });
       profileStore.toggleEditing();
     } catch (error) {
-      console.error('Eroare la salvarea modificărilor profilului:', error);
+      console.error('Error saving profile changes:', error);
     }
   };
 </script>

@@ -1,3 +1,126 @@
+<script setup lang="ts">
+  import { ref, watch, reactive, onMounted } from 'vue';
+  import { storeToRefs } from 'pinia';
+  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
+  import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
+  import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
+  import defaultProfileImage from '../../../assets/DefaultImg.png';
+
+  const studentStore = useStudentProfileStore();
+
+  const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
+
+  const isEditing = ref(false);
+  const showSuccess = ref(false);
+
+  const profile = reactive({
+    firstName: userProfile.value?.firstName || '',
+    lastName: userProfile.value?.lastName || '',
+    phone: userProfile.value?.phone || '',
+    bio: userProfile.value?.bio || '',
+    city: userProfile.value?.city || '',
+    country: userProfile.value?.country || '',
+    grade: grade.value || 0,
+    class: studentClass.value || 0,
+    profileImage: photo.value || defaultProfileImage,
+    username: userProfile.value?.username || '',
+  });
+
+  let originalProfile: any = null;
+
+  const initializeProfile = async () => {
+    if (!userProfile.value?.firstName) {
+      try {
+        const serverProfile = await getStudentProfile();
+
+        studentStore.updateUserProfile(serverProfile.userProfile);
+        studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
+        studentStore.setPhoto(serverProfile.photo.url);
+
+        syncProfileWithStore();
+      } catch (error) {
+        console.error('Failed to load student profile from server:', error);
+      }
+    } else {
+      syncProfileWithStore();
+    }
+  };
+
+  const syncProfileWithStore = () => {
+    profile.firstName = userProfile.value?.firstName || '';
+    profile.lastName = userProfile.value?.lastName || '';
+    profile.phone = userProfile.value?.phone || '';
+    profile.bio = userProfile.value?.bio || '';
+    profile.city = userProfile.value?.city || '';
+    profile.country = userProfile.value?.country || '';
+    profile.grade = grade.value || 0;
+    profile.class = studentClass.value || 0;
+    profile.username = userProfile.value?.username || '';
+    profile.profileImage = photo.value || defaultProfileImage;
+  };
+
+  onMounted(initializeProfile);
+
+  const handleSave = async () => {
+    const payload = {
+      username: profile.username,
+      phone: profile.phone,
+      firstName: profile.firstName || '',
+      lastName: profile.lastName || '',
+      bio: profile.bio,
+      birthdate: userProfile.value.birthdate,
+      grade: profile.grade,
+      class: profile.class,
+      city: profile.city,
+      country: profile.country,
+    };
+
+    try {
+      const response = await updateStudentProfile(payload);
+
+      studentStore.updateUserProfile({
+        firstName: profile.firstName || '',
+        lastName: profile.lastName || '',
+        phone: profile.phone,
+        bio: profile.bio,
+        city: profile.city,
+        country: profile.country,
+        username: profile.username,
+      });
+      studentStore.updateGradeAndClass(profile.grade, profile.class);
+      studentStore.setPhoto(response.photo?.url || defaultProfileImage); // Salvează URL-ul primit
+
+      profile.profileImage = response.photo?.url || defaultProfileImage;
+      isEditing.value = false;
+      showSuccess.value = true;
+      setTimeout(() => (showSuccess.value = false), 3000);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  const handleCancel = () => {
+    if (originalProfile) Object.assign(profile, originalProfile);
+    isEditing.value = false;
+  };
+
+  watch(isEditing, (val) => {
+    if (val) {
+      originalProfile = { ...profile };
+    } else {
+      originalProfile = null;
+    }
+  });
+
+  watch(
+    () => [userProfile.value, grade.value, studentClass.value, photo.value],
+    () => {
+      syncProfileWithStore();
+    },
+    { deep: true },
+  );
+</script>
+
 <template>
   <div class="profile-container">
     <transition name="fade">
@@ -22,12 +145,12 @@
     </transition>
 
     <div
-      class="p-4 font-sans bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 shadow-lg rounded-2xl md:p-8"
+      class="p-4 font-sans shadow-lg bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-2xl md:p-8"
     >
       <div class="flex flex-col items-center gap-4 mb-8 profile sm:flex-row sm:justify-between">
         <div class="flex flex-col items-center gap-4 sm:flex-row">
           <div class="flex flex-col items-center gap-4 sm:flex-row">
-            <div class="relative w-32 h-32 flex-shrink-0">
+            <div class="relative flex-shrink-0 w-32 h-32">
               <div class="w-32 h-32 overflow-hidden rounded-full">
                 <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
                 <img
@@ -40,7 +163,7 @@
 
               <div
                 v-if="isEditing"
-                class="absolute bottom-3 right-0 p-1 bg-white rounded-full shadow-md z-10"
+                class="absolute right-0 z-10 p-1 bg-white rounded-full shadow-md bottom-3"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -216,130 +339,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref, watch, reactive, onMounted } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
-  import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
-  import ProfilePhotoUpload from '../../../components/profile/ProfileImageUploader.vue';
-  import defaultProfileImage from '../../../assets/DefaultImg.png';
-  import { useRouter } from 'vue-router';
-
-  const studentStore = useStudentProfileStore();
-  const router = useRouter();
-  const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
-
-  const isEditing = ref(false);
-  const showSuccess = ref(false);
-
-  const profile = reactive({
-    firstName: userProfile.value?.firstName || '',
-    lastName: userProfile.value?.lastName || '',
-    phone: userProfile.value?.phone || '',
-    bio: userProfile.value?.bio || '',
-    city: userProfile.value?.city || '',
-    country: userProfile.value?.country || '',
-    grade: grade.value || 0,
-    class: studentClass.value || 0,
-    profileImage: photo.value || defaultProfileImage,
-    username: userProfile.value?.username || '',
-  });
-
-  let originalProfile: any = null;
-
-  const initializeProfile = async () => {
-    if (!userProfile.value?.firstName) {
-      try {
-        const serverProfile = await getStudentProfile();
-
-        studentStore.updateUserProfile(serverProfile.userProfile);
-        studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
-        studentStore.setPhoto(serverProfile.photo.url);
-
-        syncProfileWithStore();
-      } catch (error) {
-        console.error('Failed to load student profile from server:', error);
-      }
-    } else {
-      syncProfileWithStore();
-    }
-  };
-
-  const syncProfileWithStore = () => {
-    profile.firstName = userProfile.value?.firstName || '';
-    profile.lastName = userProfile.value?.lastName || '';
-    profile.phone = userProfile.value?.phone || '';
-    profile.bio = userProfile.value?.bio || '';
-    profile.city = userProfile.value?.city || '';
-    profile.country = userProfile.value?.country || '';
-    profile.grade = grade.value || 0;
-    profile.class = studentClass.value || 0;
-    profile.username = userProfile.value?.username || '';
-    profile.profileImage = photo.value || defaultProfileImage;
-  };
-
-  onMounted(initializeProfile);
-
-  const handleSave = async () => {
-    const payload = {
-      username: profile.username,
-      phone: profile.phone,
-      firstName: profile.firstName || '',
-      lastName: profile.lastName || '',
-      bio: profile.bio,
-      birthdate: userProfile.value.birthdate,
-      grade: profile.grade,
-      class: profile.class,
-      city: profile.city,
-      country: profile.country,
-    };
-
-    try {
-      const response = await updateStudentProfile(payload);
-
-      studentStore.updateUserProfile({
-        firstName: profile.firstName || '',
-        lastName: profile.lastName || '',
-        phone: profile.phone,
-        bio: profile.bio,
-        city: profile.city,
-        country: profile.country,
-        username: profile.username,
-      });
-      studentStore.updateGradeAndClass(profile.grade, profile.class);
-      studentStore.setPhoto(response.photo?.url || defaultProfileImage); // Salvează URL-ul primit
-
-      profile.profileImage = response.photo?.url || defaultProfileImage;
-      isEditing.value = false;
-      showSuccess.value = true;
-      setTimeout(() => (showSuccess.value = false), 3000);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    }
-  };
-
-  const handleCancel = () => {
-    if (originalProfile) Object.assign(profile, originalProfile);
-    isEditing.value = false;
-  };
-
-  watch(isEditing, (val) => {
-    if (val) {
-      originalProfile = { ...profile };
-    } else {
-      originalProfile = null;
-    }
-  });
-
-  watch(
-    () => [userProfile.value, grade.value, studentClass.value, photo.value],
-    () => {
-      syncProfileWithStore();
-    },
-    { deep: true },
-  );
-</script>
 
 <style scoped>
   .profile-container {

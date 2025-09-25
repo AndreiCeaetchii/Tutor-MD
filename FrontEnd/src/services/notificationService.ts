@@ -6,12 +6,14 @@ const API_URL =
   (window as any)?.VITE_API_BASE_URL ||
   'http://localhost:8080/api';
 
-export interface Notification {
+export type Notification = {
   id: number;
   type: string;
   payload: string;
   status: number;
+  createdAt: string;
 }
+
 export interface NotificationsResponse {
   totalCount: number;
   notifications: Notification[];
@@ -38,11 +40,11 @@ export const getUserNotifications = async (): Promise<NotificationsResponse> => 
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la preluarea notificărilor:',
+        'Error fetching notifications:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }
@@ -71,11 +73,11 @@ export const markNotificationAsRead = async (notificationId: number): Promise<vo
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la marcarea notificării ca citită:',
+        'Error marking notification as read:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }

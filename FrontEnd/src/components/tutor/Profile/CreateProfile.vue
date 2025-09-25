@@ -1,3 +1,155 @@
+<script setup lang="ts">
+  import { ref, watch, computed } from 'vue';
+  import DropdownSelect from './DropdownSelect.vue';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { faTimes } from '@fortawesome/free-solid-svg-icons';
+  import { createTutorProfile } from '../../../services/tutorService.ts';
+  import type { Subject, TutorProfileData, CreateProfileDto } from '../../../services/tutorService.ts';
+  import { useRouter } from 'vue-router';
+
+  library.add(faTimes);
+
+  const router = useRouter();
+
+  const form = ref({
+    firstName: '',
+    lastName: '',
+    username: '',
+    phone: '',
+    birthdate: '',
+    country: '',
+    city: '',
+    experienceYears: 1,
+    subjects: [
+      {
+        subjectName: 'Mathematics',
+        pricePerHour: 0,
+        currency: 'MDL',
+      },
+    ],
+    languages: [] as string[],
+    teachingPreferences: {
+      myHome: false,
+      studentHome: false,
+      online: false,
+    },
+    bio: '',
+  });
+
+  const allLanguages = ['English', 'French', 'Spanish', 'German', 'Italian', 'Romanian'];
+  const allSubjects = [
+    'Mathematics',
+    'Physics',
+    'Computer Science',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
+  ];
+
+  const availableLanguages = computed(() => {
+    return allLanguages.filter((lang) => !form.value.languages.includes(lang));
+  });
+
+  const availableSubjects = computed(() => {
+    const selectedSubjects = form.value.subjects.map((s) => s.subjectName);
+    return allSubjects.filter((subject) => !selectedSubjects.includes(subject));
+  });
+
+  const addLanguage = (language: string) => {
+    if (language && !form.value.languages.includes(language)) {
+      form.value.languages.push(language);
+    }
+  };
+
+  const removeLanguage = (language: string) => {
+    form.value.languages = form.value.languages.filter((lang) => lang !== language);
+  };
+
+  const cities = computed(() => {
+    if (form.value.country === 'Romania') {
+      return ['Bucharest', 'Cluj-Napoca', 'Iași'];
+    } else if (form.value.country === 'Moldova') {
+      return ['Chișinău', 'Bălți', 'Tiraspol'];
+    }
+    return [];
+  });
+
+  const addNewSubject = (subjectName: string) => {
+    form.value.subjects.push({
+      subjectName: subjectName,
+      pricePerHour: 0,
+      currency: 'MDL',
+    });
+  };
+
+  const removeSubject = (index: number) => {
+    if (form.value.subjects.length > 1) {
+      form.value.subjects.splice(index, 1);
+    }
+  };
+
+  watch(
+    () => form.value.country,
+    () => {
+      form.value.city = '';
+    },
+  );
+
+  const workingLocationId = computed(() => {
+    const { myHome, studentHome, online } = form.value.teachingPreferences;
+
+    if (myHome && online && studentHome) return 7;
+    if (myHome && online) return 4;
+    if (myHome && studentHome) return 5;
+    if (online && studentHome) return 6;
+    if (myHome) return 1;
+    if (online) return 2;
+    if (studentHome) return 3;
+
+    return 0;
+  });
+
+  const handleSubmit = async () => {
+    const birthdateFormatted = form.value.birthdate ? `${form.value.birthdate}T00:00:00` : '';
+
+    const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
+      subjectName: subject.subjectName,
+      subjectSlug: 'default-slug',
+      pricePerHour: parseFloat(subject.pricePerHour.toString()),
+      currency: 'MDL',
+    }));
+
+    const profileDto: CreateProfileDto = {
+      phone: form.value.phone,
+      username: form.value.username,
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
+      bio: form.value.bio,
+      birthdate: birthdateFormatted,
+      country: form.value.country,
+      city: form.value.city,
+    };
+
+    const payload: TutorProfileData = {
+      verificationStatus: 'Pending',
+      experienceYears: form.value.experienceYears,
+      subjects: subjectsPayload,
+      createProfileDto: profileDto,
+      workingLocation: workingLocationId.value,
+    };
+
+    try {
+      await createTutorProfile(payload);
+      router.push('/tutor-dashboard');
+    } catch (error) {
+      console.error('Error creating tutor profile:', error);
+    }
+  };
+</script>
+
 <template>
   <div class="min-h-screen p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 lg:p-12">
     <div class="max-w-4xl mx-auto">
@@ -369,157 +521,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref, watch, computed } from 'vue';
-  import DropdownSelect from './DropdownSelect.vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { faTimes } from '@fortawesome/free-solid-svg-icons';
-  import { createTutorProfile } from '../../services/tutorService.ts';
-  import type { Subject, TutorProfileData, CreateProfileDto } from '../../services/tutorService.ts';
-  import { useRouter } from 'vue-router';
-
-  library.add(faTimes);
-
-  const router = useRouter();
-
-  const form = ref({
-    firstName: '',
-    lastName: '',
-    username: '',
-    phone: '',
-    birthdate: '',
-    country: '',
-    city: '',
-    experienceYears: 1,
-    subjects: [
-      {
-        subjectName: 'Mathematics',
-        pricePerHour: 0,
-        currency: 'MDL',
-      },
-    ],
-    languages: [] as string[],
-    teachingPreferences: {
-      myHome: false,
-      studentHome: false,
-      online: false,
-    },
-    bio: '',
-  });
-
-  const allLanguages = ['English', 'French', 'Spanish', 'German', 'Italian', 'Romanian'];
-  const allSubjects = [
-    'Mathematics',
-    'Physics',
-    'Computer Science',
-    'Chemistry',
-    'Biology',
-    'English',
-    'History',
-    'Geography',
-  ];
-
-  const availableLanguages = computed(() => {
-    return allLanguages.filter((lang) => !form.value.languages.includes(lang));
-  });
-
-  const availableSubjects = computed(() => {
-    const selectedSubjects = form.value.subjects.map((s) => s.subjectName);
-    return allSubjects.filter((subject) => !selectedSubjects.includes(subject));
-  });
-
-  const addLanguage = (language: string) => {
-    if (language && !form.value.languages.includes(language)) {
-      form.value.languages.push(language);
-    }
-  };
-
-  const removeLanguage = (language: string) => {
-    form.value.languages = form.value.languages.filter((lang) => lang !== language);
-  };
-
-  const cities = computed(() => {
-    if (form.value.country === 'Romania') {
-      return ['Bucharest', 'Cluj-Napoca', 'Iași'];
-    } else if (form.value.country === 'Moldova') {
-      return ['Chișinău', 'Bălți', 'Tiraspol'];
-    }
-    return [];
-  });
-
-  const addNewSubject = (subjectName: string) => {
-    form.value.subjects.push({
-      subjectName: subjectName,
-      pricePerHour: 0,
-      currency: 'MDL',
-    });
-  };
-
-  const removeSubject = (index: number) => {
-    if (form.value.subjects.length > 1) {
-      form.value.subjects.splice(index, 1);
-    }
-  };
-
-  watch(
-    () => form.value.country,
-    () => {
-      form.value.city = '';
-    },
-  );
-
-  const workingLocationId = computed(() => {
-    const { myHome, studentHome, online } = form.value.teachingPreferences;
-
-    if (myHome && online && studentHome) return 7; // Home + Online + Student Home
-    if (myHome && online) return 4; // Home + Online
-    if (myHome && studentHome) return 5; // Home + Student Home
-    if (online && studentHome) return 6; // Online + Student Home
-    if (myHome) return 1; // Home
-    if (online) return 2; // Online
-    if (studentHome) return 3; // Student Home
-
-    return 0; // Nicio opțiune selectată
-  });
-
-  const handleSubmit = async () => {
-    const birthdateFormatted = form.value.birthdate ? `${form.value.birthdate}T00:00:00` : '';
-
-    const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
-      subjectName: subject.subjectName,
-      subjectSlug: 'default-slug',
-      pricePerHour: parseFloat(subject.pricePerHour.toString()),
-      currency: 'MDL',
-    }));
-
-    const profileDto: CreateProfileDto = {
-      phone: form.value.phone,
-      username: form.value.username,
-      firstName: form.value.firstName,
-      lastName: form.value.lastName,
-      bio: form.value.bio,
-      birthdate: birthdateFormatted,
-      country: form.value.country,
-      city: form.value.city,
-    };
-
-    // Aici este corectat: am adaugat workingLocation si createProfileDto
-    const payload: TutorProfileData = {
-      verificationStatus: 'Pending',
-      experienceYears: form.value.experienceYears,
-      subjects: subjectsPayload,
-      createProfileDto: profileDto,
-      workingLocation: workingLocationId.value,
-    };
-
-    try {
-      const response = await createTutorProfile(payload);
-      console.log('Profil creat cu succes:', response);
-      router.push('/tutor-dashboard');
-    } catch (error) {
-      console.error('Eroare la trimiterea datelor:', error);
-    }
-  };
-</script>

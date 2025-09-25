@@ -20,8 +20,8 @@
 
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
-  import { deleteProfilePhoto, uploadProfilePhoto } from '../../services/userService.ts'; // Ajustează calea
-  import { useProfileStore } from '../../store/profileStore.ts';
+  import { deleteProfilePhoto, uploadProfilePhoto } from '../../../services/userService.ts'; // Ajustează calea
+  import { useProfileStore } from '../../../store/profileStore.ts';
 
   const props = defineProps({
     modelValue: {

@@ -5,11 +5,11 @@
   import WriteReview from './WriteReview.vue';
   import { useRoute } from 'vue-router';
   import { useUserStore } from '../../../store/userStore.ts';
-  import {
-    getTutorReviews,
+  import type {
     TutorReview,
     TutorReviewsResponse,
   } from '../../../services/reviewService.ts';
+  import { getTutorReviews } from '../../../services/reviewService.ts';
 
   const ratingsOpen = ref(false);
   const selectedRating = ref('All Ratings');

@@ -108,7 +108,6 @@ export const useBookingStore = defineStore('booking', {
         });
         
         this.studentBookings = transformedBookings;
-        console.log('Student bookings loaded:', this.studentBookings.length);
         
       } catch (error) {
         this.error = error instanceof Error ? error.message : 'Failed to fetch bookings';
@@ -118,7 +117,7 @@ export const useBookingStore = defineStore('booking', {
       }
     },
     
-    getAvailableTimeSlots(tutorId: number, date: string) {
+    getAvailableTimeSlots() {
       this.availableTimeSlots = [
         { id: 1, startTime: "09:00", endTime: "10:00", isAvailable: true },
         { id: 2, startTime: "10:00", endTime: "11:00", isAvailable: true },
@@ -129,7 +128,6 @@ export const useBookingStore = defineStore('booking', {
         { id: 7, startTime: "16:00", endTime: "17:00", isAvailable: true }
       ].filter(slot => slot.isAvailable);
 
-      console.log(`Getting available slots for tutor ${tutorId} on ${date}`);
       
       return this.availableTimeSlots;
     },

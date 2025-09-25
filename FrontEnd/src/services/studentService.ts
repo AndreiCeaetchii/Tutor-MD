@@ -56,7 +56,7 @@ export const createStudentProfile = async (profileData: StudentProfileData) => {
     return response.data;
   } catch (error: any) {
     console.error(
-      'Eroare la crearea profilului de student:',
+      'Error creating student profile:',
       error.response ? error.response.data : error.message,
     );
     throw error;

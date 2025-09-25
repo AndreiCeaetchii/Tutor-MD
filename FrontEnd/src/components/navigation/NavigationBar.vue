@@ -17,7 +17,7 @@
   const studentTabs = [
     { name: 'Find Tutors', icon: 'search', path: '/student-dashboard/find' },
     { name: 'My Bookings', icon: 'book', path: '/student-dashboard/bookings' },
-    { name: 'Reviews', icon: 'star', path: '/student-dashboard/reviews' },
+    { name: 'Favourites Tutors', icon: 'star', path: '/student-dashboard/reviews' },
     { name: 'Messages', icon: 'chat', path: '/student-dashboard/messages' },
     { name: 'My Account', icon: 'person', path: '/student-dashboard/account' },
   ];

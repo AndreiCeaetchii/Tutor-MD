@@ -82,7 +82,8 @@ export function useAuth() {
         { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
       );
       const data = response.data;
-      store.setUser(data.token, data.id, formData.role || 'student', formData.email);
+      const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
+      store.setUser(data.token, data.id.toString(), userRole, formData.email);
       return true;
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'signup');

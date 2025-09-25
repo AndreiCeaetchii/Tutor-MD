@@ -15,7 +15,7 @@ export interface TimeSlot {
   startTime: string;
   endTime: string;
   date?: string;
-  status: 'available' | 'booked';
+  status: 'available' | 'booked' | 'completed';
   studentName?: string;
   isEditedPastSlot?: boolean;
   activeStatus?: boolean;
@@ -229,7 +229,6 @@ export const useCalendarStore = defineStore('calendar', {
         }
 
         if (this.hasTutorWithNoAvailability(userId)) {
-          console.log(`Tutor ${userId} is known to have no availability yet, skipping API call`);
           this.loading = false;
           return;
         }
@@ -246,6 +245,8 @@ export const useCalendarStore = defineStore('calendar', {
               const month = date.getMonth();
               const year = date.getFullYear();
               const monthKey = `${year}-${month}`;
+
+              const isCompleted = slot.bookingStatus === 3;
 
               if (!this.slotsByMonth[monthKey]) {
                 this.slotsByMonth[monthKey] = {
@@ -266,16 +267,13 @@ export const useCalendarStore = defineStore('calendar', {
               const startTime = slot.startTime.substring(0, 5);
               const endTime = slot.endTime.substring(0, 5);
 
-              // Check if the slot is booked and include booking details if available
               this.slotsByMonth[monthKey].slotData[day].push({
                 id: `api-${slot.id}`,
                 apiId: slot.id,
                 startTime,
                 endTime,
                 date: slot.date,
-                // Use the status from API response instead of hardcoding to 'available'
-                status: slot.isBooked ? 'booked' : 'available',
-                // Include the student name if the slot is booked
+                status: isCompleted ? 'completed' : (slot.isBooked ? 'booked' : 'available'),
                 studentName: slot.studentName || undefined,
                 activeStatus: slot.activeStatus,
               });
@@ -288,7 +286,6 @@ export const useCalendarStore = defineStore('calendar', {
 
             if (errorMessage.includes('does not have any availability')) {
               this.addTutorWithNoAvailability(userId);
-              console.log(`Tutor ${userId} has no availability yet, marking for future reference`);
             } else {
               throw error;
             }

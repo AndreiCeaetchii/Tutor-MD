@@ -36,7 +36,6 @@
       default: () => ['My home', "Student's home", 'Online'],
     },
     saved: { type: Boolean, default: false },
-    // Adaugă noua proprietate
     workingLocation: { type: Number, required: true },
   });
 
@@ -59,8 +58,7 @@
   function goToProfile() {
     router.push(`/tutor/${props.id}/profile`);
   }
-
-  // Proprietate calculată pentru a determina ce opțiuni de locație să se afișeze
+  
   const visibleLocations = computed(() => {
     const locationId = props.workingLocation;
     return {
@@ -105,7 +103,7 @@
 
         <div class="hidden sm:block">
           <div class="invisible text-xs text-gray-500">Starting from:</div>
-          <div class="invisible text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+          <div class="invisible text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
         </div>
       </div>
     </div>

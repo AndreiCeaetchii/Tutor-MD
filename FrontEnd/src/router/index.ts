@@ -6,7 +6,7 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-import StudentProfile from '../components/student/profile/StudentProfile.vue';
+import StudentProfile from '../components/student/Profile/StudentProfile.vue';
 import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
 import TutorChat from '../components/tutor/Chat/TutorChat.vue';
@@ -14,8 +14,8 @@ import TutorAvailability from '../components/tutor/Availability/TutorAvailabilit
 
 import ProfilePage from '../pages/ProfilePage.vue';
 
-import CreateProfile from '../components/profile/CreateProfile.vue';
-import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
+import CreateProfile from '../components/tutor/Profile/CreateProfile.vue';
+import CreateStudentProfile from '../components/student/Profile/CreateStudentProfile.vue';
 
 const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
 
@@ -117,6 +117,12 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    return { top: 0 }
+  },
 });
 
 router.beforeEach((to, _, next) => {

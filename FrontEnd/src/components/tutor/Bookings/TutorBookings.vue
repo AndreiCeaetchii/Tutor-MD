@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { getTutorBookings, updateBookingStatus } from '../../../services/teacherBookings';
-import NotificationMessage from '../../ui/NotificationMessage.vue';
+import { getTutorBookings, updateBookingStatus } from '../../../services/tutorBookings';
 
 const bookingStore = useBookingStore();
 const statusFilter = ref('all');
@@ -14,12 +13,24 @@ const notificationType = ref('error');
 const notificationMessage = ref('');
 
 const fetchTutorBookings = async () => {
+  loading.value = true;
   try {
-    loading.value = true;
-    
     const apiBookings = await getTutorBookings();
     
-    const transformedBookings = apiBookings.map(booking => ({
+    const sortedBookings = [...apiBookings].sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateB.getTime() !== dateA.getTime()) {
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      const timeA = a.startTime;
+      const timeB = b.startTime;
+      return timeB.localeCompare(timeA);
+    });
+
+    const transformedBookings = sortedBookings.map(booking => ({
       id: booking.id,
       studentName: booking.studentName,
       subject: booking.subject || 'Subject not specified',
@@ -38,15 +49,9 @@ const fetchTutorBookings = async () => {
     }));
     
     bookingStore.bookings = transformedBookings;
-    console.log('Tutor bookings loaded:', bookingStore.bookings.length);
     
   } catch (err) {
     console.error('Error fetching tutor bookings:', err);
-    error.value = err instanceof Error ? err.message : 'Failed to load bookings';
-    
-    notificationMessage.value = 'Failed to fetch tutor bookings';
-    notificationType.value = 'error';
-    showNotification.value = true;
   } finally {
     loading.value = false;
   }
@@ -56,8 +61,8 @@ const mapStatusToString = (status: number): string => {
   switch (status) {
     case 0: return 'pending';
     case 1: return 'confirmed';
-    case 2: return 'completed';
-    case 3: return 'cancelled';
+    case 2: return 'cancelled';
+    case 3: return 'completed';
     default: return 'unknown';
   }
 };
@@ -77,11 +82,6 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 onMounted(async () => {
   await fetchTutorBookings();
 });
-
-// const pendingCount = computed(() => bookingStore.bookings.filter(b => b.status === 'pending').length);
-// const acceptedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'confirmed').length);
-// const completedCount = computed(() => bookingStore.bookings.filter(b => b.status === 'completed').length);
-// const cancelledCount = computed(() => bookingStore.bookings.filter(b => b.status === 'cancelled').length);
 
 const filteredBookings = computed(() => {
   if (statusFilter.value === 'all') return bookingStore.bookings;
@@ -137,7 +137,7 @@ const handleReject = async (bookingId: number) => {
 const handleMarkComplete = async (bookingId: number) => {
   try {
     loading.value = true;
-    await updateBookingStatus(bookingId, 2);
+    await updateBookingStatus(bookingId, 3);
     
     const booking = bookingStore.bookings.find(b => b.id === bookingId);
     if (booking) booking.status = 'completed';
@@ -155,10 +155,6 @@ const handleMarkComplete = async (bookingId: number) => {
   } finally {
     loading.value = false;
   }
-};
-
-const closeNotification = () => {
-  showNotification.value = false;
 };
 
 const getStatusText = (status: string) => {
@@ -199,15 +195,6 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
 
 <template>
   <div class="container px-4 py-6 mx-auto tutor-bookings">
-    <NotificationMessage
-      :show="showNotification"
-      :message="notificationMessage"
-      :type="notificationType"
-      :duration="5000"
-      position="top-right"
-      @close="closeNotification"
-    />
-    
     <div class="flex items-center justify-between mb-6">
       <div class="flex border-b border-gray-200">
         <button 
@@ -274,12 +261,13 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
 
     <div v-if="!loading && filteredBookings.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
       <div class="flex items-center justify-center w-24 h-24 mb-4 border-4 border-gray-200 rounded-full">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <p class="text-lg font-medium text-gray-500">No bookings found</p>
-      <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  </div>
+  <p class="text-lg font-medium text-gray-500">No bookings found</p>
+  <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+  <p v-else class="mt-2 text-gray-400">Your booking history will appear here once you schedule sessions with students</p>
     </div>
 
     <div v-else class="space-y-4">

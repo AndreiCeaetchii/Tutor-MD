@@ -30,7 +30,6 @@ export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResp
   try {
     const userStore = useUserStore();
     const token = userStore.accessToken;
-    console.log(token);
     if (!token) {
       throw new Error('Access token not available. Please log in.');
     }
@@ -50,11 +49,11 @@ export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResp
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la preluarea recenziilor tutorelui:',
+        'Error fetching tutor reviews:',
         error.response ? error.response.data : error.message,
       );
     } else {
-      console.error('Eroare necunoscută:', String(error));
+      console.error('Unknown error:', String(error));
     }
     throw error;
   }
@@ -81,13 +80,13 @@ export const createReview = async (reviewData: CreateReviewDto) => {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error(
-        'Eroare la crearea recenziei:',
+        'Error creating review:',
         error.response ? error.response.data : error.message,
       );
-      throw new Error(error.response?.data?.message || 'A apărut o eroare la crearea recenziei.');
+      throw new Error(error.response?.data?.message || 'An error occurred while creating the review.');
     } else {
-      console.error('Eroare necunoscută:', String(error));
-      throw new Error('O eroare neașteptată a avut loc.');
+      console.error('Unknown error:', String(error));
+      throw new Error('An unexpected error occurred.');
     }
   }
 };

@@ -68,14 +68,14 @@
 
 <template>
   <div class="p-6">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Monthly Growth Trends</h2>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="p-6 bg-white rounded-lg shadow-md">
+        <h2 class="mb-4 text-xl font-semibold text-gray-800">Monthly Growth Trends</h2>
         <LineChart :chartData="monthlyChartData" class="w-full" />
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-gray-800">Subject Distribution</h2>
+      <div class="p-6 bg-white rounded-lg shadow-md">
+        <h2 class="mb-4 text-xl font-semibold text-gray-800">Subject Distribution</h2>
         <DoughnutChart
           :chartData="subjectChartData"
           :options="subjectChartOptions"

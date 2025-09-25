@@ -38,7 +38,6 @@ watch(
   { immediate: true }
 );
 
-// Sample data for conversations
 const conversations = ref<Conversation[]>([
   {
     id: '1',
@@ -129,12 +128,11 @@ const conversations = ref<Conversation[]>([
   }
 ]);
 
-const activeConversation = ref<Conversation | null>(conversations.value[0]); // Auto-select first conversation
+const activeConversation = ref<Conversation | null>(conversations.value[0]);
 const newMessage = ref('');
 const showConversationList = ref(true);
 
 const selectConversation = (conversation: Conversation) => {
-  // Mark as read when selected
   if (conversation.unread) {
     conversation.unread = false;
   }
@@ -167,7 +165,6 @@ const sendMessage = () => {
 
 <template>
   <div class="flex md:flex-row flex-col rounded-2xl shadow-lg overflow-hidden bg-white md:h-[600px]">
-    <!-- Left sidebar - Conversation list -->
     <div 
       class="w-full border-r border-gray-200 md:w-1/3 md:block"
       :class="{'hidden': !showConversationList}"
