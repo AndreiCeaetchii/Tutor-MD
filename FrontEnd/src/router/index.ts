@@ -11,6 +11,7 @@ import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
 import TutorChat from '../components/tutor/Chat/TutorChat.vue';
 import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
+import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
 
 import ProfilePage from '../pages/ProfilePage.vue';
 
@@ -29,11 +30,11 @@ import GuestPage from '../pages/GuestPage.vue';
 import AdminDashboard from '../pages/AdminDashboard.vue';
 import AdminUsers from '../components/admin/AdminUsers.vue';
 import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
-import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
+import AdminOverview from '../components/admin/AdminOverview.vue';
+import AdminNotifications from '../components/admin/AdminNotifications.vue';
 
-const AdminOverview = { template: '<div>Admin Overview</div>' };
-const AdminBookings = { template: '<div>Admin Bookings</div>' };
-const AdminNotifications = { template: '<div>Admin Notifications</div>' };
+
+
 const AdminReviews = { template: '<div>Admin Reviews</div>' };
 const AdminSettings = { template: '<div>Admin Settings</div>' };
 
@@ -84,12 +85,11 @@ const routes = [
   {
     path: '/admin-dashboard',
     component: AdminDashboard,
-    //meta: { requiresAuth: true, role: 'admin' },
+    meta: { requiresAuth: true, role: 'admin' },
     children: [
       { path: '', redirect: '/admin-dashboard/overview' },
       { path: 'overview', component: AdminOverview },
       { path: 'users', component: AdminUsers },
-      { path: 'bookings', component: AdminBookings },
       { path: 'notifications', component: AdminNotifications },
       { path: 'analytics', component: AdminAnalytics },
       { path: 'reviews', component: AdminReviews },
@@ -108,6 +108,11 @@ const routes = [
       { path: 'reviews', component: TutorReview },
     ],
   },
+  {
+    path: '/student/:id',
+    component: GuestPage,
+    meta: { requiresAuth: true },
+  }
 ];
 
 const router = createRouter({

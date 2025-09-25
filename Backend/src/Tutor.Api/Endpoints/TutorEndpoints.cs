@@ -93,7 +93,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("AdminOrTutorOrStudentPolicy")
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutors",

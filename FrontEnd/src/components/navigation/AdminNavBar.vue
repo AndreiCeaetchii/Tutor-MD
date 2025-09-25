@@ -14,11 +14,8 @@
   const tabs: Tab[] = [
     { name: 'Overview', icon: 'bar_chart', path: 'overview' },
     { name: 'Users', icon: 'group', path: 'users' },
-    { name: 'Bookings', icon: 'event', path: 'bookings' },
     { name: 'Notifications', icon: 'notifications', path: 'notifications' },
     { name: 'Analytics', icon: 'trending_up', path: 'analytics' },
-    { name: 'Reviews', icon: 'star', path: 'reviews' },
-    { name: 'Settings', icon: 'settings', path: 'settings' },
   ];
 
   const route = useRoute();
