@@ -76,24 +76,18 @@
     
     const userStore = useUserStore();
     const userRole = userStore.userRole;
-    
-    console.log('Role used for redirection:', userRole);
 
     setTimeout(() => {
       if (userRole === 'tutor') {
-        console.log('Redirecting to tutor dashboard');
         router.push('/tutor-dashboard');
       }
       else if (userRole === 'student') {
-        console.log('Redirecting to student dashboard');
         router.push('/student-dashboard');
       }
       else if (userRole === 'admin') {
-        console.log('Redirecting to admin dashboard');
         router.push('/admin-dashboard');
       }
       else {
-        console.log('No valid role found, redirecting to landing');
         router.push('/landing');
       }
     }, 1000);
@@ -110,23 +104,17 @@
     const userStore = useUserStore();
     const userRole = userStore.userRole;
     
-    console.log('Role used for Google redirection:', userRole);
-    
     setTimeout(() => {
       if (userRole === 'tutor') {
-        console.log('Redirecting to tutor dashboard after Google login');
         router.push('/tutor-dashboard');
       }
       else if (userRole === 'student') {
-        console.log('Redirecting to student dashboard after Google login');
         router.push('/student-dashboard');
       }
       else if (userRole === 'admin') {
-        console.log('Redirecting to admin dashboard after Google login');
         router.push('/admin-dashboard');
       }
       else {
-        console.log('No valid role found after Google login, redirecting to landing');
         router.push('/landing');
       }
     }, 1000);

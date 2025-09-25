@@ -1,9 +1,15 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
   import ReviewStats from '../Review/ReviewStats.vue';
   import ReviewCard from '../Review/ReviewCard.vue';
   import WriteReview from './WriteReview.vue';
   import { useRoute } from 'vue-router';
+  import { useUserStore } from '../../../store/userStore.ts';
+  import type {
+    TutorReview,
+    TutorReviewsResponse,
+  } from '../../../services/reviewService.ts';
+  import { getTutorReviews } from '../../../services/reviewService.ts';
 
   const ratingsOpen = ref(false);
   const selectedRating = ref('All Ratings');
@@ -13,8 +19,46 @@
   const selectedSort = ref('Most Recent');
   const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
 
+  const reviews = ref<TutorReview[]>([]);
+  const averageRating = ref<number | null>(null);
+  const isLoading = ref(true);
+  const error = ref<string | null>(null);
+
+  const store = useUserStore();
   const route = useRoute();
-  const tutorId = computed(() => (route.params.id as string) || '');
+  const idFromUrl = route.params.id as string | undefined;
+  const tutorId = computed(() => (route.params.id as string) || store.userId?.toString() || null);
+
+  const fetchReviews = async () => {
+    if (!tutorId.value) {
+      error.value = 'Tutor ID is not available.';
+      isLoading.value = false;
+      return;
+    }
+
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const tutorIdNumber = parseInt(tutorId.value, 10);
+      if (isNaN(tutorIdNumber)) {
+        throw new Error('Invalid tutor ID.');
+      }
+
+      const response: TutorReviewsResponse = await getTutorReviews(tutorIdNumber);
+      reviews.value = response.reviews;
+      averageRating.value = response.averageRating;
+    } catch (err: any) {
+      console.error('Failed to fetch reviews:', err);
+      error.value = err.message || 'Failed to load reviews.';
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  onMounted(() => {
+    fetchReviews();
+  });
 
   function toggleRatingsDropdown() {
     ratingsOpen.value = !ratingsOpen.value;
@@ -39,7 +83,7 @@
 
 <template>
   <div class="content-container">
-    <WriteReview v-if="tutorId" />
+    <WriteReview v-if="idFromUrl" />
     <ReviewStats v-else />
     <div class="my-6">
       <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
@@ -123,11 +167,14 @@
             </div>
           </div>
         </div>
-
-        <div class="space-y-6">
-          <ReviewCard />
-          <ReviewCard />
+        <div v-if="isLoading" class="text-center text-gray-500">Se încarcă recenziile...</div>
+        <div v-else-if="error" class="text-center text-red-500">
+          {{ error }}
         </div>
+        <div v-else-if="reviews.length > 0" class="space-y-6">
+          <ReviewCard v-for="review in reviews" :key="review.id" :review="review" />
+        </div>
+        <div v-else class="text-center text-gray-500">Nu există recenzii pentru acest tutore.</div>
       </div>
     </div>
   </div>

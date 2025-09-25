@@ -1,6 +1,7 @@
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import { library } from '@fortawesome/fontawesome-svg-core';
+  import DefaultProfileImage from '../../../assets/DefaultImg.png';
   import { useRouter } from 'vue-router';
   import {
     faHome,
@@ -21,7 +22,10 @@
     hourlyRate: { type: String, default: '712.93' },
     rating: { type: Number, default: 5.0 },
     reviews: { type: Number, default: 4448 },
-    profileImage: { type: String, default: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    profileImage: {
+      type: String,
+      default: () => DefaultProfileImage,
+    },
     description: {
       type: String,
       default:
@@ -32,6 +36,7 @@
       default: () => ['My home', "Student's home", 'Online'],
     },
     saved: { type: Boolean, default: false },
+    workingLocation: { type: Number, required: true },
   });
 
   const emit = defineEmits(['save-toggled']);
@@ -53,6 +58,15 @@
   function goToProfile() {
     router.push(`/tutor/${props.id}/profile`);
   }
+  
+  const visibleLocations = computed(() => {
+    const locationId = props.workingLocation;
+    return {
+      home: locationId === 1 || locationId === 4 || locationId === 5 || locationId === 7,
+      online: locationId === 2 || locationId === 4 || locationId === 6 || locationId === 7,
+      studentHome: locationId === 3 || locationId === 5 || locationId === 6 || locationId === 7,
+    };
+  });
 </script>
 
 <template>
@@ -64,7 +78,11 @@
       </div>
 
       <div class="flex flex-col gap-3 pr-32 sm:flex-row sm:items-center sm:pr-0">
-        <img :src="profileImage" alt="Profile" class="object-cover rounded-lg w-14 h-14" />
+        <img
+          :src="profileImage && profileImage.trim() !== '' ? profileImage : DefaultProfileImage"
+          alt="Profile"
+          class="object-cover rounded-lg w-14 h-14"
+        />
         <div class="flex-1">
           <div class="flex items-center gap-1">
             <h3 class="text-lg font-semibold">{{ name }}</h3>
@@ -85,7 +103,7 @@
 
         <div class="hidden sm:block">
           <div class="invisible text-xs text-gray-500">Starting from:</div>
-          <div class="invisible text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+          <div class="invisible text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
         </div>
       </div>
     </div>
@@ -100,7 +118,7 @@
       </div>
       <div class="flex justify-center gap-1 sm:justify-start sm:gap-4">
         <div
-          v-if="services.includes('My home')"
+          v-if="visibleLocations.home"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[30%] sm:w-28 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon
@@ -111,7 +129,7 @@
         </div>
 
         <div
-          v-if="services.includes('Student\'s home')"
+          v-if="visibleLocations.studentHome"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[40%] sm:w-36 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon
@@ -125,7 +143,7 @@
         </div>
 
         <div
-          v-if="services.includes('Online')"
+          v-if="visibleLocations.online"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[30%] sm:w-28 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon

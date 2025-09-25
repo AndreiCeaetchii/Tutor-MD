@@ -30,7 +30,7 @@ watch(() => tutorStore.selectedCategory, () => {
 });
 
 function onSearch() {
-  tutorStore.applyFilters();
+  tutorStore.debouncedSearch();
 }
 
 function selectCategory(cat: string) {

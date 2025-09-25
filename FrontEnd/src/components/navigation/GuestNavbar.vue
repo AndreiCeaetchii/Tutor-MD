@@ -16,18 +16,17 @@
 
 <template>
   <div class="max-w-3xl mx-auto mt-8">
-    <!-- Informative title -->
-    <div class="text-center mb-4">
+    <div class="mb-4 text-center">
       <h2 class="text-2xl font-semibold text-gray-800">
         Explore the details of the
-        <span class="text-purple-600 font-bold">selected tutor</span>
+        <span class="font-bold text-purple-600">selected tutor</span>
       </h2>
-      <p class="text-gray-500 text-sm">
+      <p class="text-sm text-gray-500">
         Navigate between Profile, Availability, and Reviews to learn more.
       </p>
     </div>
 
-    <div class="flex p-2 mb-2 bg-gray-100 rounded-full overflow-x-auto">
+    <div class="flex p-2 mb-2 overflow-x-auto bg-gray-100 rounded-full">
       <router-link
         v-for="tab in studentTabs"
         :key="tab.name"
@@ -39,7 +38,7 @@
             : 'text-gray-600 hover:bg-purple-50'
         "
       >
-        <span class="material-icons mr-1 text-sm md:mr-2 md:text-base">
+        <span class="mr-1 text-sm material-icons md:mr-2 md:text-base">
           {{ tab.icon }}
         </span>
         <span class="text-sm md:text-base">{{ tab.name }}</span>

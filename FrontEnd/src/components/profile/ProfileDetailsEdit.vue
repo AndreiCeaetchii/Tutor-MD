@@ -1,3 +1,100 @@
+<script setup lang="ts">
+  import { ref } from 'vue';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { faPhone, faEnvelope, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
+  import DropdownSelect from './DropdownSelect.vue';
+  import EditableSubjectCard from './EditableSubjectCard.vue';
+  import { deleteSubject } from '../../services/tutorService.ts';
+
+  library.add(faPhone, faEnvelope, faTrash, faTimes);
+
+  const props = defineProps({
+    editedProfile: {
+      type: Object,
+      required: true,
+    },
+  });
+
+  const selectedLanguage = ref('');
+
+  const availableLanguages = ref([
+    'Romanian',
+    'English',
+    'French',
+    'German',
+    'Spanish',
+    'Italian',
+    'Portuguese',
+    'Russian',
+    'Chinese',
+    'Japanese',
+  ]);
+
+  const availableSubjects = ref([
+    'Mathematics',
+    'Physics',
+    'Computer Science',
+    'Chemistry',
+    'Biology',
+    'English',
+    'History',
+    'Geography',
+  ]);
+
+  const addSubject = (subjectName: string) => {
+    if (
+      subjectName &&
+      !props.editedProfile.subjects.some((s: { name: string }) => s.name === subjectName)
+    ) {
+      props.editedProfile.subjects.push({
+        name: subjectName,
+        price: 0,
+        currency: 'MDL',
+        isNew: true,
+        isModified: false,
+      });
+    }
+  };
+
+  const updateSubjectPrice = (index: number, newPrice: number) => {
+    const subject = props.editedProfile.subjects[index];
+    subject.price = newPrice;
+    if (!subject.isNew) subject.isModified = true;
+  };
+
+  const updateSubjectCurrency = (index: number, newCurrency: string) => {
+    const subject = props.editedProfile.subjects[index];
+    subject.currency = newCurrency;
+    if (!subject.isNew) subject.isModified = true;
+  };
+
+  const removeSubject = async (index: number) => {
+    const subject = props.editedProfile.subjects[index];
+
+    if (subject.subjectId) {
+      try {
+        await deleteSubject(subject.subjectId);
+      } catch (err) {
+        console.error('Error deleting subject:', err);
+        return;
+      }
+    }
+
+    props.editedProfile.subjects.splice(index, 1);
+  };
+
+  const addLanguage = (langName: string) => {
+    if (langName && !props.editedProfile.languages.includes(langName)) {
+      props.editedProfile.languages.push(langName);
+    }
+  };
+
+  const removeLanguage = (index: number) => {
+    props.editedProfile.languages.splice(index, 1);
+  };
+</script>
+
 <template>
   <div class="p-6 lg:p-8 bg-gray-50 rounded-2xl">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -61,7 +158,7 @@
           <h3 class="font-bold text-gray-800">Languages</h3>
           <div class="flex flex-wrap gap-2 mt-2 text-sm">
             <div
-              v-for="(lang, index) in editedProfile.languages"
+              v-for="(index) in editedProfile.languages.length"
               :key="index"
               class="relative flex items-center bg-purple-100 text-[#5f22d9] rounded-full pr-8 pl-3 py-1"
             >
@@ -89,101 +186,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref } from 'vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { faPhone, faEnvelope, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
-  import DropdownSelect from './DropdownSelect.vue';
-  import EditableSubjectCard from './EditableSubjectCard.vue';
-  import { deleteSubject } from '../../services/tutorService.ts';
-
-  library.add(faPhone, faEnvelope, faTrash, faTimes);
-
-  const props = defineProps({
-    editedProfile: {
-      type: Object,
-      required: true,
-    },
-  });
-
-  const selectedLanguage = ref('');
-  //const selectedSubject = ref('');
-
-  const availableLanguages = ref([
-    'Română',
-    'Engleză',
-    'Franceză',
-    'Germană',
-    'Spaniolă',
-    'Italiană',
-    'Rusă',
-    'Chineză',
-    'Japoneză',
-  ]);
-
-  const availableSubjects = ref([
-    'Mathematics',
-    'Physics',
-    'Computer Science',
-    'Chemistry',
-    'Biology',
-    'English',
-    'History',
-    'Geography',
-  ]);
-
-  const addSubject = (subjectName: string) => {
-    if (subjectName && !props.editedProfile.subjects.some((s) => s.name === subjectName)) {
-      props.editedProfile.subjects.push({
-        name: subjectName,
-        price: 0,
-        currency: 'MDL',
-        isNew: true,
-        isModified: false,
-      });
-    }
-  };
-
-  const updateSubjectPrice = (index: number, newPrice: number) => {
-    const subject = props.editedProfile.subjects[index];
-    subject.price = newPrice;
-    if (!subject.isNew) subject.isModified = true;
-  };
-
-  const updateSubjectCurrency = (index: number, newCurrency: string) => {
-    const subject = props.editedProfile.subjects[index];
-    subject.currency = newCurrency;
-    if (!subject.isNew) subject.isModified = true;
-  };
-
-  const removeSubject = async (index: number) => {
-    const subject = props.editedProfile.subjects[index];
-
-    // dacă subiectul are subjectId, îl ștergem din backend
-    if (subject.subjectId) {
-      try {
-        console.log('Ștergem subiectul cu ID:', subject.subjectId);
-        await deleteSubject(subject.subjectId);
-        console.log(`Subiectul ${subject.name} a fost șters din backend.`);
-      } catch (err) {
-        console.error('Eroare la ștergerea subiectului din backend:', err);
-        return; // nu eliminăm subiectul din UI dacă ștergerea a eșuat
-      }
-    }
-
-    // eliminăm subiectul din array-ul local
-    props.editedProfile.subjects.splice(index, 1);
-  };
-
-  const addLanguage = (langName: string) => {
-    if (langName && !props.editedProfile.languages.includes(langName)) {
-      props.editedProfile.languages.push(langName);
-    }
-  };
-
-  const removeLanguage = (index: number) => {
-    props.editedProfile.languages.splice(index, 1);
-  };
-</script>

@@ -1,9 +1,9 @@
 <template>
-  <div class="relative w-full rounded-t-2xl p-6 lg:p-8 overflow-hidden">
+  <div class="relative w-full p-6 overflow-hidden rounded-t-2xl lg:p-8">
     <div class="absolute inset-0 bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] rounded-t-2xl"></div>
 
     <form @submit.prevent="$emit('save-profile', editedProfile)" class="relative z-10">
-      <div class="relative flex flex-col lg:flex-row items-center justify-between z-10">
+      <div class="relative z-10 flex flex-col items-center justify-between lg:flex-row">
         <div class="relative flex flex-col items-center mb-6 lg:mb-0 lg:mr-8">
           <ProfileImageUploader v-model="editedProfile.profileImage" />
           <button
@@ -12,8 +12,8 @@
           >
             <font-awesome-icon :icon="['fas', 'pencil-alt']" />
           </button>
-          <div class="mt-2 text-white text-center">
-            <div class="flex items-center justify-center space-x-1 text-yellow-400 text-lg">
+          <div class="mt-2 text-center text-white">
+            <div class="flex items-center justify-center space-x-1 text-lg text-yellow-400">
               <font-awesome-icon :icon="['fas', 'star']" />
               <span class="font-bold text-white">{{ profileStore.rating }}</span>
             </div>
@@ -22,10 +22,10 @@
         </div>
 
         <div
-          class="flex-1 flex flex-col items-center lg:items-start justify-center text-white mt-4 lg:mt-0"
+          class="flex flex-col items-center justify-center flex-1 mt-4 text-white lg:items-start lg:mt-0"
         >
-          <div class="text-center lg:text-left w-full">
-            <div class="flex flex-col sm:flex-row space-x-0 sm:space-x-4 mb-4 lg:mb-0">
+          <div class="w-full text-center lg:text-left">
+            <div class="flex flex-col mb-4 space-x-0 sm:flex-row sm:space-x-4 lg:mb-0">
               <div class="flex-1">
                 <span class="text-xs text-gray-300">First Name</span>
                 <input
@@ -44,7 +44,7 @@
               </div>
             </div>
 
-            <div class="mt-4 text-sm text-gray-200 grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 gap-4 mt-4 text-sm text-gray-200 lg:grid-cols-3">
               <div class="flex flex-col">
                 <span class="text-xs text-gray-300">Years of experience</span>
                 <input
@@ -101,7 +101,7 @@
 
   const profileStore = useProfileStore();
 
-  const props = defineProps({
+  defineProps({
     editedProfile: {
       type: Object,
       required: true,

@@ -1,3 +1,111 @@
+<script setup lang="ts">
+  import { ref, onMounted, onBeforeUnmount } from 'vue';
+  import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
+  import { useRouter } from 'vue-router';
+  import logo from '../assets/tutor2.png';
+  import { library } from '@fortawesome/fontawesome-svg-core';
+  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+  import {
+    faUser,
+    faCog,
+    faBook,
+    faCreditCard,
+    faCircleQuestion,
+    faRightFromBracket,
+  } from '@fortawesome/free-solid-svg-icons';
+  import { useUserStore } from '../store/userStore.ts';
+  import { useProfileStore } from '../store/profileStore.ts';
+  import { computed } from 'vue';
+  import { useStudentProfileStore } from '../store/studentProfileStore.ts';
+  import NotificationsDropdown from '../components/profile/NotificationsDropdown.vue';
+
+  library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
+
+  interface HeaderProps {
+    userType?: 'student' | 'tutor';
+  }
+
+  withDefaults(defineProps<HeaderProps>(), {
+    userType: 'student',
+  });
+
+  const router = useRouter();
+  const store = useUserStore();
+  const profileStore = useProfileStore();
+  const isMenuOpen = ref(false);
+  const showProfileMenu = ref(false);
+  const studentProfileStore = useStudentProfileStore();
+
+  const profileButton = ref<HTMLElement | null>(null);
+  const profileMenu = ref<HTMLElement | null>(null);
+
+  function toggleMenu() {
+    isMenuOpen.value = !isMenuOpen.value;
+  }
+
+  function toggleProfileMenu() {
+    showProfileMenu.value = !showProfileMenu.value;
+  }
+
+  function closeProfileMenu() {
+    showProfileMenu.value = false;
+  }
+
+  function handleLogout() {
+    store.clearUser();
+    profileStore.clearProfile();
+    studentProfileStore.clearProfile();
+    router.push('/landing');
+    showProfileMenu.value = false;
+  }
+
+  const userRole = computed(() => store.userRole);
+
+  const userName = computed(() => {
+  if (userRole.value === 'student') {
+    if (studentProfileStore.userProfile?.username) {
+      return studentProfileStore.userProfile.username;
+    }
+    
+    if (store.email) {
+      const emailPart = store.email.split('@')[0];
+      
+      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+      
+      studentProfileStore.updateUsername(cleanEmailPart);
+      
+      return cleanEmailPart;
+    }
+    
+    return 'user';
+  } else {
+    return profileStore.userName || '';
+  }
+});
+
+  const email = computed(() => store.email);
+
+  function handleClickOutside(event: MouseEvent) {
+    if (
+      showProfileMenu.value &&
+      profileButton.value &&
+      profileMenu.value &&
+      !profileButton.value.contains(event.target as Node) &&
+      !profileMenu.value.contains(event.target as Node)
+    ) {
+      showProfileMenu.value = false;
+    }
+  }
+
+  onMounted(() => {
+    document.addEventListener('click', handleClickOutside);
+  });
+
+  onBeforeUnmount(() => {
+    document.removeEventListener('click', handleClickOutside);
+  });
+</script>
+
 <template>
   <header class="sticky top-0 z-50 bg-white border-b border-gray-100">
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -10,7 +118,7 @@
           </div>
         </div>
         <div class="items-center hidden space-x-4 md:flex">
-          <Bell class="w-5 h-5 text-gray-600" />
+          <NotificationsDropdown @close-other-menus="closeProfileMenu" />
 
           <div v-if="store.isAuthenticated" class="relative">
             <button
@@ -221,91 +329,3 @@
     </div>
   </header>
 </template>
-
-<script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount } from 'vue';
-  import { Menu, X, User, Bell, LogOut } from 'lucide-vue-next';
-  import { useRouter } from 'vue-router';
-  import logo from '../assets/tutor2.png';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import {
-    faUser,
-    faCog,
-    faBook,
-    faCreditCard,
-    faCircleQuestion,
-    faRightFromBracket,
-  } from '@fortawesome/free-solid-svg-icons';
-  import { useUserStore } from '../store/userStore.ts';
-  import { useProfileStore } from '../store/profileStore.ts';
-  import { computed } from 'vue';
-  import { useStudentProfileStore } from '../store/studentProfileStore.ts';
-
-  library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
-
-  interface HeaderProps {
-    userType?: 'student' | 'tutor';
-  }
-
-  withDefaults(defineProps<HeaderProps>(), {
-    userType: 'student',
-  });
-
-  const router = useRouter();
-  const store = useUserStore();
-  const profileStore = useProfileStore();
-  const isMenuOpen = ref(false);
-  const showProfileMenu = ref(false);
-  const studentProfileStore = useStudentProfileStore();
-
-  const profileButton = ref<HTMLElement | null>(null);
-  const profileMenu = ref<HTMLElement | null>(null);
-
-  function toggleMenu() {
-    isMenuOpen.value = !isMenuOpen.value;
-  }
-
-  function closeMenu() {
-    isMenuOpen.value = false;
-  }
-
-  function toggleProfileMenu() {
-    showProfileMenu.value = !showProfileMenu.value;
-  }
-
-  function handleLogout() {
-    store.clearUser();
-    profileStore.clearProfile();
-    studentProfileStore.clearProfile();
-    router.push('/landing');
-    showProfileMenu.value = false;
-  }
-
-  const userName = computed(() =>
-    profileStore.userName ? profileStore.userName : studentProfileStore.userProfile.username,
-  );
-
-  const email = computed(() => store.email);
-
-  function handleClickOutside(event: MouseEvent) {
-    if (
-      showProfileMenu.value &&
-      profileButton.value &&
-      profileMenu.value &&
-      !profileButton.value.contains(event.target as Node) &&
-      !profileMenu.value.contains(event.target as Node)
-    ) {
-      showProfileMenu.value = false;
-    }
-  }
-
-  // Adaugă și elimină event listener-ul în momentele corespunzătoare
-  onMounted(() => {
-    document.addEventListener('click', handleClickOutside);
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('click', handleClickOutside);
-  });
-</script>
