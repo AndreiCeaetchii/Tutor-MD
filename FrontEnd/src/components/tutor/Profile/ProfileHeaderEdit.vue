@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
   import { defineProps, defineEmits } from 'vue';
-  import { useProfileStore } from '../../store/profileStore.ts';
+  import { useProfileStore } from '../../../store/profileStore.ts';
   import { faStar, faTrophy, faMapMarkerAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';

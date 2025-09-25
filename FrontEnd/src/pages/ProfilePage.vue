@@ -15,10 +15,10 @@
   import { ref, onMounted, watch } from 'vue';
   import { useProfileStore } from '../store/profileStore.ts';
   import type { ProfileState } from '../store/profileStore.ts';
-  import ProfileHeader from '../components/profile/ProfileHeader.vue';
-  import ProfileDetails from '../components/profile/ProfileDetails.vue';
-  import ProfileHeaderEdit from '../components/profile/ProfileHeaderEdit.vue';
-  import ProfileDetailsEdit from '../components/profile/ProfileDetailsEdit.vue';
+  import ProfileHeader from '../components/tutor/Profile/ProfileHeader.vue';
+  import ProfileDetails from '../components/tutor/Profile/ProfileDetails.vue';
+  import ProfileHeaderEdit from '../components/tutor/Profile/ProfileHeaderEdit.vue';
+  import ProfileDetailsEdit from '../components/tutor/Profile/ProfileDetailsEdit.vue';
   import {
     addSubject,
     updateSubject,
