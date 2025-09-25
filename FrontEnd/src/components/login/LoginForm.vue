@@ -3,7 +3,7 @@
   import { useAuth } from '../../services/useAuth.ts';
   import { useRouter } from 'vue-router';
   import BaseAuthForm from '../auth/AuthForm.vue';
-  import Notification from '../ui/NotificationMessage.vue';
+  import Notification from '../ui/AlertMessage.vue';
   import { useUserStore } from '../../store/userStore.ts';
 
   interface LoginFormData {
@@ -18,7 +18,7 @@
     email: '',
     password: '',
   });
-  
+
   const touchedFields = ref<Set<string>>(new Set());
 
   const emailError = computed(() => {
@@ -35,7 +35,7 @@
   const fieldErrors = computed(() => {
     return {
       email: emailError.value,
-      password: passwordError.value
+      password: passwordError.value,
     };
   });
 
@@ -62,32 +62,29 @@
   const handleSubmit = async (data: LoginFormData) => {
     touchedFields.value.add('email');
     touchedFields.value.add('password');
-    
+
     formData.value = data;
-    
+
     if (emailError.value || passwordError.value) {
       return;
     }
-    
+
     const result = await login(data);
-    if (!result.success) return; 
+    if (!result.success) return;
 
     showSuccess();
-    
+
     const userStore = useUserStore();
     const userRole = userStore.userRole;
 
     setTimeout(() => {
       if (userRole === 'tutor') {
         router.push('/tutor-dashboard');
-      }
-      else if (userRole === 'student') {
+      } else if (userRole === 'student') {
         router.push('/student-dashboard');
-      }
-      else if (userRole === 'admin') {
+      } else if (userRole === 'admin') {
         router.push('/admin-dashboard');
-      }
-      else {
+      } else {
         router.push('/landing');
       }
     }, 1000);
@@ -95,26 +92,23 @@
 
   const handleSocialLogin = async ({ provider }: { provider: string; role?: string }) => {
     if (provider !== 'google') return;
-    
+
     const result = await loginWithGoogle(false);
     if (!result.success) return;
 
     showSuccess();
-    
+
     const userStore = useUserStore();
     const userRole = userStore.userRole;
-    
+
     setTimeout(() => {
       if (userRole === 'tutor') {
         router.push('/tutor-dashboard');
-      }
-      else if (userRole === 'student') {
+      } else if (userRole === 'student') {
         router.push('/student-dashboard');
-      }
-      else if (userRole === 'admin') {
+      } else if (userRole === 'admin') {
         router.push('/admin-dashboard');
-      }
-      else {
+      } else {
         router.push('/landing');
       }
     }, 1000);
@@ -122,7 +116,7 @@
 </script>
 
 <template>
-  <Notification 
+  <Notification
     :show="showSuccessNotification"
     :message="successMessage"
     type="success"
