@@ -231,11 +231,11 @@
         class="absolute right-0 z-50 py-2 mt-2 bg-white shadow-2xl w-80 rounded-xl"
       >
         <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
-          <p class="text-sm font-semibold text-gray-900">Notificări ({{ notifications.length }})</p>
+          <p class="text-sm font-semibold text-gray-900">Notifications ({{ notifications.length }})</p>
         </div>
 
         <div v-if="isLoading" class="px-4 py-2 text-sm text-center text-gray-500">
-          Se încarcă notificările...
+          Loading notifications...
         </div>
 
         <div v-else-if="notifications.length > 0" class="py-1 overflow-y-auto max-h-96">
