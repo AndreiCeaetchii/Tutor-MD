@@ -45,6 +45,14 @@ const handleActivationToggle = (user: User) => {
   }
 };
 
+const getDisplayStatus = (user: User): User['status'] => {
+  if (!user.isActive) return 'Suspended';
+  if (user.status === 'Pending') return 'Pending';
+  if (user.status === 'Active') return 'Active';
+  return user.status;
+};
+
+
 const getStatusClasses = (status: User['status']) => {
   switch (status) {
     case 'Active': return 'bg-green-100 text-green-800';
@@ -53,6 +61,13 @@ const getStatusClasses = (status: User['status']) => {
     default: return '';
   }
 };
+
+const formattedJoinDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  return new Intl.DateTimeFormat('ro-RO', options).format(date);
+};
+
 </script>
 
 <template>
@@ -121,11 +136,12 @@ const getStatusClasses = (status: User['status']) => {
             </span>
         </td>
         <td class="py-3 px-6 text-left">
-            <span :class="['py-1 px-3 rounded-full text-xs font-semibold', getStatusClasses(user.status)]">
-              {{ user.status }}
+            <span :class="['py-1 px-3 rounded-full text-xs font-semibold', getStatusClasses(getDisplayStatus(user))]">
+              {{ getDisplayStatus(user) }}
             </span>
+
         </td>
-        <td class="py-3 px-6 text-left">{{ user.joinDate }}</td>
+        <td class="py-3 px-6 text-left">{{ formattedJoinDate(user.joinDate)  }}</td>
         <td class="py-3 px-6 text-left">{{ user.bookings }}</td>
         <td class="py-3 px-6 text-center">
           <div class="flex justify-center space-x-2">
@@ -181,7 +197,7 @@ const getStatusClasses = (status: User['status']) => {
 
       <div class="text-sm text-gray-700 space-y-1">
         <p><span class="font-semibold">Type:</span> {{ user.type }}</p>
-        <p><span class="font-semibold">Join Date:</span> {{ user.joinDate }}</p>
+        <p><span class="font-semibold">Join Date:</span> {{ formattedJoinDate(user.joinDate)  }}</p>
         <p><span class="font-semibold">Bookings:</span> {{ user.bookings }}</p>
       </div>
 

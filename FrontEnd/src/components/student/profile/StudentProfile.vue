@@ -224,9 +224,10 @@
   import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
   import ProfilePhotoUpload from '../../../components/profile/ProfileImageUploader.vue';
   import defaultProfileImage from '../../../assets/DefaultImg.png';
+  import { useRouter } from 'vue-router';
 
   const studentStore = useStudentProfileStore();
-
+  const router = useRouter();
   const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
 
   const isEditing = ref(false);

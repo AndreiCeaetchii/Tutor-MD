@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import AdminUserTable from './AdminUserTable.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
+import PromoteAdminModal from './PromoteAdminModal.vue';
 import { useRouter } from 'vue-router';
 import {
   getTutorsForAdmin,
@@ -10,6 +11,7 @@ import {
   declineTutor,
   changeUserStatus,
   getAllStudents,
+  createAdmin,
 } from '../../services/adminService.ts';
 import {
   faUsers,
@@ -20,8 +22,11 @@ import {
   faSortUp,
   faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faPlus, faCrown  } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faUsers, faUserCheck, faUserClock, faUserTimes, faSort, faSortUp, faSortDown);
+library.add(faCrown, faUsers, faUserCheck, faUserClock, faUserTimes, faSort, faSortUp, faSortDown);
+
+library.add(faUsers, faUserCheck, faUserClock, faUserTimes, faSort, faSortUp, faSortDown, faMagnifyingGlass, faPlus);
 
 interface User {
   id: number;
@@ -34,6 +39,7 @@ interface User {
   isActive: boolean;
 }
 
+const searchQuery = ref<string>('');
 const users = ref<User[]>([]);
 const sortBy = ref<string>('joinDate');
 const sortDirection = ref<string>('desc');
@@ -126,16 +132,23 @@ const sortedAndFilteredUsers = computed(() => {
   return sorted;
 });
 
-const onView = (user: User) => router.push(`/tutor/${user.id}/profile`);
+const onView = (user: User) => {
+  if (user.type === 'Student') {
+    router.push(`/student/${user.id}`);
+    return;
+  }
+  router.push(`/tutor/${user.id}/profile`);
+}
 
 const onDecline = async (user: User) => {
+  if (user.type === 'Student') {
+    return;
+  }
   try {
     if (user.type === 'Tutor') {
       await declineTutor(user.id);
-      console.log(`Tutor ${user.name} has been declined.`);
     } else {
       await changeUserStatus(user.id, false);
-      console.log(`Student ${user.name} has been deactivated.`);
     }
     await fetchAllUsers();
   } catch (error) {
@@ -145,14 +158,12 @@ const onDecline = async (user: User) => {
 
 const onApprove = async (user: User) => {
   if (user.type === 'Student') {
-    console.log('Action not available for students.');
     return;
   }
 
   try {
     if (user.type === 'Tutor') {
       await approveTutor(user.id);
-      console.log(`Tutor ${user.name} has been approved.`);
     }
     await fetchAllUsers();
   } catch (error) {
@@ -163,7 +174,6 @@ const onApprove = async (user: User) => {
 const onActivate = async (user: User) => {
   try {
     await changeUserStatus(user.id, true);
-    console.log(`User ${user.name} has been activated.`);
     await fetchAllUsers();
   } catch (error) {
     console.error(`Failed to activate user ${user.name}:`, error);
@@ -173,18 +183,58 @@ const onActivate = async (user: User) => {
 const onDeactivate = async (user: User) => {
   try {
     await changeUserStatus(user.id, false);
-    console.log(`User ${user.name} has been deactivated.`);
     await fetchAllUsers();
   } catch (error) {
     console.error(`Failed to deactivate user ${user.name}:`, error);
   }
 };
+
+const isModalVisible = ref(false);
+
+const openModal = () => {
+  isModalVisible.value = true;
+};
+
+const closeModal = () => {
+  isModalVisible.value = false;
+};
+
+const handlePromote = async (user: any) => {
+  try {
+    await createAdmin(user.id);
+    await fetchAllUsers();
+  } catch (error) {
+    console.error(`Failed to promote user ${user.name} to Admin:`, error);
+  }
+};
+
+
 </script>
 
 <template>
   <div class="p-6">
-    <h1 class="text-2xl font-bold mb-6">User Management</h1>
-
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">User Management</h1>
+      <div class="flex items-center gap-4">
+        <button
+          @click="openModal"
+          class="text-white font-bold py-2 px-4 rounded-full shadow-md transition duration-300 flex items-center gap-2"
+          style="background: linear-gradient(to right, #f97316, #f59e0b);"
+        >
+          <font-awesome-icon icon="fa-solid fa-crown" />
+          Create Admin
+        </button>
+        <div class="relative w-64">
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Search users..."
+            class="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          />
+          <font-awesome-icon icon="fa-solid fa-magnifying-glass" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        </div>
+      </div>
+    </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div class="bg-white p-6 rounded-lg shadow-md flex justify-between items-center">
         <div>
@@ -215,7 +265,6 @@ const onDeactivate = async (user: User) => {
         <font-awesome-icon icon="fa-solid fa-user-times" class="text-4xl text-red-600" />
       </div>
     </div>
-
     <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
       <div class="min-w-full md:min-w-[800px]">
         <AdminUserTable
@@ -232,4 +281,10 @@ const onDeactivate = async (user: User) => {
       </div>
     </div>
   </div>
+  <PromoteAdminModal
+    :users="users"
+    :isVisible="isModalVisible"
+    @close="closeModal"
+    @promote="handlePromote"
+  />
 </template>
