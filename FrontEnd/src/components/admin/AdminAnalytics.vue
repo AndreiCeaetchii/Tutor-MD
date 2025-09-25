@@ -3,10 +3,8 @@
   import { DoughnutChart, LineChart } from 'vue-chart-3';
   import { Chart, registerables } from 'chart.js';
 
-  // Înregistrează toate elementele Chart.js
   Chart.register(...registerables);
 
-  // Date false pentru graficul de creștere lunară
   const monthlyGrowthData = ref([
     { month: 'Jan', value: 3000 },
     { month: 'Feb', value: 3500 },
@@ -14,7 +12,6 @@
     { month: 'Apr', value: 4500 },
   ]);
 
-  // Date false pentru graficul de distribuție pe materii
   const subjectDistributionData = ref([
     { subject: 'Mathematics', value: 35, color: '#a55eea' },
     { subject: 'Physics', value: 22, color: '#3498db' },
@@ -23,7 +20,6 @@
     { subject: 'Other', value: 10, color: '#9b59b6' },
   ]);
 
-  // Proprietate calculată pentru a formata datele pentru graficul de linii
   const monthlyChartData = computed(() => {
     const labels = monthlyGrowthData.value.map((d) => d.month);
     const data = monthlyGrowthData.value.map((d) => d.value);
@@ -43,7 +39,6 @@
     };
   });
 
-  // Proprietate calculată pentru a formata datele pentru graficul cu gogoașă
   const subjectChartData = computed(() => {
     const labels = subjectDistributionData.value.map((d) => `${d.subject} (${d.value}%)`);
     const data = subjectDistributionData.value.map((d) => d.value);
@@ -60,7 +55,6 @@
     };
   });
 
-  // Opțiuni de stil pentru graficul cu gogoașă
   const subjectChartOptions = ref({
     responsive: true,
     cutout: '60%',
