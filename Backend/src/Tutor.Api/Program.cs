@@ -1,3 +1,4 @@
+using Ardalis.Result;
 using DotNetEnv;
 using Hangfire;
 using Hangfire.MemoryStorage;
@@ -59,8 +60,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOrStudentPolicy", policy =>
         policy.RequireRole("Admin", "Student"));
     options.AddPolicy("AdminOrTutorOrStudentPolicy", policy =>
-        policy.RequireRole("Tutor", "Student","Admin"));
-    
+        policy.RequireRole("Tutor", "Student", "Admin"));
+
     options.AddPolicy("ActiveUserOnly", policy =>
         policy.Requirements.Add(new ActiveUserRequirement()));
 });
@@ -84,7 +85,7 @@ builder.Services.AddExceptionHandler<ExceptionHandler>();
 //Anti forgery
 builder.Services.AddAntiforgery(options =>
 {
-    options.HeaderName = "X-CSRF-TOKEN"; 
+    options.HeaderName = "X-CSRF-TOKEN";
 });
 
 
@@ -129,41 +130,48 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-// app.Use(async (context, next) =>
-// {
-//     var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
-//
-//     if (HttpMethods.IsPost(context.Request.Method) ||
-//         HttpMethods.IsPut(context.Request.Method) ||
-//         HttpMethods.IsDelete(context.Request.Method))
-//     {
-//         try
-//         {
-//             await antiforgery.ValidateRequestAsync(context);
-//         }
-//         catch (AntiforgeryValidationException)
-//         {
-//             var problem = Results.Problem(
-//                 title: "Forbidden",
-//                 detail: "Invalid or missing CSRF token.",
-//                 statusCode: StatusCodes.Status403Forbidden,
-//                 instance: context.Request.Path
-//             );
-//
-//             await problem.ExecuteAsync(context);
-//             return; // stop pipeline
-//         }
-//     }
-//
-//     await next();
-// });
+app.Use(async (context, next) =>
+{
+    var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+    var path = context.Request.Path.Value?.ToLowerInvariant();
+
+    if ((HttpMethods.IsPost(context.Request.Method) ||
+         HttpMethods.IsPut(context.Request.Method) ||
+         HttpMethods.IsDelete(context.Request.Method))
+        && !(path.Contains("/login") || path.Contains("/register")
+                                     || path.Contains("/login-auth") || path.Contains("/register-auth")))
+    {
+        if (!context.Request.Headers.ContainsKey("X-CSRF-TOKEN"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new { error = "Forbidden", detail = "Missing CSRF cookie." });
+            return;
+        }
+
+        try
+        {
+            await antiforgery.ValidateRequestAsync(context);
+        }
+        catch (AntiforgeryValidationException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "Forbidden", detail = $"CSRF Validation FAILED: {ex.Message}"
+            });
+            return;
+        }
+    }
+
+    await next();
+});
+
 app.UseSwaggerSetup();
 app.UseHangfireDashboard();
 app.MapUserEndpoints();
 app.MapTutorEndpoints();
 app.MapStudentEndpoints();
 app.MapAdminEndpoints();
-
 
 
 await app.RunAsync();

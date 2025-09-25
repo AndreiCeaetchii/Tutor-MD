@@ -412,7 +412,8 @@ public static class UserEndpoints
         {
             var tokens = antiforgery.GetAndStoreTokens(context);
             return Results.Ok(new { csrfToken = tokens.RequestToken });
-        }).WithName("GetCsrfToken");
+        }).WithName("GetCsrfToken")
+        .RequireAuthorization("AdminOrTutorOrStudentPolicy");
 
 
         var healthGroup = builder.MapGroup("health")
