@@ -112,34 +112,34 @@
 
   function formatNotificationTime(timestamp: string | undefined): string {
     if (timestamp === undefined || timestamp === null) return 'recently';
-
+    
     try {
       if (timestamp === '') return 'recently';
-
+      
       let date: Date;
-
+      
       if (!isNaN(Number(timestamp))) {
         const timestampNum = Number(timestamp);
         date = new Date(timestampNum < 10000000000 ? timestampNum * 1000 : timestampNum);
       } else {
         date = new Date(timestamp);
       }
-
+      
       if (isNaN(date.getTime())) {
         return 'recently';
       }
-
+      
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMins / 60);
       const diffDays = Math.floor(diffHours / 24);
-
+      
       if (diffMins < 1) return 'just now';
-      if (diffMins < 60) return `${diffMins} min ago`;
+      if (diffMins < 60) return diffMins === 1 ? '1 minute ago' : `${diffMins} minutes ago`;
       if (diffHours < 24) return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
       if (diffDays < 7) return diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
-
+      
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     } catch (e) {
       return 'recently';
