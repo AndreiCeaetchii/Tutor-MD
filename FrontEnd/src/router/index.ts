@@ -11,13 +11,12 @@ import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
 import TutorChat from '../components/tutor/Chat/TutorChat.vue';
 import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
+import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
 
 import ProfilePage from '../pages/ProfilePage.vue';
 
 import CreateProfile from '../components/tutor/Profile/CreateProfile.vue';
 import CreateStudentProfile from '../components/student/Profile/CreateStudentProfile.vue';
-
-const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
@@ -33,6 +32,8 @@ import AdminUsers from '../components/admin/AdminUsers.vue';
 import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
 import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
+
+
 
 const AdminReviews = { template: '<div>Admin Reviews</div>' };
 const AdminSettings = { template: '<div>Admin Settings</div>' };
@@ -58,10 +59,10 @@ const routes = [
     component: StudentDashboard,
     meta: { requiresAuth: true, role: 'student' },
     children: [
-      { path: '', redirect: '/student-dashboard/find' },
-      { path: 'find', component: FindTutor },
+      { path: '', redirect: '/student-dashboard/find-tutors' },
+      { path: 'find-tutors', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
-      { path: 'reviews', component: StudentReviews },
+      { path: 'favourite-tutors', component: FavouriteTutors },
       { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
     ],
