@@ -10,5 +10,7 @@ public record UserResponseDto
     public string? Username { get; set; } = string.Empty;
 
     public required string Token { get; set; }
+    public string?  RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
     
 }

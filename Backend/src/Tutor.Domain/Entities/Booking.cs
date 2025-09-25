@@ -8,9 +8,11 @@ public class Booking : Entity<int>
     public int TutorUserId { get; set; }
     public int StudentUserId { get; set; }
     public int SubjectId { get; set; }
-    
+
     public int AvailabilityRuleId { get; set; }
-    
+
+    public string? GoogleCalendarEventId { get; set; }
+
     public string? Description { get; set; }
     public BookingStatus Status { get; set; }
 

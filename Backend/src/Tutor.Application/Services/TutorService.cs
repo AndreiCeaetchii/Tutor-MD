@@ -21,6 +21,7 @@ public class TutorService : ITutorService
     private readonly ITutorSubjectService _tutorSubjectService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
+    private readonly IGenericRepository<Favorites, int> _favoritesRepository;
 
     public TutorService(
         IGenericRepository<User, int> userRepository,
@@ -28,6 +29,7 @@ public class TutorService : ITutorService
         IGenericRepository2<TutorProfile> tutorProfileRepository,
         IUserRoleService userRoleService,
         ITutorSubjectService tutorSubjectService,
+        IGenericRepository<Favorites, int> favoritesRepository,
         IMapper mapper)
     {
         _userRepository = userRepository;
@@ -35,6 +37,7 @@ public class TutorService : ITutorService
         _tutorProfileRepository = tutorProfileRepository;
         _userRoleService = userRoleService;
         _tutorSubjectService = tutorSubjectService;
+        _favoritesRepository = favoritesRepository;
         _mapper = mapper;
     }
 
@@ -77,6 +80,7 @@ public class TutorService : ITutorService
     }
 
     public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsync(
+        int userId,
         string? city = null,
         string? country = null,
         int[]? subjectIds = null,
@@ -84,7 +88,8 @@ public class TutorService : ITutorService
         decimal? minPrice = null,
         decimal? maxPrice = null,
         string? sortBy = null,
-        bool sortDescending = false)
+        bool sortDescending = false
+        )
     {
         var profiles = await _tutorProfileRepository.GetAll();
         if (profiles is null || profiles.Count() == 0)
@@ -187,6 +192,17 @@ public class TutorService : ITutorService
             return Result<List<TutorProfileDto>>.NotFound("No tutors found matching the criteria");
 
         var result = _mapper.Map<List<TutorProfileDto>>(resultList);
+        // Get all tutor IDs from the result list
+        var tutorIds = result.Select(t => t.UserId).ToList();
+
+        var favorites =
+            await _favoritesRepository.FindAsync(f => f.StudentUserId == userId && tutorIds.Contains(f.TutorUserId));
+        var favoritesIds = favorites.Select(t => t.TutorUserId).ToList();
+    // Set IsFavorite using for loop
+        foreach (var tutorDto in result)
+        {
+            tutorDto.IsFavorite = favoritesIds.Contains(tutorDto.UserId);
+        }
         return Result<List<TutorProfileDto>>.Success(result);
     }
 
@@ -237,5 +253,43 @@ public class TutorService : ITutorService
         await _tutorProfileRepository.Update(tutorProfile);
 
         return Result<TutorProfileDto>.Success(_mapper.Map<TutorProfileDto>(tutorProfile));
+    }
+
+    public async Task<Result<bool>> AddToFavorite(int userId, int tutorProfileId)
+    {
+        var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == tutorProfileId);
+        if (tutorProfile == null)
+        {
+            return Result<bool>.Error("Tutor profile not found.");
+        }
+        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f => 
+            f.StudentUserId == userId && f.TutorUserId == tutorProfileId);
+        if (existingFavorite != null)
+        {
+            return Result<bool>.Error("This tutor is already in your favorites.");
+        }
+        var favorite = new Favorites
+        {
+            StudentUserId = userId,
+            TutorUserId = tutorProfileId,
+        };
+        await _favoritesRepository.Create(favorite);
+        return Result<bool>.Success(true, "Tutor added to favorites successfully.");
+    }
+    public async Task<Result<bool>> DeleteFavorite(int userId, int tutorProfileId)
+    {
+        var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == tutorProfileId);
+        if (tutorProfile == null)
+        {
+            return Result<bool>.Error("Tutor profile not found.");
+        }
+        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f => 
+            f.StudentUserId == userId && f.TutorUserId == tutorProfileId);
+        if (existingFavorite == null)
+        {
+            return Result<bool>.Error("Your favorite does not exist.");
+        }
+        await _favoritesRepository.Delete(existingFavorite);
+        return Result<bool>.Success(true, "Tutor deleted from favorites successfully.");
     }
 }

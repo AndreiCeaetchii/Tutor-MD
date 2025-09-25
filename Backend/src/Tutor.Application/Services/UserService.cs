@@ -100,6 +100,11 @@ public class UserService : IUserService
         return Result.Success();
     }
 
+    public async Task Update(User user)
+    {
+        await _userRepository.Update(user);
+    }
+
 
     public async Task UpdateLastLoginAsync(int userId)
     {

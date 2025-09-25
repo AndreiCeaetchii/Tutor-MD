@@ -33,7 +33,7 @@ public static class TutorEndpoints
             .WithTags("tutors");
 
         group.MapPost("/create-tutor",
-                 async (IMediator mediator, [FromBody] CreateTutorProfileDto createTutorProfileDto,
+                async (IMediator mediator, [FromBody] CreateTutorProfileDto createTutorProfileDto,
                     HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -54,9 +54,9 @@ public static class TutorEndpoints
             .WithName("CreateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
-            .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("TutorPolicy")
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPut("/update-tutor",
                 async (IMediator mediator, [FromBody] UpdateTutorProfileDto updateTutorProfileDto,
                     HttpContext httpContext) =>
@@ -79,7 +79,7 @@ public static class TutorEndpoints
             .WithName("UpdateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
-            .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("TutorPolicy")
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutor/{id}",
@@ -97,8 +97,8 @@ public static class TutorEndpoints
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapGet("/get-tutors",
-               
                 async (IMediator mediator,
+                    HttpContext httpContext,
                     [FromQuery] string? city = null,
                     [FromQuery] string? country = null,
                     [FromQuery] int[]? subjectId = null,
@@ -108,16 +108,25 @@ public static class TutorEndpoints
                     [FromQuery] string? sortBy = null,
                     [FromQuery] bool sortDescending = false) =>
                 {
-                     var command = new GetAllTutorsQuery(
-                        city, 
-                        country, 
-                        subjectId, 
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+
+                    var command = new GetAllTutorsQuery(
+                        userId,
+                        city,
+                        country,
+                        subjectId,
                         ratings,
-                        minPrice, 
-                        maxPrice, 
-                        sortBy, 
+                        minPrice,
+                        maxPrice,
+                        sortBy,
                         sortDescending
-                    );;
+                    );
+                    ;
 
                     var result = await mediator.Send(command);
                     return result.IsSuccess
@@ -126,9 +135,8 @@ public static class TutorEndpoints
                 }).WithName("GetAllTutorProfile")
             .Produces<List<TutorProfileDto>>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
-            .RequireAuthorization("AdminOrStudentPolicy") 
+            .RequireAuthorization("AdminOrStudentPolicy")
             .Produces(StatusCodes.Status400BadRequest)
-
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/approve-tutor/{id}",
@@ -141,7 +149,7 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("ApproveTutor")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
@@ -156,13 +164,14 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeclineTutor")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPost("/add-subject",
-                async (IMediator mediator, HttpContext httpContext, [FromBody] TutorSubjectRequestDto tutorSubjectRequestDto) =>
+                async (IMediator mediator, HttpContext httpContext,
+                    [FromBody] TutorSubjectRequestDto tutorSubjectRequestDto) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -178,12 +187,12 @@ public static class TutorEndpoints
                 }).WithName("AddSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("TutorPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapDelete("/delete-subject/{subjectId}",
-                async (IMediator mediator, HttpContext httpContext,  int subjectId) =>
+                async (IMediator mediator, HttpContext httpContext, int subjectId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -198,11 +207,11 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeleteSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("TutorPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPut("/update-subject",
                 async (IMediator mediator, HttpContext httpContext, [FromBody] TutorSubjectDto tutorSubjectDto) =>
                 {
@@ -219,25 +228,26 @@ public static class TutorEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("UpdateSubject")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorPolicy") 
+            .RequireAuthorization("TutorPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPost("availability/create",
-            async (IMediator mediator, [FromBody] CreateAvailabilityDto createAvailabilityDto, HttpContext httpContext) =>
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Results.Unauthorized();
+                async (IMediator mediator, [FromBody] CreateAvailabilityDto createAvailabilityDto,
+                    HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
 
-                if (!int.TryParse(userIdClaim, out var userId))
-                    return Results.BadRequest("Invalid UserId in token");
-                var command = new CreateAvailabilityCommand(userId, createAvailabilityDto);
-                var result = await mediator.Send(command);
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            }).WithName("CreateAvailability")
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new CreateAvailabilityCommand(userId, createAvailabilityDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("CreateAvailability")
             .Produces<AvailabilityDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy")
             .RequireAuthorization("ActiveUserOnly")
@@ -283,7 +293,7 @@ public static class TutorEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("availability/{userId}",
                 async (IMediator mediator, int userId) =>
                 {
@@ -298,8 +308,5 @@ public static class TutorEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-
     }
-    
-   
 }
