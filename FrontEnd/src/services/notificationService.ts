@@ -6,12 +6,14 @@ const API_URL =
   (window as any)?.VITE_API_BASE_URL ||
   'http://localhost:8080/api';
 
-export interface Notification {
+export type Notification = {
   id: number;
   type: string;
   payload: string;
   status: number;
+  createdAt: string;
 }
+
 export interface NotificationsResponse {
   totalCount: number;
   notifications: Notification[];
