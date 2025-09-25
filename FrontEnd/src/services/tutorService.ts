@@ -198,3 +198,78 @@ export const getTutors = async () => {
     );
   }
 };
+
+// export const getFavouriteTutors = async () => {
+//   try {
+//     const store = useUserStore();
+//     const token = store.accessToken;
+    
+//     const response = await axios.get(`${API_URL}/tutors/favourites`, {
+//       headers: { Authorization: `Bearer ${token}` },
+//       withCredentials: true,
+//     });
+    
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(
+//       error.response?.data?.message || error.message || 'Failed to fetch favourite tutors.'
+//     );
+//   }
+// };
+
+// export const addToFavourites = async (tutorId: number) => {
+//   try {
+//     const store = useUserStore();
+//     const token = store.accessToken;
+    
+//     const response = await axios.post(`${API_URL}/tutors/favourites`, { tutorId }, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//       withCredentials: true,
+//     });
+    
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(
+//       error.response?.data?.message || error.message || 'Failed to add tutor to favourites.'
+//     );
+//   }
+// };
+
+// export const removeFromFavourites = async (tutorId: number) => {
+//   try {
+//     const store = useUserStore();
+//     const token = store.accessToken;
+    
+//     const response = await axios.delete(`${API_URL}/tutors/favourites/${tutorId}`, {
+//       headers: { Authorization: `Bearer ${token}` },
+//       withCredentials: true,
+//     });
+    
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(
+//       error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.'
+//     );
+//   }
+// };
+
+// export const getTutorById = async (tutorId: number) => {
+//   try {
+//     const store = useUserStore();
+//     const token = store.accessToken;
+    
+//     const response = await axios.get(`${tutorsAPI}/${tutorId}`, {
+//       headers: { Authorization: `Bearer ${token}` },
+//       withCredentials: true,
+//     });
+    
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(
+//       error.response?.data?.message || error.message || `Failed to fetch tutor with ID ${tutorId}.`
+//     );
+//   }
+// };
