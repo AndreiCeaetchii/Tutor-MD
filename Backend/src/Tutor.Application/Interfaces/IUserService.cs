@@ -15,4 +15,5 @@ public interface IUserService
     Task<Result> ActivateUserAsync(int userId);
     Task<Result> DeactivateUserAsync(int userId);
     Task<Result> CreateAdminAsync(int userId);
+    Task Update(User user);
 }

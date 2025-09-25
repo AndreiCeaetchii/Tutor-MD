@@ -6,6 +6,7 @@ using Tutor.Application.Features.Tutors.Dto;
 namespace Tutor.Application.Features.Tutors.GetAllTutors;
 
 public record GetAllTutorsQuery(
+    int UserId,
     string? City = null,
     string? Country = null,
     int[]? SubjectId= null,

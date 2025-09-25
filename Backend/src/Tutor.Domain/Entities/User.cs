@@ -23,6 +23,9 @@ public class User : Entity<int>
     public string? TwoFactorSecret { get; set; }
     public bool TwoFactorEnabled { get; set; }
     public string? TwoFactorRecoveryCodes { get; set; }
+    
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 
     // Navigation properties
     public virtual Photo Photo { get; set; }

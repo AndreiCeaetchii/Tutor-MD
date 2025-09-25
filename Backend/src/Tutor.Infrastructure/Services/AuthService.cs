@@ -1,7 +1,9 @@
 ﻿using Ardalis.Result;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Tutor.Application.Features.Users.Dtos;
@@ -68,7 +70,17 @@ public class AuthService : IAuthService
         }
 
         var token = _tokenService.GenerateToken(user, role);
+        var refreshTokenInitial = _tokenService.GenerateRefreshToken();
+        var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
+
+        // Update user with hashed refresh token
+        user.RefreshToken = _tokenService.HashRefreshToken(refreshTokenInitial);
+        user.RefreshTokenExpiryTime = refreshTokenExpiry;
+        await _userRepository.Update(user);
+
         var response = user.ToResponseDto(token);
+        response.RefreshToken = refreshTokenInitial;
+
 
         return Result<UserResponseDto>.Success(response);
     }
@@ -106,8 +118,16 @@ public class AuthService : IAuthService
         var token = _tokenService.GenerateToken(user, role);
         if (string.IsNullOrEmpty(token))
             return Result<UserResponseDto>.Error("Token generation failed");
+        var refreshTokenInitial = _tokenService.GenerateRefreshToken();
+        var refreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
+      
+        user.RefreshToken = _tokenService.HashRefreshToken(refreshTokenInitial);
+        user.RefreshTokenExpiryTime = refreshTokenExpiry;
+        await _userRepository.Update(user);
 
         var response = user.ToResponseDto(token);
+        response.RefreshToken = refreshTokenInitial;
+
 
         return Result<UserResponseDto>.Success(response);
     }
@@ -119,7 +139,7 @@ public class AuthService : IAuthService
         var recoveryCodes = _mfaService.GenerateRecoveryCodes();
 
         user.TwoFactorSecret = _mfaService.Encrypt(secretKey);
-        List<string> hashedCodes =  new List<string>();
+        List<string> hashedCodes = new List<string>();
         foreach (var recoveryCode in recoveryCodes)
             hashedCodes.Add(_mfaService.Hash(recoveryCode));
         user.TwoFactorRecoveryCodes = JsonSerializer.Serialize(hashedCodes);
@@ -135,7 +155,7 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetById(userId);
         var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
-        
+
         var result = _mfaService.VerifyCode(decryptedSecret, code);
         if (result)
         {
@@ -156,4 +176,58 @@ public class AuthService : IAuthService
         await _userRepository.Update(user);
         return true;
     }
+    public async Task<Result<TokenResponseDto>> RefreshTokenAsync(string accessToken, string refreshToken)
+{
+    if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+        return Result<TokenResponseDto>.Error("Invalid tokens");
+
+    try
+    { var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken);
+        var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            return Result<TokenResponseDto>.Error("Invalid token");
+
+        var user = await _userRepository.FindAsyncDefault(u => u.Id == userId);
+        if (user == null)
+            return Result<TokenResponseDto>.Error("User not found");
+        if (user.RefreshTokenExpiryTime < DateTime.UtcNow)
+            return Result<TokenResponseDto>.Error("Refresh token expired");
+
+        if (!_tokenService.VerifyRefreshToken(refreshToken, user.RefreshToken))
+            return Result<TokenResponseDto>.Error("Invalid refresh token");
+
+        var userRole = await _userRoleRepository.FindAsyncDefault(u => u.UserId == user.Id);
+        if (userRole == null)
+            return Result<TokenResponseDto>.Error("User role not found");
+
+        var role = await _roleRepository.FindAsyncDefault(r => r.Id == userRole.RoleId);
+        if (role == null)
+            return Result<TokenResponseDto>.Error("Role not found");
+
+        var newAccessToken = _tokenService.GenerateToken(user, role);
+        var newRefreshToken = _tokenService.GenerateRefreshToken();
+        var newRefreshTokenExpiry = _tokenService.GetRefreshTokenExpiryTime();
+        user.RefreshToken = _tokenService.HashRefreshToken(newRefreshToken);
+        user.RefreshTokenExpiryTime = newRefreshTokenExpiry;
+        await _userRepository.Update(user);
+
+        var response = new TokenResponseDto
+        {
+            Token = newAccessToken,
+            RefreshToken = newRefreshToken,
+            RefreshTokenExpiryTime = newRefreshTokenExpiry
+        };
+
+        return Result<TokenResponseDto>.Success(response);
+    }
+    catch (SecurityTokenException)
+    {
+        return Result<TokenResponseDto>.Error("Invalid access token");
+    }
+    catch (Exception ex)
+    {
+        return Result<TokenResponseDto>.Error($"Token refresh failed: {ex.Message}");
+    }
+}
 }

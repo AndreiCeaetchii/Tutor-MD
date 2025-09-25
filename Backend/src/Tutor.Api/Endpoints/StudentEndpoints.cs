@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
+using Tutor.Application.Features.Booking.AddToCalendar;
 using Tutor.Application.Features.Booking.CreateBooking;
 using Tutor.Application.Features.Booking.Dto;
 using Tutor.Application.Features.Booking.GetBooking;
@@ -20,6 +21,8 @@ using Tutor.Application.Features.Students.DTOs;
 using Tutor.Application.Features.Students.GetAllStudents;
 using Tutor.Application.Features.Students.GetStudent;
 using Tutor.Application.Features.Students.UpdateStudent;
+using Tutor.Application.Features.Tutors.AddToFavorite;
+using Tutor.Application.Features.Tutors.DeleteFromFavorite;
 using Tutor.Application.Features.Tutors.Dto;
 using Tutor.Domain.Entities;
 
@@ -32,30 +35,30 @@ public static class StudentEndpoints
         var group = builder.MapGroup("api/students")
             .WithTags("students");
         group.MapPost("/create-student",
-            async (IMediator mediator, [FromBody] CreateStudentDto createStudentDto, HttpContext httpContext) =>
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Results.Unauthorized();
+                async (IMediator mediator, [FromBody] CreateStudentDto createStudentDto, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
 
-                if (!int.TryParse(userIdClaim, out var userId))
-                    return Results.BadRequest("Invalid UserId in token");
-                var command = new CreateStudentCommand(userId, createStudentDto);
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new CreateStudentCommand(userId, createStudentDto);
 
-                var result = await mediator.Send(command);
+                    var result = await mediator.Send(command);
 
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            })
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
             .WithName("CreateStudentProfile")
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces<StudentDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("/student-profile",
-                async (IMediator mediator,  HttpContext httpContext) =>
+                async (IMediator mediator, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -73,7 +76,7 @@ public static class StudentEndpoints
                 })
             .WithName("GetStudentProfile")
             .Produces<StudentDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
@@ -90,13 +93,14 @@ public static class StudentEndpoints
                 })
             .WithName("AllStudents")
             .Produces<StudentDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("AdminPolicy") 
+            .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPut("/update-profile",
-                 async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,HttpContext httpContext) =>
+                async (IMediator mediator, [FromBody] UpdateStudentProfileDto updateStudentProfileDto,
+                    HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -114,36 +118,13 @@ public static class StudentEndpoints
                 })
             .WithName("UpdateStudentProfile")
             .Produces<StudentDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPost("/booking/create",
-            async (IMediator mediator, [FromBody] CreateBookingDto createBookingDto, HttpContext httpContext) =>
-            {
-                var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userIdClaim))
-                    return Results.Unauthorized();
-
-                if (!int.TryParse(userIdClaim, out var userId))
-                    return Results.BadRequest("Invalid UserId in token");
-                var command = new CreateBookingCommand(userId, createBookingDto);
-
-                var result = await mediator.Send(command);
-
-                return result.IsSuccess
-                    ? Results.Ok(result.Value)
-                    : Results.BadRequest(result.Errors);
-            }).WithName("CreateBooking")
-            .Produces<BookingDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
-            .RequireAuthorization("ActiveUserOnly")
-            .Produces(StatusCodes.Status400BadRequest)
-            .Produces(StatusCodes.Status401Unauthorized);
-        
-        group.MapPut("/booking/update/{bookingId}",
-                async (IMediator mediator, [FromBody] BookingStatus status, int bookingId ,HttpContext httpContext) =>
+                async (IMediator mediator, [FromBody] CreateBookingDto createBookingDto, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -151,7 +132,30 @@ public static class StudentEndpoints
 
                     if (!int.TryParse(userIdClaim, out var userId))
                         return Results.BadRequest("Invalid UserId in token");
-                    var command = new UpdateBookingStatusCommand(userId, bookingId,status);
+                    var command = new CreateBookingCommand(userId, createBookingDto);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("CreateBooking")
+            .Produces<BookingDto>(StatusCodes.Status200OK)
+            .RequireAuthorization("StudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+
+        group.MapPut("/booking/update/{bookingId}",
+                async (IMediator mediator, [FromBody] BookingStatus status, int bookingId, HttpContext httpContext) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new UpdateBookingStatusCommand(userId, bookingId, status);
 
                     var result = await mediator.Send(command);
 
@@ -160,13 +164,13 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("UpdateBookingStatus")
             .Produces<BookingDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("/booking/{bookingId}",
-                async (IMediator mediator,int bookingId ,HttpContext httpContext) =>
+                async (IMediator mediator, int bookingId, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -183,13 +187,13 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetBooking")
             .Produces<BookingDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("/bookings",
-                async (IMediator mediator,HttpContext httpContext) =>
+                async (IMediator mediator, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -206,12 +210,34 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetBookingsByTutor")
             .Produces<BookingDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("TutorOrStudentPolicy") 
+            .RequireAuthorization("TutorOrStudentPolicy")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+        group.MapPut("/booking/add-calendar/{bookingId}",
+                async (IMediator mediator, HttpContext httpContext, int bookingId, [FromBody] string accessToken) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new AddToCalendarCommand(userId, bookingId, accessToken);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("AddToGoogleCalendar")
+            .Produces(StatusCodes.Status200OK)
+            .RequireAuthorization("TutorOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+
         group.MapPost("/reviews/create",
-                async (IMediator mediator, [FromBody] CreateReviewDto createReviewDto ,HttpContext httpContext) =>
+                async (IMediator mediator, [FromBody] CreateReviewDto createReviewDto, HttpContext httpContext) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -228,13 +254,14 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("CreateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapPut("/reviews/update/{reviewId}",
-                async (IMediator mediator, [FromBody] UpdateReviewDto updateReviewDto ,HttpContext httpContext, int reviewId ) =>
+                async (IMediator mediator, [FromBody] UpdateReviewDto updateReviewDto, HttpContext httpContext,
+                    int reviewId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -251,13 +278,13 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("UpdateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
-            .RequireAuthorization("StudentPolicy") 
+            .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapDelete("/reviews/delete/{reviewId}",
-                async (IMediator mediator,HttpContext httpContext, int reviewId ) =>
+                async (IMediator mediator, HttpContext httpContext, int reviewId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -274,13 +301,13 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("DeleteReview")
             .Produces(StatusCodes.Status200OK)
-            .RequireAuthorization("AdminOrStudentPolicy") 
+            .RequireAuthorization("AdminOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
+
         group.MapGet("/reviews/{tutorId}",
-                async (IMediator mediator,HttpContext httpContext, int tutorId ) =>
+                async (IMediator mediator, HttpContext httpContext, int tutorId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -297,11 +324,52 @@ public static class StudentEndpoints
                         : Results.BadRequest(result.Errors);
                 }).WithName("GetReviews")
             .Produces(StatusCodes.Status200OK)
-            .RequireAuthorization("AdminOrTutorOrStudentPolicy") 
+            .RequireAuthorization("AdminOrTutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
-        
-           
+
+        group.MapPost("/favorites/{tutorId}",
+                async (IMediator mediator, HttpContext httpContext, int tutorId) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new AddToFavoriteCommand(userId, tutorId);
+
+                    var result = await mediator.Send(command);
+
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("AddToFavorite")
+            .Produces(StatusCodes.Status200OK)
+            .RequireAuthorization("AdminOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapDelete("/favorites/{tutorId}",
+                async (IMediator mediator, HttpContext httpContext, int tutorId) =>
+                {
+                    var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userIdClaim))
+                        return Results.Unauthorized();
+
+                    if (!int.TryParse(userIdClaim, out var userId))
+                        return Results.BadRequest("Invalid UserId in token");
+                    var command = new DeleteFavoriteCommand(userId, tutorId);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("DeleteFavorite")
+            .Produces(StatusCodes.Status200OK)
+            .RequireAuthorization("AdminOrStudentPolicy")
+            .RequireAuthorization("ActiveUserOnly")
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status401Unauthorized);
     }
 }

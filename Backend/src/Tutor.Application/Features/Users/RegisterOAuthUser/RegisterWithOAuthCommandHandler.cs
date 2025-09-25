@@ -96,7 +96,16 @@ public class RegisterUserWithOAuthCommandHandler
         var token = _jwtTokenService.GenerateToken(user, role);
         if (string.IsNullOrEmpty(token))
             return Result<UserResponseDto>.Error("Token generation failed");
+        var refreshTokenInitial = _jwtTokenService.GenerateRefreshToken();
+        var refreshTokenExpiry = _jwtTokenService.GetRefreshTokenExpiryTime();
+      
+        user.RefreshToken = _jwtTokenService.HashRefreshToken(refreshTokenInitial);
+        user.RefreshTokenExpiryTime = refreshTokenExpiry;
+        await _userService.Update(user);
 
-        return Result.Success(user.ToResponseDto(token));
+        var response = user.ToResponseDto(token);
+        response.RefreshToken = refreshTokenInitial;
+        
+        return Result<UserResponseDto>.Success(response);
     }
 }

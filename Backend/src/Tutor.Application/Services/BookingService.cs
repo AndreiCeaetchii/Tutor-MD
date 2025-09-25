@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,8 @@ public class BookingService : IBookingService
     private readonly IBookingNotificationService _bookingNotificationService;
     private readonly IGenericRepository<TutorAvailabilityRule, int> _tutorAvailabilityRuleRepository;
     private readonly IMapper _mapper;
+    private readonly IGoogleCalendarService _calendarService;
+    private readonly ILogger<BookingService> _logger;
 
     public BookingService(IGenericRepository<Booking, int> bookingRepository,
         IGenericRepository2<User> userRepository,
@@ -35,6 +38,8 @@ public class BookingService : IBookingService
         IGenericRepository<Notification, int> notificationRepository,
         IBookingNotificationService bookingNotificationService,
         IGenericRepository<TutorAvailabilityRule, int> tutorAvailabilityRuleRepository,
+        IGoogleCalendarService calendarService,
+        ILogger<BookingService> logger,
         IMapper mapper)
     {
         _bookingRepository = bookingRepository;
@@ -48,6 +53,8 @@ public class BookingService : IBookingService
         _bookingNotificationService = bookingNotificationService;
         _tutorAvailabilityRuleRepository = tutorAvailabilityRuleRepository;
         _mapper = mapper;
+        _calendarService = calendarService;
+        _logger = logger;
     }
 
 
@@ -235,5 +242,42 @@ public class BookingService : IBookingService
     public async Task CreateNotificationAsync(Notification notification)
     {
         await _notificationRepository.Create(notification);
+    }
+    
+    public async Task<Result> AddToCalendar(int bookingId, int userId, string googleAccessToken)
+    {
+        try
+        {
+            // Get the booking
+            var booking = await _bookingRepository.GetById(bookingId);
+            if (booking == null)
+                return Result.Error("Booking not found");
+
+            // Verify user has permission to add this booking to calendar
+            if (booking.StudentUserId != userId && booking.TutorUserId != userId)
+                return Result.Error("You don't have permission to add this booking to calendar");
+
+            if (!string.IsNullOrEmpty(booking.GoogleCalendarEventId))
+                return Result.Error("This booking is already added to Google Calendar");
+
+            var bookingDto = await GetBookingDtoWithDetails(booking);
+
+            var calendarResult = await _calendarService.CreateEventAsync(bookingDto, googleAccessToken);
+            
+            if (!calendarResult.IsSuccess)
+                return Result.Error($"Failed to create calendar event: {calendarResult.Errors.First()}");
+            booking.GoogleCalendarEventId = calendarResult.Value;
+            await _bookingRepository.Update(booking);
+
+            _logger.LogInformation("Booking {BookingId} successfully added to Google Calendar with event ID {EventId}", 
+                bookingId, calendarResult.Value);
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add booking {BookingId} to Google Calendar", bookingId);
+            return Result.Error($"Failed to add booking to calendar: {ex.Message}");
+        }
     }
 }

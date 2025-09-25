@@ -23,6 +23,7 @@ public class GetAllTutorsHandler : IRequestHandler<GetAllTutorsQuery, Result<Lis
     public async Task<Result<List<TutorProfileDto>>> Handle(GetAllTutorsQuery request, CancellationToken cancellationToken)
     {
         return await _tutorService.GetAllTutorProfileAsync(
+            request.UserId,
             request.City,
             request.Country,
             request.SubjectId,

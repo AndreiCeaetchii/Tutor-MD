@@ -16,4 +16,5 @@ public interface IBookingService
     Task<List<Booking>> GetBookingsStartingBetweenAsync(DateTime startWindow, DateTime endWindow, BookingStatus status);
     Task<bool> NotificationExistsAsync(int bookingId, string notificationType, int recipientUserId);
     Task CreateNotificationAsync(Notification notification);
+    Task<Result> AddToCalendar(int bookingId, int userId, string googleAccessToken);
 }
