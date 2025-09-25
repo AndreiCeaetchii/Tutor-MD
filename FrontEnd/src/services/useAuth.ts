@@ -39,7 +39,7 @@ export function useAuth() {
   const API_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
     (window as any)?.VITE_API_BASE_URL ||
-    'http://localhost:8080/api';
+    'https://localhost:8085/api';
 
   const SIGNUP_URL = `${API_URL}/users/register`;
   const LOGIN_URL = `${API_URL}/users/login`;

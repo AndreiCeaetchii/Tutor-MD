@@ -4,7 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 const tutorsWithNoAvailability: number[] = [];
 
@@ -42,6 +42,22 @@ availabilityAxios.interceptors.response.use(
   },
 );
 
+availabilityAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  
+  if (csrfToken) {
+    config.headers['X-CSRF-Token'] = csrfToken;
+  }
+  
+  return config;
+});
+
 export interface AvailabilitySlot {
   id?: number;
   date: string;
@@ -54,12 +70,7 @@ export const getTutorAvailability = async (tutorId: number) => {
   if (hasTutorWithNoAvailability(tutorId)) return [];
 
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await availabilityAxios.get(`/availability/${tutorId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await availabilityAxios.get(`/availability/${tutorId}`);
 
     if (hasTutorWithNoAvailability(tutorId)) {
       removeTutorWithNoAvailability(tutorId);
@@ -94,7 +105,7 @@ export const createAvailability = async (slot: AvailabilitySlot) => {
       endTime: slot.endTime,
       activeStatus: slot.activeStatus,
     };
-
+    
     const response = await availabilityAxios.post(`/availability/create`, simplifiedSlot, {
       headers: {
         'Content-Type': 'application/json',
@@ -118,11 +129,13 @@ export const updateAvailability = async (slot: AvailabilitySlot) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
+    const csrfToken = store.csrfToken;
 
     const response = await availabilityAxios.put(`/availability/update`, slot, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
+        'X-CSRF-Token': csrfToken,
       },
     });
 
@@ -138,9 +151,13 @@ export const deleteAvailability = async (id: number) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
+    const csrfToken = store.csrfToken;
 
     const response = await availabilityAxios.delete(`/availability/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { 
+        Authorization: `Bearer ${token}`, 
+        'X-CSRF-Token': csrfToken 
+      },
     });
 
     return response.data;

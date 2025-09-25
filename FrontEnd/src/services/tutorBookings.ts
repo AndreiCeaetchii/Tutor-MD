@@ -4,11 +4,11 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 const bookingAxios = axios.create({
   baseURL: API_URL,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export interface TutorBooking {
@@ -32,11 +32,11 @@ export const getBookingById = async (bookingId: number): Promise<TutorBooking> =
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
+
     const response = await bookingAxios.get(`/students/booking/${bookingId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;
@@ -50,11 +50,11 @@ export const getTutorBookings = async (): Promise<TutorBooking[]> => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
+
     const response = await bookingAxios.get(`/students/bookings`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;
@@ -64,12 +64,15 @@ export const getTutorBookings = async (): Promise<TutorBooking[]> => {
   }
 };
 
-export const updateBookingStatus = async (bookingId: number, status: number): Promise<TutorBooking> => {
+export const updateBookingStatus = async (
+  bookingId: number,
+  status: number,
+): Promise<TutorBooking> => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
 
-    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`,  status, {
+    const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, status, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
