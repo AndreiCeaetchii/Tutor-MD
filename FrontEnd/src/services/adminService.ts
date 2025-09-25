@@ -217,3 +217,36 @@ export const getAllStudents = async (): Promise<StudentProfile[]> => {
     throw error;
   }
 };
+
+export const createAdmin = async (userId: number): Promise<TutorProfile> => {
+  try {
+    const userStore = useUserStore();
+    const token = userStore.accessToken;
+
+    if (!token) {
+      throw new Error('Access token is not available. Please log in again.');
+    }
+
+    const payload = { userId };
+
+    const response = await axios.post<TutorProfile>(`${API_URL}/users/admin/create`, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        `Error while creating tutor with userId ${userId}:`,
+        error.response ? error.response.data : error.message,
+      );
+    } else {
+      console.error('Unknown error:', String(error));
+    }
+    throw error;
+  }
+};
