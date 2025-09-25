@@ -4,8 +4,8 @@
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faTimes } from '@fortawesome/free-solid-svg-icons';
-  import { createTutorProfile } from '../../services/tutorService.ts';
-  import type { Subject, TutorProfileData, CreateProfileDto } from '../../services/tutorService.ts';
+  import { createTutorProfile } from '../../../services/tutorService.ts';
+  import type { Subject, TutorProfileData, CreateProfileDto } from '../../../services/tutorService.ts';
   import { useRouter } from 'vue-router';
 
   library.add(faTimes);
