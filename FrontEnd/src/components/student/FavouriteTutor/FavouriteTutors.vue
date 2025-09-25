@@ -1,85 +1,74 @@
-<script>
-import { mapActions, mapState } from 'vuex';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { useFavouriteTutorStore } from '../../../store/favouriteTutorStore';
+import TutorCards from '../FindTutor/TutorCards.vue';
 
-export default {
-  name: 'FavouriteTutors',
-  computed: {
-    ...mapState('favouriteTutor', ['favouriteTutors', 'loading'])
-  },
-  mounted() {
-    this.fetchFavouriteTutors();
-  },
-  methods: {
-    ...mapActions('favouriteTutor', ['fetchFavouriteTutors', 'removeFromFavourites']),
-    viewFullProfile(tutorId) {
-      this.$router.push(`/tutor/${tutorId}`);
-    },
-    startChat(tutorId) {
-      this.$router.push(`/chat/${tutorId}`);
-    }
+const favouriteTutorStore = useFavouriteTutorStore();
+const loading = ref(true);
+const errorMessage = ref('');
+
+onMounted(async () => {
+  try {
+    loading.value = true;
+    await favouriteTutorStore.fetchFavouriteTutors();
+  } catch (error: any) {
+    errorMessage.value = error.message || 'An error occurred while fetching favourite tutors.';
+  } finally {
+    loading.value = false;
   }
-}
+});
+
+const handleSaveToggled = async (isSaved: boolean, tutorId: number) => {
+  if (!isSaved) {
+    await favouriteTutorStore.removeFromFavourites(tutorId);
+  }
+};
 </script>
 
+
 <template>
-  <div class="px-4 py-8 mx-auto max-w-7xl">
-    <h1 class="mb-8 text-3xl font-bold text-center text-gray-800">My Favourite Tutors</h1>
-    
-    <div v-if="loading" class="flex flex-col items-center justify-center py-12">
-      <div class="w-10 h-10 mb-4 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
-      <p class="text-gray-600">Loading your favourite tutors...</p>
-    </div>
-    
-    <div v-else-if="favouriteTutors.length === 0" class="py-12 text-center">
-      <p class="mb-4 text-gray-600">You don't have any favourite tutors yet.</p>
-      <router-link to="/find-tutor" class="inline-block px-6 py-3 font-bold text-white transition-colors bg-blue-500 rounded hover:bg-blue-600">
-        Find Tutors
-      </router-link>
-    </div>
-    
-    <div v-else class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-      <div v-for="tutor in favouriteTutors" :key="tutor.id" 
-          class="p-6 transition-transform border border-gray-200 rounded-lg shadow-md hover:shadow-lg hover:-translate-y-1">
-        <div class="relative flex mb-4">
-          <div class="flex-shrink-0 w-20 h-20 mr-4 overflow-hidden rounded-full">
-            <img :src="tutor.profileImage" :alt="tutor.name" class="object-cover w-full h-full">
-          </div>
-          <div class="flex-1">
-            <h2 class="m-0 text-xl font-bold text-gray-800">{{ tutor.name }}</h2>
-            <p class="mt-1 text-sm text-gray-600">{{ tutor.title }}</p>
-            <div class="flex items-center mt-1">
-              <span v-for="star in 5" :key="star" 
-                    :class="{ 'text-yellow-400': star <= Math.round(tutor.rating), 'text-gray-300': star > Math.round(tutor.rating) }"
-                    class="text-lg mr-0.5">
-                ★
-              </span>
-              <span class="ml-1 text-sm text-gray-500">({{ tutor.rating }})</span>
-            </div>
-          </div>
-          <button @click="removeFromFavourites(tutor.id)" 
-                  class="absolute top-0 right-0 p-1 text-xl text-red-500 hover:text-red-600 focus:outline-none">
-            <i class="fas fa-heart"></i>
-          </button>
+  <div class="favourite-tutors">
+    <div class="container px-4 py-6 mx-auto">
+      <h1 class="mb-6 text-2xl font-bold">My Favourite Tutors</h1>
+      
+      <div v-if="loading" class="flex justify-center my-8">
+        <div class="w-12 h-12 border-t-2 border-b-2 border-purple-500 rounded-full animate-spin"></div>
+      </div>
+      
+      <div v-else-if="errorMessage" class="px-4 py-3 mb-4 text-red-700 bg-red-100 border border-red-400 rounded">
+        {{ errorMessage }}
+      </div>
+      
+      <div v-else-if="favouriteTutorStore.favouriteTutors.length === 0" class="py-12 text-center">
+        <div class="mb-4 text-gray-500">
+          <svg class="w-16 h-16 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
         </div>
-        
-        <div class="flex flex-wrap gap-2 mb-4">
-          <span v-for="(subject, index) in tutor.subjects" :key="index" 
-                class="px-3 py-1 text-xs text-gray-800 bg-gray-100 rounded-full">
-            {{ subject }}
-          </span>
-        </div>
-        
-        <p class="mb-4 text-sm leading-relaxed text-gray-700">{{ tutor.description }}</p>
-        
-        <div class="flex gap-4 mt-4">
-          <button @click="viewFullProfile(tutor.id)"
-                  class="flex-1 px-4 py-2 font-bold text-gray-800 transition-colors bg-gray-100 rounded hover:bg-gray-200">
-            View Full Profile
-          </button>
-          <button @click="startChat(tutor.id)"
-                  class="flex-1 px-4 py-2 font-bold text-white transition-colors bg-blue-500 rounded hover:bg-blue-600">
-            Let's Chat
-          </button>
+        <h2 class="mb-2 text-xl font-medium">No favourite tutors yet</h2>
+        <p class="text-gray-500">
+          You haven't added any tutors to your favourites list yet.
+          <br>
+          Browse tutors and click the heart icon to add them here.
+        </p>
+      </div>
+      
+      <div v-else>
+        <div v-for="tutor in favouriteTutorStore.favouriteTutors" :key="tutor.id" class="mb-4">
+          <TutorCards 
+            :id="tutor.id"
+            :name="tutor.name"
+            :location="tutor.location"
+            :hourlyRate="tutor.hourlyRate"
+            :rating="tutor.rating"
+            :reviews="tutor.reviews"
+            :profileImage="tutor.profileImage"
+            :description="tutor.description"
+            :services="tutor.services"
+            :saved="true"
+            :workingLocation="tutor.workingLocation"
+            @save-toggled="(isSaved) => handleSaveToggled(isSaved, tutor.id)"
+          />
         </div>
       </div>
     </div>

@@ -1,70 +1,112 @@
-// import {
-//   getFavouriteTutors,
-//   addToFavourites,
-//   removeFromFavourites,
-//   getTutorById
-// } from '../services/tutorService';
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import { addToFavourites as apiAddToFavourites, removeFromFavourites as apiRemoveFromFavourites, getTutors } from '../services/tutorService';
 
-// // State interface
-// interface FavoriteTutorsState {
-//   favouriteTutors: any[];
-//   loading: boolean;
-//   error: string | null;
-// }
+interface FavouriteTutor {
+  id: number;
+  name: string;
+  location: string;
+  hourlyRate: string;
+  rating: number;
+  reviews: number;
+  profileImage: string;
+  description: string;
+  services: string[];
+  saved: boolean;
+  categories: string[];
+  workingLocation: number;
+}
 
-// const state: FavoriteTutorsState = {
-//   favouriteTutors: [],
-//   loading: false,
-//   error: null
-// };
+export const useFavouriteTutorStore = defineStore('favouriteTutor', () => {
+  const favouriteTutors = ref<FavouriteTutor[]>([]);
+  const favouriteTutorIds = ref<number[]>([]);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
 
-// const getters = {
-//   isFavourite: (state) => (tutorId) => {
-//     return state.favouriteTutors.some(tutor => tutor.id === tutorId);
-//   }
-// };
+  function hasFavourites() {
+    return favouriteTutors.value.length > 0;
+  }
 
-// const actions = {
-//   async fetchFavouriteTutors({ commit }) {
-//     commit('SET_LOADING', true);
-//     try {
-//       const response = await getFavouriteTutors();
-//       commit('SET_FAVOURITE_TUTORS', response.data || []);
-//     } catch (error) {
-//       commit('SET_ERROR', 'Failed to load favourite tutors');
-//       console.error('Error fetching favourite tutors:', error);
-//     } finally {
-//       commit('SET_LOADING', false);
-//     }
-//   },
-  
-//   async addToFavourites({ commit }, tutorId) {
-//     try {
-//       await addToFavourites(tutorId);
-//       // If we have tutor details, we can add directly to state
-//       // Otherwise we'll need to fetch the tutor details first
-//       const tutorDetails = await getTutorById(tutorId);
-//       commit('ADD_FAVOURITE', tutorDetails);
-//     } catch (error) {
-//       commit('SET_ERROR', 'Failed to add tutor to favourites');
-//       console.error('Error adding to favourites:', error);
-//     }
-//   },
-  
-//   async removeFromFavourites({ commit }, tutorId) {
-//     try {
-//       await removeFromFavourites(tutorId);
-//       commit('REMOVE_FAVOURITE', tutorId);
-//     } catch (error) {
-//       commit('SET_ERROR', 'Failed to remove tutor from favourites');
-//       console.error('Error removing from favourites:', error);
-//     }
-//   }
-// };
+  async function fetchFavouriteTutors() {
+    loading.value = true;
+    error.value = null;
+    
+    try {
+      // Get all tutors and filter by favorites
+      const allTutors = await getTutors();
+      
+      favouriteTutors.value = allTutors
+        .filter((tutor: any) => favouriteTutorIds.value.includes(tutor.userId))
+        .map((item: any) => ({
+          id: item.userId,
+          name: `${item.userProfile.firstName} ${item.userProfile.lastName}`,
+          location: `${item.userProfile.city}, ${item.userProfile.country}`,
+          hourlyRate: item.tutorSubjects?.[0]?.price?.toString() ?? '0',
+          rating: item.rating ?? 0,
+          reviews: item.reviews ?? 0,
+          profileImage: item.photo?.url ?? '',
+          description: item.userProfile.bio ?? '',
+          services: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
+          workingLocation: item.workingLocation ?? 0,
+          saved: true,
+          categories: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
+        }));
+    } catch (err: any) {
+      error.value = err.message || 'Failed to fetch favourite tutors';
+      console.error('fetchFavouriteTutors error:', err);
+    } finally {
+      loading.value = false;
+    }
+  }
 
-// export default {
-//   namespaced: true,
-//   state,
-//   getters,
-//   actions,
-// };
+  async function addToFavourites(tutorId: number) {
+    try {
+      await apiAddToFavourites(tutorId);
+      
+      // Add to local state if not already there
+      if (!favouriteTutorIds.value.includes(tutorId)) {
+        favouriteTutorIds.value.push(tutorId);
+      }
+      
+      await fetchFavouriteTutors();
+      return true;
+    } catch (err: any) {
+      error.value = err.message || 'Failed to add tutor to favourites';
+      console.error('addToFavourites error:', err);
+      return false;
+    }
+  }
+
+  async function removeFromFavourites(tutorId: number) {
+    try {
+      await apiRemoveFromFavourites(tutorId);
+      
+      favouriteTutorIds.value = favouriteTutorIds.value.filter(id => id !== tutorId);
+      favouriteTutors.value = favouriteTutors.value.filter(tutor => tutor.id !== tutorId);
+      
+      return true;
+    } catch (err: any) {
+      error.value = err.message || 'Failed to remove tutor from favourites';
+      console.error('removeFromFavourites error:', err);
+      return false;
+    }
+  }
+
+  function isFavourite(tutorId: number): boolean {
+    return favouriteTutorIds.value.includes(tutorId);
+  }
+
+  return {
+    favouriteTutors,
+    favouriteTutorIds,
+    loading,
+    error,
+    hasFavourites,
+    fetchFavouriteTutors,
+    addToFavourites,
+    removeFromFavourites,
+    isFavourite
+  };
+}, {
+  persist: true
+});
