@@ -17,7 +17,7 @@
   import { useProfileStore } from '../store/profileStore.ts';
   import { computed } from 'vue';
   import { useStudentProfileStore } from '../store/studentProfileStore.ts';
-  import NotificationsDropdown from '../components/profile/NotificationsDropdown.vue';
+  import NotificationsDropdown from '../components/notifications/NotificationsDropdown.vue';
 
   library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref, watch, computed } from 'vue';
-  import DropdownSelect from '../../profile/DropdownSelect.vue';
+  import DropdownSelect from '../../../components/tutor/Profile/DropdownSelect.vue';
   import { useRouter } from 'vue-router';
   import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
   import { createStudentProfile } from '../../../services/studentService.ts';

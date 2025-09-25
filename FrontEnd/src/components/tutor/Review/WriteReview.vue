@@ -1,13 +1,13 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { createReview } from '../../../services/reviewService.ts';
-  import NotificationMessage from '../../ui/NotificationMessage.vue';
+  import NotificationMessage from '../../ui/AlertMessage.vue';
 
   const isModalOpen = ref(false);
   const rating = ref(0);
   const reviewText = ref('');
   const isLoading = ref(false);
-  
+
   // Notification state
   const showNotification = ref(false);
   const notificationMessage = ref('');
@@ -49,7 +49,7 @@
       closeModal();
       rating.value = 0;
       reviewText.value = '';
-      
+
       notificationMessage.value = 'Review submitted successfully!';
       notificationType.value = 'success';
       showNotification.value = true;
@@ -148,6 +148,5 @@
       position="top-right"
       @close="closeNotification"
     />
-    
   </div>
 </template>

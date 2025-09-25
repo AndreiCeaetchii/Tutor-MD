@@ -3,7 +3,7 @@
   import { storeToRefs } from 'pinia';
   import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
   import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
-  import ProfilePhotoUpload from '../../../components/profile/ProfileImageUploader.vue';
+  import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
   import defaultProfileImage from '../../../assets/DefaultImg.png';
 
   const studentStore = useStudentProfileStore();
