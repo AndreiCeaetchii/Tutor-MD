@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Security.Claims;
+using Tutor.Api.Filters;
 using Tutor.Application.Features.Admin.ActivateDeactivateStatus;
 using Tutor.Application.Features.Admin.CreateAdmin;
 using Tutor.Application.Features.Admin.Dto.Activate;
@@ -40,6 +41,7 @@ public static class UserEndpoints
         group.MapPost("/register",
                 async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto, HttpContext context) =>
                 {
+                    
                     var command = new RegisterUserCommand(registerUserDto);
                     var result = await mediator.Send(command);
 
@@ -66,6 +68,7 @@ public static class UserEndpoints
                         return Results.BadRequest(result.Errors);
                     }
                 })
+            .AddEndpointFilter<ValidationFilter>() 
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterUser");
@@ -390,6 +393,7 @@ public static class UserEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 }).WithName("ChangeIsActiveStatus")
+            
             .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
