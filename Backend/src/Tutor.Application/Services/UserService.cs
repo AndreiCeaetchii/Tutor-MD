@@ -84,8 +84,6 @@ public class UserService : IUserService
                 }
             }
         }
-        Console.WriteLine(profileDto.Username);
-
         user.Phone = profileDto.Phone;
         user.FirstName = profileDto.FirstName;
         user.LastName = profileDto.LastName;
