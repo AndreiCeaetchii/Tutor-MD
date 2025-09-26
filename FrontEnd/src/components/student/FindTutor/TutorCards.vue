@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, watch, computed } from 'vue';
+  import { useFavouriteTutorStore } from '../../../store/favouriteTutorStore';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import DefaultProfileImage from '../../../assets/DefaultImg.png';
   import { useRouter } from 'vue-router';
@@ -43,6 +44,8 @@
   const router = useRouter();
   const isSaved = ref(props.saved);
 
+  const favouriteTutorStore = useFavouriteTutorStore();
+
   watch(
     () => props.saved,
     (newValue) => {
@@ -50,9 +53,23 @@
     },
   );
 
-  function toggleSave() {
-    isSaved.value = !isSaved.value;
-    emit('save-toggled', isSaved.value);
+  async function toggleSave() {
+    try {
+      if (isSaved.value) {
+        const success = await favouriteTutorStore.removeFromFavourites(props.id);
+        if (success) {
+          isSaved.value = false;
+        }
+      } else {
+        const success = await favouriteTutorStore.addToFavourites(props.id);
+        if (success) {
+          isSaved.value = true;
+        }
+      }
+      emit('save-toggled', isSaved.value);
+    } catch (error) {
+      console.error('Failed to toggle favorite status', error);
+    }
   }
 
   function goToProfile() {
@@ -74,7 +91,7 @@
     <div class="relative">
       <div class="absolute top-0 right-0 text-right">
         <div class="text-xs text-gray-500">Starting from:</div>
-        <div class="text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+        <div class="text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
       </div>
 
       <div class="flex flex-col gap-3 pr-32 sm:flex-row sm:items-center sm:pr-0">
@@ -164,7 +181,7 @@
         @click="toggleSave"
       >
         <font-awesome-icon :icon="['fas', 'heart']" class="w-4 h-4" />
-        <span class="text-sm">{{ isSaved ? 'Saved' : 'Add to save' }}</span>
+        <span class="text-sm">{{ isSaved ? 'Favourite Tutor' : 'Add to favourite' }}</span>
       </div>
       <div class="flex gap-2">
         <button
