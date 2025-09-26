@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,12 @@ builder.Services.AddPersistenceSetup(builder.Configuration);
 builder.Services.AddHangfire(config =>
     config.UseMemoryStorage());
 builder.Services.AddHangfireServer();
+//Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "TutorApp:"; // Optional: prefix for keys
+});
 
 // Application layer setup
 builder.Services.AddApplicationSetup(builder.Configuration);
@@ -144,7 +151,7 @@ app.Use(async (context, next) =>
         if (!context.Request.Headers.ContainsKey("X-CSRF-TOKEN"))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsJsonAsync(new { error = "Forbidden", detail = "Missing CSRF cookie." });
+            await context.Response.WriteAsJsonAsync(new { error = "Forbidden", detail = "Missing CSRF token." });
             return;
         }
 
