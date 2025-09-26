@@ -17,6 +17,7 @@ using System;
 using System.Threading;
 using Tutor.Api.Common;
 using Tutor.Api.Filters.Guards;
+using Tutor.Application.Interfaces;
 using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Seeder;
@@ -113,9 +114,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
     await context.Database.MigrateAsync();
     await SubjectSeeder.SeedAsync(context);
     await RoleSeeder.SeedAsync(context);
+    await AdminSeeder.SeedAsync(context,passwordHasher);
     var scheduler = scope.ServiceProvider.GetRequiredService<JobSchedulerService>();
     await scheduler.StartAsync(CancellationToken.None);
 }
