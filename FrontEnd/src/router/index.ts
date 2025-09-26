@@ -17,14 +17,13 @@ import ProfilePage from '../pages/ProfilePage.vue';
 import CreateProfile from '../components/tutor/Profile/CreateProfile.vue';
 import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
 
-const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
-
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
 import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 import StudentChat from '../components/student/Chat/StudentChat.vue';
+import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
 
 import GuestPage from '../pages/GuestPage.vue';
 
