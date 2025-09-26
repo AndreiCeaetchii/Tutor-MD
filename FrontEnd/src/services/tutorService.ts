@@ -43,6 +43,8 @@ const API_URL =
 
 const tutorsAPI = `${API_URL}/tutors`;
 
+const favouriteTutorAPI = `${API_URL}/students`;
+
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
     const store = useUserStore();
@@ -195,6 +197,45 @@ export const getTutors = async () => {
   } catch (error: any) {
     throw new Error(
       error.response?.data?.message || error.message || 'Failed to fetch tutors list.',
+    );
+  }
+};
+
+export const addToFavourites = async (tutorId: number) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+
+    const response = await axios.post(`${favouriteTutorAPI}/favorite/${tutorId}`, {}, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.'
+    );
+  }
+};
+
+export const removeFromFavourites = async (tutorId: number) => {
+  try {
+    const store = useUserStore();
+    const token = store.accessToken;
+    
+    const response = await axios.delete(`${favouriteTutorAPI}/favorites/${tutorId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true,
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.'
     );
   }
 };

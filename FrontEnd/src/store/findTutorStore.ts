@@ -1,9 +1,9 @@
-// store/findTutorStore.ts
 import { defineStore } from 'pinia';
 import debounce from 'lodash/debounce';
 import { getTutors } from '../services/tutorService';
+import { useFavouriteTutorStore } from './favouriteTutorStore';
 
-// Tipurile pentru tutor
+
 interface Tutor {
   id: number;
   name: string;
@@ -19,7 +19,6 @@ interface Tutor {
   workingLocation: number;
 }
 
-// Funcție ajutătoare pentru căutare
 function matchesSearchQuery(tutor: Tutor, query: string): boolean {
   return (
     tutor.name.toLowerCase().includes(query) ||
@@ -160,7 +159,8 @@ export const useFindTutorStore = defineStore('tutor', {
 
       try {
         const serverTutors = await getTutors();
-
+        const favouriteStore = useFavouriteTutorStore();
+        
         this.tutors = serverTutors.map((item: any) => ({
           id: item.userId,
           name: `${item.userProfile.firstName} ${item.userProfile.lastName}`,
@@ -172,7 +172,7 @@ export const useFindTutorStore = defineStore('tutor', {
           description: item.userProfile.bio ?? '',
           services: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
           workingLocation: item.workingLocation ?? 0,
-          saved: false,
+          saved: favouriteStore.isFavourite(item.userId),
           categories: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
         }));
       } catch (err: any) {
@@ -182,5 +182,11 @@ export const useFindTutorStore = defineStore('tutor', {
         this.loading = false;
       }
     },
+    updateSavedStatus(tutorId: number, isSaved: boolean) {
+      const tutorIndex = this.tutors.findIndex(t => t.id === tutorId);
+      if (tutorIndex !== -1) {
+        this.tutors[tutorIndex].saved = isSaved;
+      }
+    }
   },
 });

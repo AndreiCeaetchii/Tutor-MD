@@ -35,6 +35,10 @@ import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
 
 
+
+const AdminReviews = { template: '<div>Admin Reviews</div>' };
+const AdminSettings = { template: '<div>Admin Settings</div>' };
+
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
@@ -56,10 +60,10 @@ const routes = [
     component: StudentDashboard,
     meta: { requiresAuth: true, role: 'student' },
     children: [
-      { path: '', redirect: '/student-dashboard/find' },
-      { path: 'find', component: FindTutor },
+      { path: '', redirect: '/student-dashboard/find-tutors' },
+      { path: 'find-tutors', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
-      { path: 'reviews', component: StudentReviews },
+      { path: 'favourite-tutors', component: FavouriteTutors },
       { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
     ],
