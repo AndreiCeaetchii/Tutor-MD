@@ -2,6 +2,33 @@ import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
 
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'https://localhost:8085/api'
+;
+
+const tutorAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+tutorAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export interface Subject {
   subjectName: string;
   subjectSlug: string;
@@ -36,27 +63,17 @@ export interface TutorProfileData {
   workingLocation: number;
 }
 
-const API_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ||
-  (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api';
-
 const tutorsAPI = `${API_URL}/tutors`;
-
 const favouriteTutorAPI = `${API_URL}/students`;
 
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
-    const store = useUserStore();
     const profileStore = useProfileStore();
-    const token = store.accessToken;
 
-    const response = await axios.post(`${tutorsAPI}/create-tutor`, profileData, {
+    const response = await tutorAxios.post(`${tutorsAPI}/create-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     profileStore.userName = profileData.createProfileDto.username;
@@ -72,14 +89,7 @@ export const createTutorProfile = async (profileData: TutorProfileData) => {
 
 export const getTutorProfile = async (userId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.get(`${tutorsAPI}/get-tutor/${userId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true,
-    });
-
+    const response = await tutorAxios.get(`${tutorsAPI}/get-tutor/${userId}`);
     return response.data;
   } catch (error: any) {
     if (error.response?.status === 404) {
@@ -93,16 +103,12 @@ export const getTutorProfile = async (userId: number) => {
 
 export const editTutorProfile = async (profileData: any) => {
   try {
-    const store = useUserStore();
     const profileStore = useProfileStore();
-    const token = store.accessToken;
 
-    const response = await axios.put(`${tutorsAPI}/update-tutor`, profileData, {
+    const response = await tutorAxios.put(`${tutorsAPI}/update-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     if (response.data.userProfile?.username) {
@@ -119,15 +125,10 @@ export const editTutorProfile = async (profileData: any) => {
 
 export const addSubject = async (subjectData: Subject) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.post(`${tutorsAPI}/add-subject`, subjectData, {
+    const response = await tutorAxios.post(`${tutorsAPI}/add-subject`, subjectData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -138,14 +139,7 @@ export const addSubject = async (subjectData: Subject) => {
 
 export const deleteSubject = async (subjectId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.delete(`${tutorsAPI}/delete-subject/${subjectId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true,
-    });
-
+    const response = await tutorAxios.delete(`${tutorsAPI}/delete-subject/${subjectId}`);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -158,15 +152,10 @@ export const deleteSubject = async (subjectId: number) => {
 
 export const updateSubject = async (subjectData: UpdateSubject) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.put(`${tutorsAPI}/update-subject`, subjectData, {
+    const response = await tutorAxios.put(`${tutorsAPI}/update-subject`, subjectData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -181,18 +170,7 @@ export const updateSubject = async (subjectData: UpdateSubject) => {
 
 export const getTutors = async () => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    if (!token) {
-      throw new Error('User not authenticated. Access token is missing.');
-    }
-
-    const response = await axios.get(`${tutorsAPI}/get-tutors`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true,
-    });
-
+    const response = await tutorAxios.get(`${tutorsAPI}/get-tutors`);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -203,39 +181,31 @@ export const getTutors = async () => {
 
 export const addToFavourites = async (tutorId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.post(`${favouriteTutorAPI}/favorite/${tutorId}`, {}, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await tutorAxios.post(
+      `${favouriteTutorAPI}/favorite/${tutorId}`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-      withCredentials: true,
-    });
-    
+    );
+
     return response.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.'
+      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.',
     );
   }
 };
 
 export const removeFromFavourites = async (tutorId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-    
-    const response = await axios.delete(`${favouriteTutorAPI}/favorites/${tutorId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true,
-    });
-    
+    const response = await tutorAxios.delete(`${favouriteTutorAPI}/favorites/${tutorId}`);
     return response.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.'
+      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.',
     );
   }
 };

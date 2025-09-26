@@ -5,6 +5,26 @@ const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
   'https://localhost:8085/api';
+const adminAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+adminAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
 
 export interface TutorSubject {
   subjectId: number;
@@ -58,19 +78,10 @@ export interface StudentProfile {
 
 export const getTutorsForAdmin = async (): Promise<TutorProfile[]> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
-    const response = await axios.get<TutorProfile[]>(`${API_URL}/admin/tutors`, {
+    const response = await adminAxios.get<TutorProfile[]>(`/admin/tutors`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -89,19 +100,10 @@ export const getTutorsForAdmin = async (): Promise<TutorProfile[]> => {
 
 export const approveTutor = async (tutorId: number): Promise<TutorProfile> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
-    const response = await axios.put<TutorProfile>(`${API_URL}/tutors/approve-tutor/${tutorId}`, null, {
+    const response = await adminAxios.put<TutorProfile>(`/tutors/approve-tutor/${tutorId}`, null, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -118,22 +120,12 @@ export const approveTutor = async (tutorId: number): Promise<TutorProfile> => {
   }
 };
 
-
 export const declineTutor = async (tutorId: number): Promise<TutorProfile> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
-    const response = await axios.put<TutorProfile>(`${API_URL}/tutors/decline-tutor/${tutorId}`, null, {
+    const response = await adminAxios.put<TutorProfile>(`/tutors/decline-tutor/${tutorId}`, null, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -152,24 +144,15 @@ export const declineTutor = async (tutorId: number): Promise<TutorProfile> => {
 
 export const changeUserStatus = async (userId: number, isActive: boolean): Promise<any> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
     const payload = {
       userId,
       isActive,
     };
 
-    const response = await axios.put(`${API_URL}/users/changestatus`, payload, {
+    const response = await adminAxios.put(`/users/changestatus`, payload, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -186,22 +169,12 @@ export const changeUserStatus = async (userId: number, isActive: boolean): Promi
   }
 };
 
-
 export const getAllStudents = async (): Promise<StudentProfile[]> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
-    const response = await axios.get<StudentProfile[]>(`${API_URL}/students/all-students`, {
+    const response = await adminAxios.get<StudentProfile[]>(`/students/all-students`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -220,21 +193,12 @@ export const getAllStudents = async (): Promise<StudentProfile[]> => {
 
 export const createAdmin = async (userId: number): Promise<TutorProfile> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token is not available. Please log in again.');
-    }
-
     const payload = { userId };
 
-    const response = await axios.post<TutorProfile>(`${API_URL}/users/admin/create`, payload, {
+    const response = await adminAxios.post<TutorProfile>(`/users/admin/create`, payload, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;

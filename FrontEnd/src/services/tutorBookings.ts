@@ -5,10 +5,25 @@ const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
   'https://localhost:8085/api';
-
 const bookingAxios = axios.create({
   baseURL: API_URL,
   withCredentials: true,
+});
+
+bookingAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
 });
 
 export interface TutorBooking {
@@ -30,15 +45,7 @@ export interface TutorBooking {
 
 export const getBookingById = async (bookingId: number): Promise<TutorBooking> => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await bookingAxios.get(`/students/booking/${bookingId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await bookingAxios.get(`/students/booking/${bookingId}`);
     return response.data;
   } catch (error: any) {
     console.error('Error fetching booking details:', error.response?.data || error);
@@ -48,15 +55,7 @@ export const getBookingById = async (bookingId: number): Promise<TutorBooking> =
 
 export const getTutorBookings = async (): Promise<TutorBooking[]> => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await bookingAxios.get(`/students/bookings`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await bookingAxios.get(`/students/bookings`);
     return response.data;
   } catch (error: any) {
     console.error('Error fetching tutor bookings:', error.response?.data || error);
@@ -69,13 +68,9 @@ export const updateBookingStatus = async (
   status: number,
 ): Promise<TutorBooking> => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
     const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, status, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 

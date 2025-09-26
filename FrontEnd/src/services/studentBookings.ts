@@ -11,6 +11,22 @@ const bookingAxios = axios.create({
   withCredentials: true,
 });
 
+bookingAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export interface BookingRequest {
   tutorUserId: number;
   subjectId: number;
@@ -36,13 +52,9 @@ export interface StudentBooking {
 
 export const createBooking = async (bookingData: BookingRequest) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
     const response = await bookingAxios.post('/students/booking/create', bookingData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -58,15 +70,7 @@ export const createBooking = async (bookingData: BookingRequest) => {
 
 export const getStudentBookings = async (): Promise<StudentBooking[]> => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await bookingAxios.get(`/students/bookings`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
+    const response = await bookingAxios.get(`/students/bookings`);
     return response.data;
   } catch (error: any) {
     console.error('Error fetching student bookings:', error.response?.data || error);
@@ -76,13 +80,9 @@ export const getStudentBookings = async (): Promise<StudentBooking[]> => {
 
 export const cancelStudentBooking = async (bookingId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
     const response = await bookingAxios.put(`/students/booking/update/${bookingId}`, 2, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -100,7 +100,7 @@ export const formatTimeForBooking = (date: string, time: string): string => {
 
 export const fetchTutorSubjects = async (tutorId: number) => {
   try {
-    const response = await axios.get(`${API_URL}/tutors/${tutorId}/subjects`);
+    const response = await bookingAxios.get(`/tutors/${tutorId}/subjects`);
     return response.data.map((subject: any) => ({
       name: subject.name,
       subjectId: subject.id,
