@@ -4,7 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 export interface TutorSubject {
   subjectId: number;
@@ -96,13 +96,17 @@ export const approveTutor = async (tutorId: number): Promise<TutorProfile> => {
       throw new Error('Access token is not available. Please log in again.');
     }
 
-    const response = await axios.put<TutorProfile>(`${API_URL}/tutors/approve-tutor/${tutorId}`, null, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await axios.put<TutorProfile>(
+      `${API_URL}/tutors/approve-tutor/${tutorId}`,
+      null,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
       },
-      withCredentials: true,
-    });
+    );
 
     return response.data;
   } catch (error) {
@@ -118,7 +122,6 @@ export const approveTutor = async (tutorId: number): Promise<TutorProfile> => {
   }
 };
 
-
 export const declineTutor = async (tutorId: number): Promise<TutorProfile> => {
   try {
     const userStore = useUserStore();
@@ -128,13 +131,17 @@ export const declineTutor = async (tutorId: number): Promise<TutorProfile> => {
       throw new Error('Access token is not available. Please log in again.');
     }
 
-    const response = await axios.put<TutorProfile>(`${API_URL}/tutors/decline-tutor/${tutorId}`, null, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await axios.put<TutorProfile>(
+      `${API_URL}/tutors/decline-tutor/${tutorId}`,
+      null,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
       },
-      withCredentials: true,
-    });
+    );
 
     return response.data;
   } catch (error) {
@@ -185,7 +192,6 @@ export const changeUserStatus = async (userId: number, isActive: boolean): Promi
     throw error;
   }
 };
-
 
 export const getAllStudents = async (): Promise<StudentProfile[]> => {
   try {

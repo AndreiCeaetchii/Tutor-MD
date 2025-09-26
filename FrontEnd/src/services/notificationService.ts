@@ -4,7 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 export type Notification = {
   id: number;
@@ -12,7 +12,7 @@ export type Notification = {
   payload: string;
   status: number;
   createdAt: string;
-}
+};
 
 export interface NotificationsResponse {
   totalCount: number;

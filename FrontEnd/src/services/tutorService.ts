@@ -39,7 +39,7 @@ export interface TutorProfileData {
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 const tutorsAPI = `${API_URL}/tutors`;
 
@@ -206,18 +206,22 @@ export const addToFavourites = async (tutorId: number) => {
     const store = useUserStore();
     const token = store.accessToken;
 
-    const response = await axios.post(`${favouriteTutorAPI}/favorite/${tutorId}`, {}, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+    const response = await axios.post(
+      `${favouriteTutorAPI}/favorite/${tutorId}`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
       },
-      withCredentials: true,
-    });
-    
+    );
+
     return response.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.'
+      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.',
     );
   }
 };
@@ -226,16 +230,16 @@ export const removeFromFavourites = async (tutorId: number) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
+
     const response = await axios.delete(`${favouriteTutorAPI}/favorites/${tutorId}`, {
       headers: { Authorization: `Bearer ${token}` },
       withCredentials: true,
     });
-    
+
     return response.data;
   } catch (error: any) {
     throw new Error(
-      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.'
+      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.',
     );
   }
 };

@@ -4,11 +4,11 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
 
 const bookingAxios = axios.create({
   baseURL: API_URL,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export interface BookingRequest {
@@ -30,7 +30,7 @@ export interface StudentBooking {
   startTime: string;
   endTime: string;
   description: string;
-  status: number; 
+  status: number;
   tutorPhoto: string | null;
 }
 
@@ -38,12 +38,12 @@ export const createBooking = async (bookingData: BookingRequest) => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
+
     const response = await bookingAxios.post('/students/booking/create', bookingData, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;
@@ -60,11 +60,11 @@ export const getStudentBookings = async (): Promise<StudentBooking[]> => {
   try {
     const store = useUserStore();
     const token = store.accessToken;
-    
+
     const response = await bookingAxios.get(`/students/bookings`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     return response.data;
@@ -103,7 +103,7 @@ export const fetchTutorSubjects = async (tutorId: number) => {
     const response = await axios.get(`${API_URL}/tutors/${tutorId}/subjects`);
     return response.data.map((subject: any) => ({
       name: subject.name,
-      subjectId: subject.id
+      subjectId: subject.id,
     }));
   } catch (error) {
     console.error('Error fetching tutor subjects:', error);
