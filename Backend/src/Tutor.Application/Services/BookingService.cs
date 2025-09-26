@@ -162,8 +162,6 @@ public class BookingService : IBookingService
     public async Task<Result<List<BookingDto>>> GetBookingsByUSer(int userId)
     {
         var bookings = await _bookingRepository.FindAsync(b => b.StudentUserId == userId || b.TutorUserId == userId);
-        if (bookings.Count == 0)
-            return Result<List<BookingDto>>.Error("Bookings not found");
         var bookingDtos = new List<BookingDto>();
         foreach (var booking in bookings)
         {
