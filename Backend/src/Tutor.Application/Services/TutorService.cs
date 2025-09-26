@@ -51,6 +51,7 @@ public class TutorService : ITutorService
 
     private const string TutorByIdKey = "tutor:{0}";
     private const string TutorListKey = "tutors:list";
+
     public async Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto,
         int userId)
     {
@@ -135,15 +136,13 @@ public class TutorService : ITutorService
                     var cacheKey = string.Format(TutorByIdKey, tutorDto.UserId);
                     await _cacheService.SetAsync(cacheKey, tutorDto, TimeSpan.FromHours(1));
                 }
+
                 Console.Write("from cache");
                 return Result<List<TutorProfileDto>>.Success(cachedTutors);
             }
-            
         }
 
         var profiles = await _tutorProfileRepository.GetAll();
-        if (profiles is null || profiles.Count() == 0)
-            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
         var verifiedProfiles = profiles
             .Where(profile => profile.VerificationStatus == VerificationStatus.Verified &&
                               profile.User.IsActive == true)
@@ -155,6 +154,7 @@ public class TutorService : ITutorService
                 profile.User?.City != null &&
                 profile.User.City.Equals(city, StringComparison.OrdinalIgnoreCase));
         }
+
         if (!string.IsNullOrEmpty(country))
         {
             filteredProfiles = filteredProfiles.Where(profile =>
@@ -190,6 +190,7 @@ public class TutorService : ITutorService
                 profile.Reviews.Any() &&
                 ratings.Contains((int)Math.Floor(profile.Reviews.Average(r => r.Rating))));
         }
+
         IOrderedEnumerable<TutorProfile> orderedProfiles;
         switch (sortBy?.ToLower())
         {
@@ -230,9 +231,6 @@ public class TutorService : ITutorService
 
         var resultList = orderedProfiles.ToList();
 
-        if (resultList.Count == 0)
-            return Result<List<TutorProfileDto>>.NotFound("No tutors found matching the criteria");
-
         var result = _mapper.Map<List<TutorProfileDto>>(resultList);
         var tutorIds = result.Select(t => t.UserId).ToList();
         var favorites =
@@ -257,8 +255,6 @@ public class TutorService : ITutorService
     public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsyncForAdmin()
     {
         var profiles = await _tutorProfileRepository.GetAll();
-        if (profiles is null || profiles.Count() == 0)
-            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
         var filteredProfiles = new List<TutorProfile>();
         foreach (var profile in profiles)
         {
