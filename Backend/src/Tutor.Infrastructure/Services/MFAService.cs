@@ -70,7 +70,7 @@ public class MFAService : IMFAService
     {
         var fullCipher = Convert.FromBase64String(cipherText);
         var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("MFA_ENCRYPTION_KEY") 
-                                         ?? "Your32CharEncryptionKeyHere123456789012"); 
+                                         ?? "Your32CharEncryptionKeyHere12345"); 
 
         using var aes = Aes.Create();
         aes.Key = key;
