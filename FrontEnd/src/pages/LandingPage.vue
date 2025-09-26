@@ -40,10 +40,10 @@ onMounted(() => {
             </div>
 
             <p class="text-sm font-bold tracking-widest text-orange-500 uppercase">
-              Our featured instructors
+              Our featured Tutors
             </p>
             <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Every instructor is <span class="text-[#5f22d9]">professional</span><br class="hidden lg:inline" /> and highly qualified
+              Every tutor is <span class="text-[#5f22d9]">professional</span><br class="hidden lg:inline" /> and highly qualified
             </h2>
 
             <p class="max-w-2xl mx-auto mt-4 text-base text-gray-500">
@@ -63,7 +63,7 @@ onMounted(() => {
             <div class="mt-1">
               <button
                   class="inline-flex items-center rounded-full border border-transparent bg-[#5f22d9] px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                Explore all instructors
+                Explore all tutors
                 <svg
                     class="w-5 h-5 ml-2 -mr-1"
                     xmlns="http://www.w3.org/2000/svg"

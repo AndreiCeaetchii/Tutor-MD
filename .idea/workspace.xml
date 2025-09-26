@@ -6,14 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="fca9aeb0-1feb-4b14-b4bb-c0aa0d3779f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Api/Endpoints/TutorEndpoints.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminAnalytics.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminAnalytics.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminUserTable.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminUserTable.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminUsers.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/admin/AdminUsers.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/navigation/AdminNavBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/navigation/AdminNavBar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/ReviewService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/src/Tutor.Application/Services/ReviewService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/navigation/GuestNavbar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/navigation/GuestNavbar.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/SearchBar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/FindTutor/SearchBar.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/student/profile/StudentProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Availability/TutorAvailability.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Availability/TutorAvailability.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/CreateProfile.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/CreateProfile.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/PricingCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/PricingCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/ProfileDetails.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/ProfileDetails.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/ProfileDetailsEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Profile/ProfileDetailsEdit.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/ReviewStats.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/ReviewStats.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/TutorReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/TutorReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/WriteReview.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/components/tutor/Review/WriteReview.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/pages/GuestPage.vue" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/pages/GuestPage.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/router/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/adminService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/adminService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/services/reviewService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/services/reviewService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/profileStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/profileStore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/FrontEnd/src/store/studentProfileStore.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
