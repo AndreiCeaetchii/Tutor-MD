@@ -50,6 +50,7 @@ public static class ApplicationSetup
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
         services.AddScoped<IMFAService, MFAService>();
+        services.AddScoped<IGoogleCalendarService, GoogleCalendarService>();
 
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));

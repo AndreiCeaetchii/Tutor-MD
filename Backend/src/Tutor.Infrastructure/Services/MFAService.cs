@@ -49,7 +49,7 @@ public class MFAService : IMFAService
     public string Encrypt(string plainText)
     {
         var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("MFA_ENCRYPTION_KEY") 
-                                         ?? "Your32CharEncryptionKeyHere123456789012"); // 32 chars
+                                         ?? "Your32CharEncryptionKeyHere12345"); // 32 chars
 
         using var aes = Aes.Create();
         aes.Key = key;

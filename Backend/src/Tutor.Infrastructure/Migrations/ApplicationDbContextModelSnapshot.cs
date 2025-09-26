@@ -142,6 +142,9 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<string>("GoogleCalendarEventId")
+                        .HasColumnType("text");
+
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -170,6 +173,36 @@ namespace Tutor.Infrastructure.Migrations
                     b.HasIndex("TutorUserId");
 
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.Favorites", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("StudentUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TutorUserId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentUserId");
+
+                    b.HasIndex("TutorUserId", "StudentUserId")
+                        .IsUnique();
+
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("Tutor.Domain.Entities.GoogleAuth", b =>
@@ -611,6 +644,12 @@ namespace Tutor.Infrastructure.Migrations
                     b.Property<int?>("PhotoId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("RefreshTokenExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
 
@@ -832,6 +871,25 @@ namespace Tutor.Infrastructure.Migrations
                     b.Navigation("Subject");
 
                     b.Navigation("TutorAvailabilityRule");
+
+                    b.Navigation("TutorProfile");
+                });
+
+            modelBuilder.Entity("Tutor.Domain.Entities.Favorites", b =>
+                {
+                    b.HasOne("Tutor.Domain.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tutor.Domain.Entities.TutorProfile", "TutorProfile")
+                        .WithMany()
+                        .HasForeignKey("TutorUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Student");
 
                     b.Navigation("TutorProfile");
                 });

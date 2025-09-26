@@ -7,6 +7,7 @@ interface UserState {
   userId: string | null;
   role: UserRole | null;
   email: string | null;
+  csrfToken: string | null;
 }
 
 // @ts-ignore
@@ -16,6 +17,7 @@ export const useUserStore = defineStore('user', {
     userId: null,
     role: null,
     email: null,
+    csrfToken: null
   }),
   getters: {
     userRole: (state) => state.role,
@@ -29,11 +31,17 @@ export const useUserStore = defineStore('user', {
       this.role = role;
       this.email = email;
     },
+
+    setCsrfToken(token: string) {
+      this.csrfToken = token;
+    },
+
     clearUser() {
       this.accessToken = null;
       this.userId = null;
       this.role = null;
       this.email = null;
+      this.csrfToken = null;
     },
 
     updateRole(newRole: UserRole) {

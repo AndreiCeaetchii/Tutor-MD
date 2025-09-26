@@ -14,11 +14,11 @@ public class TutorMappingProfile : Profile
     {
         // TutorProfile -> TutorProfileDto
         CreateMap<TutorProfile, TutorProfileDto>()
-            .ForMember(dest => dest.UserProfile, 
+            .ForMember(dest => dest.UserProfile,
                 opt => opt.MapFrom(src => src.User))
             .ForMember(dest => dest.Rating,
                 opt => opt.MapFrom(src => src.Reviews.Any()
-                    ? src.Reviews.Average(r => r.Rating)   // assumes Review has Rating
+                    ? src.Reviews.Average(r => r.Rating) // assumes Review has Rating
                     : 0))
             .ForMember(dest => dest.ReviewCount,
                 opt => opt.MapFrom(src => src.Reviews.Count))
@@ -40,6 +40,5 @@ public class TutorMappingProfile : Profile
         CreateMap<UpdateTutorProfileDto, CreateProfileDto>();
         CreateMap<Photo, PhotoDto>();
     }
-    
     
 }

@@ -20,5 +20,7 @@ public class TutorProfileDto
     public decimal Rating {get; set;}
     
     public int ReviewCount { get; set; }
+    
+    public bool IsFavorite { get; set; }
 }
 
