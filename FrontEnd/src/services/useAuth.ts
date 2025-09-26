@@ -166,6 +166,8 @@ export function useAuth() {
             const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
             store.setUser(data.token, data.id, userRole, email);
 
+
+
             resolve({ success: true, role: userRole });
           } catch (err: any) {
             errorMessage.value = handleAuthError(err, 'google', isSignup);

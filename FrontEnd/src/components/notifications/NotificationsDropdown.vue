@@ -206,12 +206,13 @@
 
 <template>
   <div class="relative">
-    <button @click="toggleNotificationsMenu" ref="notificationsButton" class="relative">
-      <Bell class="w-5 h-5 text-gray-600 transition-colors hover:text-gray-900" />
+    <button @click="toggleNotificationsMenu" ref="notificationsButton"   class="flex items-center justify-center relative p-2 text-gray-600 rounded-full hover:bg-gray-100"
+    >
+      <Bell class="w-5 h-5 text-gray-600 transition-colors hover:text-gray-900 transform translate-y-0.5" />
       <span
         v-if="unreadCount > 0"
         :class="[
-          'absolute top-0 right-0 inline-flex items-center justify-center text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full',
+          'absolute top-2 right-1 inline-flex items-center justify-center text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full',
           badgeSizeClass,
         ]"
         >{{ unreadCount }}</span
