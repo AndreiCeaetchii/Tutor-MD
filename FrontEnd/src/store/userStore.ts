@@ -7,6 +7,7 @@ interface UserState {
   userId: string | null;
   role: UserRole | null;
   email: string | null;
+  hasMfa: boolean;
 }
 
 // @ts-ignore
@@ -16,6 +17,7 @@ export const useUserStore = defineStore('user', {
     userId: null,
     role: null,
     email: null,
+    hasMfa: false,
   }),
   getters: {
     userRole: (state) => state.role,
@@ -29,16 +31,22 @@ export const useUserStore = defineStore('user', {
       this.role = role;
       this.email = email;
     },
+
     clearUser() {
       this.accessToken = null;
       this.userId = null;
       this.role = null;
       this.email = null;
+      this.hasMfa = false;
     },
 
     updateRole(newRole: UserRole) {
       this.role = newRole;
     },
+
+    updateUserMfaStatus(status: boolean) {
+    this.hasMfa = status;
+  },
   },
   persist: true,
 });

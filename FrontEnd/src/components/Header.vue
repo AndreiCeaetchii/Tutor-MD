@@ -8,10 +8,12 @@
   import {
     faUser,
     faCog,
-    faBook,
-    faCreditCard,
-    faCircleQuestion,
+    faCalendarDays,
+    faMessage,
+    faUserGear,
     faRightFromBracket,
+    faShieldHalved,
+    faCheckCircle,
   } from '@fortawesome/free-solid-svg-icons';
   import { useUserStore } from '../store/userStore.ts';
   import { useProfileStore } from '../store/profileStore.ts';
@@ -19,7 +21,16 @@
   import { useStudentProfileStore } from '../store/studentProfileStore.ts';
   import NotificationsDropdown from '../components/notifications/NotificationsDropdown.vue';
 
-  library.add(faUser, faCog, faBook, faCreditCard, faCircleQuestion, faRightFromBracket);
+  library.add(
+    faUser, 
+    faCog, 
+    faCalendarDays,
+    faMessage,
+    faUserGear,
+    faRightFromBracket, 
+    faShieldHalved,
+    faCheckCircle
+  );
 
   interface HeaderProps {
     userType?: 'student' | 'tutor';
@@ -38,6 +49,9 @@
 
   const profileButton = ref<HTMLElement | null>(null);
   const profileMenu = ref<HTMLElement | null>(null);
+
+  // Get MFA status directly from the store
+  const hasMfa = computed(() => store.hasMfa);
 
   function toggleMenu() {
     isMenuOpen.value = !isMenuOpen.value;
@@ -59,29 +73,46 @@
     showProfileMenu.value = false;
   }
 
+  function navigateToMfaSetup() {
+    router.push('/mfa-setup');
+    showProfileMenu.value = false;
+  }
+
   const userRole = computed(() => store.userRole);
 
-  const userName = computed(() => {
-  if (userRole.value === 'student') {
-    if (studentProfileStore.userProfile?.username) {
-      return studentProfileStore.userProfile.username;
+  // Navigation based on user role
+  function navigateBasedOnRole(path: string) {
+    const role = userRole.value;
+    if (role === 'tutor') {
+      router.push(`/tutor-dashboard${path}`);
+    } else if (role === 'student') {
+      router.push(`/student-dashboard${path}`);
+    } else if (role === 'admin') {
+      router.push(`/admin-dashboard${path}`);
+    } else {
+      router.push('/landing');
     }
-    
-    if (store.email) {
-      const emailPart = store.email.split('@')[0];
-      
-      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
-      
-      studentProfileStore.updateUsername(cleanEmailPart);
-      
-      return cleanEmailPart;
-    }
-    
-    return 'user';
-  } else {
-    return profileStore.userName || '';
+    showProfileMenu.value = false;
   }
-});
+
+  const userName = computed(() => {
+    if (userRole.value === 'student') {
+      if (studentProfileStore.userProfile?.username) {
+        return studentProfileStore.userProfile.username;
+      }
+      
+      if (store.email) {
+        const emailPart = store.email.split('@')[0];
+        const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+        studentProfileStore.updateUsername(cleanEmailPart);
+        return cleanEmailPart;
+      }
+      
+      return 'user';
+    } else {
+      return profileStore.userName || '';
+    }
+  });
 
   const email = computed(() => store.email);
 
@@ -148,69 +179,83 @@
                   <p class="mt-1 text-xs text-gray-500 truncate">{{ email }}</p>
                 </div>
                 <div class="py-1">
-                  <a
-                    href="#profile"
-                    class="block text-sm text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  <!-- 2FA Security with check mark -->
+                  <button
+                    @click="navigateToMfaSetup"
+                    class="block w-full text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
                   >
                     <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
-                      <font-awesome-icon
-                        :icon="['fas', 'user']"
-                        class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
-                      />
-                      Profile
+                      <div class="relative w-4 h-4 mr-3">
+                        <font-awesome-icon 
+                          :icon="['fas', 'shield-halved']" 
+                          class="w-4 h-4 text-gray-500 transition-colors duration-200 group-hover:text-violet-600" 
+                        />
+                        <font-awesome-icon 
+                          v-if="hasMfa"
+                          :icon="['fas', 'check-circle']" 
+                          class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500" 
+                        />
+                      </div>
+                      {{ hasMfa ? 'Manage 2FA Security' : 'Enable 2FA Security' }}
                     </div>
-                  </a>
-                  <a
-                    href="#settings"
-                    class="block text-sm text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
-                  >
-                    <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
-                      <font-awesome-icon
-                        :icon="['fas', 'cog']"
-                        class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
-                      />
+                  </button>
 
-                      Settings
-                    </div>
-                  </a>
-                  <a
-                    href="#my-courses"
-                    class="block text-sm text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  <!-- Tutor: Availability Link -->
+                  <button
+                    v-if="userRole === 'tutor'"
+                    @click="navigateBasedOnRole('/availability')"
+                    class="block w-full text-sm text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
                   >
                     <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
                       <font-awesome-icon
-                        :icon="['fas', 'book']"
+                        :icon="['fas', 'calendar-days']"
                         class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                       />
+                      Availability
+                    </div>
+                  </button>
 
-                      My Courses
-                    </div>
-                  </a>
-                  <a
-                    href="#billing"
-                    class="block text-sm text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  <!-- Profile Link with better icon -->
+                  <button
+                    @click="navigateBasedOnRole(userRole === 'student' ? '/account' : '/profile')"
+                    class="block w-full text-sm text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
                   >
                     <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
                       <font-awesome-icon
-                        :icon="['fas', 'credit-card']"
+                        :icon="['fas', 'user-gear']"
                         class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                       />
-
-                      Billing & Payments
+                      Profile Settings
                     </div>
-                  </a>
-                  <a
-                    href="#help"
-                    class="block text-sm text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  </button>
+                  
+                  <!-- Bookings Link with better icon -->
+                  <button
+                    @click="navigateBasedOnRole('/bookings')"
+                    class="block w-full text-sm text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
                   >
                     <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
                       <font-awesome-icon
-                        :icon="['fas', 'circle-question']"
+                        :icon="['fas', 'calendar-days']"
                         class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                       />
-                      Help & Support
+                      Bookings
                     </div>
-                  </a>
+                  </button>
+                  
+                  <!-- Messages Link with better icon -->
+                  <button
+                    @click="navigateBasedOnRole('/messages')"
+                    class="block w-full text-sm text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  >
+                    <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
+                      <font-awesome-icon
+                        :icon="['fas', 'message']"
+                        class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
+                      />
+                      Messages
+                    </div>
+                  </button>
                 </div>
                 <div class="pt-2 mt-2 border-t border-gray-100">
                   <button
@@ -261,47 +306,61 @@
       <div v-if="isMenuOpen" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 sm:px-3">
           <div class="py-2 space-y-1">
-            <a
-              href="#profile"
-              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            <!-- Mobile menu links - also update icons here -->
+            <button
+              @click="navigateBasedOnRole(userRole === 'student' ? '/account' : '/profile')"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
-              <font-awesome-icon :icon="['fas', 'user']" class="w-5 h-5 mr-3 text-gray-500" />
+              <font-awesome-icon :icon="['fas', 'user-gear']" class="w-5 h-5 mr-3 text-gray-500" />
               Profile
-            </a>
-            <a
-              href="#settings"
-              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            </button>
+            
+            <!-- 2FA link with check mark for mobile -->
+            <button
+              @click="navigateToMfaSetup"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
-              <font-awesome-icon :icon="['fas', 'cog']" class="w-5 h-5 mr-3 text-gray-500" />
-              Settings
-            </a>
-            <a
-              href="#my-courses"
-              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+              <div class="relative">
+                <font-awesome-icon :icon="['fas', 'shield-halved']" class="w-5 h-5 mr-3 text-gray-500" />
+                <font-awesome-icon 
+                  v-if="hasMfa"
+                  :icon="['fas', 'check-circle']" 
+                  class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500" 
+                />
+              </div>
+              Security Settings
+            </button>
+            
+            <button
+              v-if="userRole === 'tutor'"
+              @click="navigateBasedOnRole('/availability')"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
-              <font-awesome-icon :icon="['fas', 'book']" class="w-5 h-5 mr-3 text-gray-500" />
-              My Courses
-            </a>
-            <a
-              href="#billing"
-              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+              <font-awesome-icon :icon="['fas', 'calendar-days']" class="w-5 h-5 mr-3 text-gray-500" />
+              Availability
+            </button>
+            
+            <button
+              @click="navigateBasedOnRole('/bookings')"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
               <font-awesome-icon
-                :icon="['fas', 'credit-card']"
+                :icon="['fas', 'calendar-days']"
                 class="w-5 h-5 mr-3 text-gray-500"
               />
-              Billing & Payments
-            </a>
-            <a
-              href="#help"
-              class="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+              Bookings
+            </button>
+            
+            <button
+              @click="navigateBasedOnRole('/messages')"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
               <font-awesome-icon
-                :icon="['fas', 'circle-question']"
+                :icon="['fas', 'message']"
                 class="w-5 h-5 mr-3 text-gray-500"
               />
-              Help & Support
-            </a>
+              Messages
+            </button>
           </div>
 
           <div class="pt-4 pb-3 border-t border-gray-100">
