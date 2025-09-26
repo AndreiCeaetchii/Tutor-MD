@@ -1,64 +1,126 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+import { computed } from 'vue';
 
-  const ratings = ref([
-    { stars: 5, count: 4 },
-    { stars: 4, count: 2 },
-    { stars: 3, count: 0 },
-    { stars: 2, count: 0 },
-    { stars: 1, count: 0 },
-  ]);
+interface ReviewItem {
+  id: number;
+  rating: number;
+}
 
-  const totalReviews = computed(() => {
-    return ratings.value.reduce((sum, rating) => sum + rating.count, 0);
+interface TutorReviewsData {
+  reviews: ReviewItem[];
+  averageRating: number | null;
+}
+
+const props = defineProps<{
+  reviewsData: TutorReviewsData;
+}>();
+
+const starPath = "M12 .587l3.668 7.425 8.214 1.192-5.948 5.793 1.405 8.172-7.34-3.868-7.34 3.868 1.405-8.172-5.948-5.793 8.214-1.192z";
+const emptyColor = "#D1D5DB";
+
+const reviewsData = computed(() => props.reviewsData);
+
+const totalReviews = computed(() => {
+  return reviewsData.value.reviews.length;
+});
+
+const actualAverageRating = computed(() => {
+  if (totalReviews.value === 0) return 0;
+
+  const sum = reviewsData.value.reviews.reduce((acc, r) => acc + r.rating, 0);
+  return parseFloat((sum / totalReviews.value).toFixed(1));
+});
+
+const visualRating = computed(() => {
+  return Math.round(actualAverageRating.value * 2) / 2;
+});
+
+
+const ratingsDistribution = computed(() => {
+  const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+
+  reviewsData.value.reviews.forEach(review => {
+    const star = review.rating;
+    if (star >= 1 && star <= 5) {
+      distribution[star]++;
+    }
   });
+
+  return Object.keys(distribution)
+    .map(key => ({
+      stars: parseInt(key),
+      count: distribution[parseInt(key)],
+    }))
+    .sort((a, b) => b.stars - a.stars);
+});
+
+const fullStars = computed(() => Math.floor(visualRating.value));
+const hasHalfStar = computed(() => visualRating.value % 1 !== 0);
+const emptyStars = computed(() => 5 - fullStars.value - (hasHalfStar.value ? 1 : 0));
 </script>
 
 <template>
   <div class="content-container">
     <div
-      class="flex flex-col items-start p-6 space-y-6 bg-white shadow-lg rounded-2xl md:p-8 md:flex-row md:items-center md:space-y-0 md:space-x-8"
+      class="flex flex-col items-start p-6 space-y-6 bg-white shadow-lg rounded-2xl md:p-8 md:flex-row md:items-center md:space-y-0"
     >
-      <div class="w-full md:w-2/3">
+      <div class="w-full">
         <h2 class="mb-4 text-xl font-bold text-gray-800">
           Student
           <span class="text-purple-600"> Ratings </span>& Feedback
         </h2>
         <div class="flex items-center mb-4 space-x-4">
           <div class="flex-shrink-0">
-            <p class="text-4xl font-bold text-gray-800">4.7</p>
+            <p class="text-4xl font-bold text-gray-800">{{ actualAverageRating.toFixed(1) }}</p>
+
             <div class="flex mt-1 text-yellow-400">
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <svg
+                v-for="n in fullStars"
+                :key="'full-' + n"
+                class="w-5 h-5 fill-current"
+                viewBox="0 0 24 24"
+              >
+                <path :d="starPath" />
+              </svg>
+
+              <svg
+                v-if="hasHalfStar"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <clipPath id="cut-half">
+                    <rect x="0" y="0" width="12" height="24" />
+                  </clipPath>
+                </defs>
                 <path
-                  d="M12 .587l3.668 7.425 8.214 1.192-5.948 5.793 1.405 8.172-7.34-3.868-7.34 3.868 1.405-8.172-5.948-5.793 8.214-1.192z"
+                  :fill="emptyColor"
+                  :d="starPath"
+                />
+                <path
+                  fill="currentColor"
+                  :d="starPath"
+                  clip-path="url(#cut-half)"
                 />
               </svg>
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path
-                  d="M12 .587l3.668 7.425 8.214 1.192-5.948 5.793 1.405 8.172-7.34-3.868-7.34 3.868 1.405-8.172-5.948-5.793 8.214-1.192z"
-                />
-              </svg>
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path
-                  d="M12 .587l3.668 7.425 8.214 1.192-5.948 5.793 1.405 8.172-7.34-3.868-7.34 3.868 1.405-8.172-5.948-5.793 8.214-1.192z"
-                />
-              </svg>
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path
-                  d="M12 .587l3.668 7.425 8.214 1.192-5.948 5.793 1.405 8.172-7.34-3.868-7.34 3.868 1.405-8.172-5.948-5.793 8.214-1.192z"
-                />
-              </svg>
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path
-                  d="M12 17.27l-6.18 3.73 1.64-7.03L1.24 9.1l7.2-.62L12 2l3.56 6.48 7.2.62-5.92 5.87 1.64 7.03z"
-                />
+
+              <svg
+                v-for="n in emptyStars"
+                :key="'empty-' + n"
+                class="w-5 h-5 fill-current"
+                viewBox="0 0 24 24"
+                :style="{ color: emptyColor }"
+              >
+                <path :d="starPath" />
               </svg>
             </div>
-            <p class="mt-2 text-sm text-gray-500">6 reviews</p>
+
+            <p class="mt-2 text-sm text-gray-500">{{ totalReviews }} reviews</p>
           </div>
 
           <div class="flex-grow space-y-2">
-            <div v-for="rating in ratings" :key="rating.stars" class="flex items-center space-x-2">
+            <div v-for="rating in ratingsDistribution" :key="rating.stars" class="flex items-center space-x-2">
               <span class="w-4 text-sm font-medium text-gray-700">{{ rating.stars }}</span>
               <div class="relative flex-grow h-2 overflow-hidden bg-gray-200 rounded-full">
                 <div
@@ -67,27 +129,9 @@
                 ></div>
               </div>
               <span class="w-4 text-sm font-medium text-right text-gray-700">{{
-                rating.count
-              }}</span>
+                  rating.count
+                }}</span>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-full pt-6 border-t border-gray-200 md:w-1/3 md:border-t-0 md:border-l md:pl-8 md:pt-0">
-        <h3 class="mb-4 text-lg font-semibold text-gray-800">Quick Stats</h3>
-        <div class="grid grid-cols-3 gap-4 md:grid-cols-1">
-          <div class="p-3 text-center bg-blue-50 rounded-xl">
-            <p class="text-xl font-bold text-blue-700">5</p>
-            <p class="text-xs text-blue-600">Verified Reviews</p>
-          </div>
-          <div class="p-3 text-center bg-green-50 rounded-xl">
-            <p class="text-xl font-bold text-green-700">100%</p>
-            <p class="text-xs text-green-600">Positive Reviews</p>
-          </div>
-          <div class="p-3 text-center bg-purple-50 rounded-xl">
-            <p class="text-xl font-bold text-purple-700">51</p>
-            <p class="text-xs text-purple-600">Helpful Votes</p>
           </div>
         </div>
       </div>

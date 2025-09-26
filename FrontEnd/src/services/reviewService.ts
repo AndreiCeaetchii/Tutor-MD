@@ -21,9 +21,9 @@ export interface TutorReviewsResponse {
 }
 
 export interface CreateReviewDto {
-  BookingId: number;
-  Rating: number;
-  Description: string;
+  bookingId: number;
+  rating: number;
+  description: string;
 }
 
 export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResponse> => {
