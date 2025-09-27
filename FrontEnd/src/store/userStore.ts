@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { useNotificationStore } from './notificationStore';
 
 export type UserRole = 'tutor' | 'student' | 'admin';
 
@@ -38,6 +39,14 @@ export const useUserStore = defineStore('user', {
       this.role = null;
       this.email = null;
       this.hasMfa = false;
+      const notificationStore = useNotificationStore();
+      notificationStore.notifications = [];
+      notificationStore.locallyReadIds = [];
+      notificationStore.loading = false;
+      notificationStore.error = null;
+      notificationStore.lastFetchTime = 0;
+      
+      localStorage.removeItem('notification-read-ids');
     },
 
     updateRole(newRole: UserRole) {
