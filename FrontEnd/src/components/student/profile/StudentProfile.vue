@@ -5,6 +5,8 @@
   import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
   import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
   import defaultProfileImage from '../../../assets/DefaultImg.png';
+  import { useRouter } from 'vue-router';
+  
 
   const studentStore = useStudentProfileStore();
 
@@ -12,6 +14,8 @@
 
   const isEditing = ref(false);
   const showSuccess = ref(false);
+
+  const router = useRouter();
 
   const profile = reactive({
     firstName: userProfile.value?.firstName || '',
@@ -88,7 +92,7 @@
         username: profile.username,
       });
       studentStore.updateGradeAndClass(profile.grade, profile.class);
-      studentStore.setPhoto(response.photo?.url || defaultProfileImage); // Salvează URL-ul primit
+      studentStore.setPhoto(response.photo?.url || defaultProfileImage); 
 
       profile.profileImage = response.photo?.url || defaultProfileImage;
       isEditing.value = false;
@@ -186,74 +190,102 @@
               <h3 class="text-xl font-semibold text-gray-800">
                 {{ profile.firstName }} {{ profile.lastName }}
               </h3>
-              <p v-if="!isEditing" class="text-gray-600">
-                Class: {{ profile.class }}, Grade: {{ profile.grade }}
-              </p>
+              <div v-if="!isEditing" class="flex flex-col mt-2 space-y-1.5">
+                <div class="flex items-center">
+                  <span class="px-3 py-1 text-sm font-medium text-purple-800 bg-purple-100 rounded-full shadow-sm">
+                    Class {{ profile.class }}
+                  </span>
+                </div>
+                <div class="flex items-center">
+                  <div class="px-3 py-1 text-sm font-medium text-indigo-700 rounded-full shadow-sm bg-gradient-to-r from-indigo-100 to-blue-100">
+                    Grade {{ profile.grade }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="flex gap-2 mt-4 sm:mt-0">
-          <button
-            v-if="isEditing"
-            @click="handleSave"
-            class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+        <div class="flex flex-col gap-2 mt-4 sm:mt-0">
+          <div v-if="isEditing" class="flex gap-2">
+            <button
+              @click="handleSave"
+              class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
-              <path
-                fill-rule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Save
-          </button>
-          <button
-            v-if="isEditing"
-            @click="handleCancel"
-            class="flex items-center gap-2 px-5 py-2 font-medium text-gray-600 transition-all border border-gray-300 rounded-full"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Save
+            </button>
+            <button
+              @click="handleCancel"
+              class="flex items-center gap-2 px-5 py-2 font-medium text-gray-600 transition-all border border-gray-300 rounded-full"
             >
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Cancel
-          </button>
-          <button
-            v-else
-            @click="isEditing = true"
-            class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Cancel
+            </button>
+          </div>
+          <template v-else>
+            <button
+              @click="isEditing = true"
+              class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md w-full justify-center"
             >
-              <path
-                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Edit Profile
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+                />
+                <path
+                  fill-rule="evenodd"
+                  d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Edit Profile
+            </button>
+            <button
+              @click="router.push('/mfa-setup')"
+              class="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md w-full justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Enable MFA
+            </button>
+          </template>
         </div>
       </div>
 
