@@ -5,6 +5,8 @@
   import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
   import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
   import defaultProfileImage from '../../../assets/DefaultImg.png';
+  import { useRouter } from 'vue-router';
+  
 
   const studentStore = useStudentProfileStore();
 
@@ -12,6 +14,8 @@
 
   const isEditing = ref(false);
   const showSuccess = ref(false);
+
+  const router = useRouter();
 
   const profile = reactive({
     firstName: userProfile.value?.firstName || '',
@@ -88,7 +92,7 @@
         username: profile.username,
       });
       studentStore.updateGradeAndClass(profile.grade, profile.class);
-      studentStore.setPhoto(response.photo?.url || defaultProfileImage); // Salvează URL-ul primit
+      studentStore.setPhoto(response.photo?.url || defaultProfileImage); 
 
       profile.profileImage = response.photo?.url || defaultProfileImage;
       isEditing.value = false;
@@ -122,15 +126,21 @@
 </script>
 
 <template>
-  <div class="profile-container">
-    <transition name="fade">
+  <div class="relative w-full max-w-6xl px-4 py-4 mx-auto">
+    <!-- Success Notification -->
+    <transition 
+      enter-active-class="transition duration-300 ease-out" 
+      enter-from-class="transform -translate-y-3 opacity-0" 
+      leave-active-class="transition duration-200 ease-in" 
+      leave-to-class="transform -translate-y-3 opacity-0"
+    >
       <div
         v-if="showSuccess"
-        class="flex items-center gap-2 p-3 text-teal-800 border-l-4 border-teal-400 rounded-r-lg shadow-md success-toast bg-teal-50"
+        class="fixed top-6 right-6 z-50 max-w-[300px] bg-green-50 border-l-4 border-green-500 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="w-5 h-5 text-teal-500"
+          class="w-5 h-5 text-green-600"
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -140,291 +150,225 @@
             clip-rule="evenodd"
           />
         </svg>
-        <span>Profile updated successfully!</span>
+        <span class="font-medium text-green-800">Profile updated successfully!</span>
       </div>
     </transition>
 
-    <div
-      class="p-4 font-sans shadow-lg bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-2xl md:p-8"
-    >
-      <div class="flex flex-col items-center gap-4 mb-8 profile sm:flex-row sm:justify-between">
-        <div class="flex flex-col items-center gap-4 sm:flex-row">
+    <!-- Main Profile Card -->
+    <div class="overflow-hidden bg-white shadow-md rounded-2xl">
+      <!-- Profile Header Section -->
+      <div class="p-6 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-blue-50">
+        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <!-- Left Side: Photo and Name -->
           <div class="flex flex-col items-center gap-4 sm:flex-row">
-            <div class="relative flex-shrink-0 w-32 h-32">
-              <div class="w-32 h-32 overflow-hidden rounded-full">
+            <!-- Profile Photo -->
+            <div class="relative flex-shrink-0">
+              <div class="w-24 h-24 overflow-hidden border-4 border-white rounded-full shadow-md">
                 <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
                 <img
                   v-else
                   :src="profile.profileImage"
-                  alt="Profile picture"
-                  class="object-cover w-full h-full border-4 border-white rounded-full shadow-lg"
+                  alt="Profile"
+                  class="object-cover w-full h-full"
                 />
               </div>
-
+              
               <div
                 v-if="isEditing"
-                class="absolute right-0 z-10 p-1 bg-white rounded-full shadow-md bottom-3"
+                class="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-sm"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-6 h-6 text-purple-500"
+                  class="w-4 h-4 text-purple-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
-                  <path
-                    d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                    clip-rule="evenodd"
-                  />
+                  <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                  <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
                 </svg>
               </div>
             </div>
-            <div class="text-center sm:text-left sm:ml-4">
-              <h3 class="text-xl font-semibold text-gray-800">
-                {{ profile.firstName }} {{ profile.lastName }}
-              </h3>
-              <p v-if="!isEditing" class="text-gray-600">
-                Class: {{ profile.class }}, Grade: {{ profile.grade }}
-              </p>
+            
+            <!-- Name and Academic Info -->
+            <div class="text-center sm:text-left">
+              <h1 class="text-2xl font-bold text-gray-800">{{ profile.firstName }} {{ profile.lastName }}</h1>
+              
+              <div v-if="!isEditing" class="flex flex-wrap gap-2 mt-2">
+                <span class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full">
+                  Class {{ profile.class }}
+                </span>
+                <span class="px-3 py-1 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+                  Grade {{ profile.grade }}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="flex gap-2 mt-4 sm:mt-0">
-          <button
-            v-if="isEditing"
-            @click="handleSave"
-            class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Save
-          </button>
-          <button
-            v-if="isEditing"
-            @click="handleCancel"
-            class="flex items-center gap-2 px-5 py-2 font-medium text-gray-600 transition-all border border-gray-300 rounded-full"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Cancel
-          </button>
-          <button
-            v-else
-            @click="isEditing = true"
-            class="flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-full font-medium transition-all hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            Edit Profile
-          </button>
+          
+          <!-- Right Side: Action Buttons -->
+          <div class="flex gap-3">
+            <!-- Editing Mode Buttons -->
+            <div v-if="isEditing" class="flex gap-2">
+              <button
+                @click="handleSave"
+                class="flex items-center justify-center gap-1 px-6 py-2 text-sm font-medium text-white transition-colors bg-purple-600 rounded-full hover:bg-purple-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+                Save
+              </button>
+              
+              <button
+                @click="handleCancel"
+                class="flex items-center justify-center gap-1 px-6 py-2 text-sm font-medium text-gray-600 transition-colors border border-gray-300 rounded-full hover:bg-gray-50"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Cancel
+              </button>
+            </div>
+            
+            <!-- View Mode Buttons -->
+            <template v-else>
+              <button
+                @click="isEditing = true"
+                class="flex items-center justify-center gap-1 px-6 py-2 text-sm font-medium text-white transition-colors bg-purple-600 rounded-full hover:bg-purple-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                  <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                </svg>
+                Edit Profile
+              </button>
+              
+              <button
+                @click="router.push('/mfa-setup')"
+                class="flex items-center justify-center gap-1 px-6 py-2 text-sm font-medium text-white transition-colors bg-indigo-600 rounded-full hover:bg-indigo-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                </svg>
+                Enable MFA
+              </button>
+            </template>
+          </div>
         </div>
       </div>
 
-      <div class="space-y-6">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-          <template v-if="isEditing">
-            <div class="field-group">
-              <label class="label">Username</label>
-              <div class="input-container group">
-                <input v-model="profile.username" type="text" class="input-field" />
+      <!-- Profile Content -->
+      <div class="p-5">
+        <!-- Personal Information Section -->
+        <div class="mb-6">
+          <h2 class="mb-4 text-lg font-medium text-gray-700">Personal Information</h2>
+          
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <template v-if="isEditing">
+              <!-- Username Field -->
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">Username</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.username" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
               </div>
-            </div>
-            <div class="field-group">
-              <label class="label">First Name</label>
-              <div class="input-container group">
-                <input v-model="profile.firstName" type="text" class="input-field" />
+              
+              <!-- First Name Field -->
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">First Name</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.firstName" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
               </div>
-            </div>
-            <div class="field-group">
-              <label class="label">Last Name</label>
-              <div class="input-container group">
-                <input v-model="profile.lastName" type="text" class="input-field" />
+              
+              <!-- Last Name Field -->
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">Last Name</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.lastName" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
               </div>
-            </div>
-          </template>
-          <template v-else>
-            <div class="field-group md:col-span-2">
-              <label class="label">Full Name</label>
-              <div class="input-container">
-                <p class="text-display">{{ profile.firstName }} {{ profile.lastName }}</p>
+            </template>
+            <template v-else>
+              <!-- Full Name Display -->
+              <div class="sm:col-span-2">
+                <label class="block mb-1 text-sm text-gray-500">Full Name</label>
+                <div class="px-3 py-2 border border-gray-200 rounded-lg bg-gray-50">
+                  {{ profile.firstName }} {{ profile.lastName }}
+                </div>
               </div>
-            </div>
-          </template>
+            </template>
 
-          <div class="field-group">
-            <label class="label">Phone</label>
-            <div class="input-container group">
-              <input v-if="isEditing" v-model="profile.phone" type="tel" class="input-field" />
-              <p v-else class="text-display">{{ profile.phone }}</p>
-            </div>
-          </div>
-          <div class="field-group">
-            <label class="label">City</label>
-            <div class="input-container group">
-              <input v-if="isEditing" v-model="profile.city" type="text" class="input-field" />
-              <p v-else class="text-display">{{ profile.city }}</p>
-            </div>
-          </div>
-          <div class="field-group">
-            <label class="label">Country</label>
-            <div class="input-container group">
-              <input v-if="isEditing" v-model="profile.country" type="text" class="input-field" />
-              <p v-else class="text-display">{{ profile.country }}</p>
-            </div>
-          </div>
-          <template v-if="isEditing">
-            <div class="field-group">
-              <label class="label">Grade</label>
-              <div class="input-container group">
-                <input v-model="profile.grade" type="text" class="input-field" />
+            <!-- Phone Field -->
+            <div>
+              <label class="block mb-1 text-sm text-gray-500">Phone</label>
+              <div class="border border-gray-200 rounded-lg bg-gray-50">
+                <input v-if="isEditing" v-model="profile.phone" type="tel" class="w-full px-3 py-2 bg-transparent" />
+                <div v-else class="px-3 py-2">{{ profile.phone }}</div>
               </div>
             </div>
-            <div class="field-group">
-              <label class="label">Class</label>
-              <div class="input-container group">
-                <input v-model="profile.class" type="text" class="input-field" />
+
+            <!-- City & Country Fields -->
+            <template v-if="isEditing">
+              <!-- City Field (Edit Mode) -->
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">City</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.city" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
+              </div>
+              
+              <!-- Country Field (Edit Mode) -->
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">Country</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.country" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
+              </div>
+            </template>
+            
+            <!-- Combined Location Field (View Mode) -->
+            <div v-if="!isEditing" class="sm:col-span-1">
+              <label class="block mb-1 text-sm text-gray-500">Location</label>
+              <div class="px-3 py-2 border border-gray-200 rounded-lg bg-gray-50">
+                {{ profile.city }}, {{ profile.country }}
               </div>
             </div>
-          </template>
+            
+            <!-- Edit Mode Academic Fields -->
+            <template v-if="isEditing">
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">Grade</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.grade" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
+              </div>
+              
+              <div>
+                <label class="block mb-1 text-sm text-gray-500">Class</label>
+                <div class="border border-gray-200 rounded-lg bg-gray-50">
+                  <input v-model="profile.class" type="text" class="w-full px-3 py-2 bg-transparent" />
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
-        <div class="field-group">
-          <label class="label">Bio</label>
-          <div class="input-container group">
-            <textarea
-              v-if="isEditing"
-              v-model="profile.bio"
-              class="input-field min-h-[100px] resize-y"
-            ></textarea>
-            <p v-else class="leading-relaxed text-display">{{ profile.bio }}</p>
+        
+        <!-- Bio Section -->
+        <div>
+          <h2 class="mb-3 text-lg font-medium text-gray-700">About Me</h2>
+          <div>
+            <div class="border border-gray-200 rounded-lg bg-gray-50">
+              <textarea
+                v-if="isEditing"
+                v-model="profile.bio"
+                class="w-full px-3 py-2 bg-transparent resize-y min-h-[100px]"
+                placeholder="Tell us about yourself..."
+              ></textarea>
+              <div v-else class="px-3 py-2 min-h-[50px] whitespace-pre-line">{{ profile.bio || "No bio provided." }}</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-  .profile-container {
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  .success-toast {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 50;
-    max-width: 300px;
-  }
-
-  .fade-enter-active,
-  .fade-leave-active {
-    transition:
-      opacity 0.3s,
-      transform 0.3s;
-  }
-
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  .field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .label {
-    font-size: 0.875rem;
-    color: #4b5563;
-    font-weight: 500;
-  }
-
-  .input-container {
-    background-color: #fff;
-    border-radius: 0.6rem;
-    padding: 0.5rem;
-    transition:
-      box-shadow 0.2s ease-in-out,
-      border-color 0.2s ease-in-out;
-    border: 1px solid #e5e7eb;
-  }
-
-  .input-container:has(input:focus),
-  .input-container:has(textarea:focus) {
-    border-color: #9333ea;
-    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
-  }
-
-  .input-field {
-    width: 100%;
-    background-color: transparent;
-    border: 0;
-    border-radius: 0.5rem;
-  }
-
-  .input-field:focus {
-    outline: none;
-    box-shadow: none;
-    border: transparent;
-  }
-
-  .text-display {
-    padding-top: 0.125rem;
-    padding-bottom: 0.125rem;
-    color: #1f2937;
-  }
-
-  @media (max-width: 640px) {
-    .input-container {
-      padding: 0.5rem;
-    }
-
-    .success-toast {
-      left: 16px;
-      right: 16px;
-      max-width: calc(100% - 32px);
-    }
-  }
-</style>

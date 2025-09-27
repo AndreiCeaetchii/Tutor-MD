@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/userStore';
 import { fetchCsrfToken } from './csrfService';
 
+
 declare const google: any;
 
 interface AuthFormData {
@@ -95,30 +96,138 @@ export function useAuth() {
     }
   };
 
-  const login = async (formData: {
-    email: string;
-    password: string;
-  }): Promise<{ success: boolean; role?: string }> => {
-    errorMessage.value = null;
-    try {
-      const response = await axios.post(
-        LOGIN_URL,
-        { Email: formData.email, Password: formData.password },
-        { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
-      );
-      const data = response.data;
-      const decoded = decodeJwt(data.token);
-      const userRole = decoded?.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id, userRole, formData.email);
+  const requiresMfa = ref(false);
 
-      await fetchCsrfToken();
+  const requiresMfa = ref(false);
 
-      return { success: true, role: userRole };
-    } catch (err: any) {
-      errorMessage.value = handleAuthError(err, 'login');
+const login = async (formData: {
+  email: string;
+  password: string;
+  mfaCode?: string;
+}): Promise<{ success: boolean; role?: string; requiresMfa?: boolean }> => {
+  errorMessage.value = null;
+  try {
+    const requestData: any = { 
+      Email: formData.email, 
+      Password: formData.password 
+    };
+    
+    if (formData.mfaCode) {
+      const formattedMfaCode = formData.mfaCode.replace(/\s/g, '').substring(0, 6).padStart(6, '0');
+      Object.assign(requestData, { MfaCode: formattedMfaCode });
+      console.log("Using formatted MFA code:", formattedMfaCode);
+    }
+    
+    const response = await axios.post(
+      LOGIN_URL,
+      requestData,
+      { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
+    );
+    
+    const data = response.data;
+
+    if (
+      data.requiresMfa === true || 
+      data.message === 'MFA_REQUIRED' ||
+      (Array.isArray(data) && data.includes('MFA_REQUIRED')) ||
+      (typeof data === 'string' && data.includes('MFA_REQUIRED')) ||
+      JSON.stringify(data).includes('MFA_REQUIRED')
+    ) {
+      console.log("MFA required detected:", data);
+      requiresMfa.value = true;
+      sessionStorage.setItem('mfa_email', formData.email);
+      return { success: false, requiresMfa: true };
+    }
+    
+    const decoded = decodeJwt(data.token);
+    const userRole = decoded?.role?.toLowerCase() || 'student';
+    store.setUser(data.token, data.id, userRole, formData.email);
+
+    await fetchCsrfToken();
+
+    requiresMfa.value = false;
+    return { success: true, role: userRole };
+  } catch (err: any) {
+    console.log("Login error response:", err.response?.data);
+    
+    if (
+      err.response?.data?.requiresMfa === true ||
+      err.response?.data?.message === 'MFA_REQUIRED' ||
+      err.response?.data?.detail === 'MFA_REQUIRED' || 
+      (Array.isArray(err.response?.data) && err.response.data.includes('MFA_REQUIRED')) ||
+      (err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED'))
+    ) {
+      console.log("MFA required detected in error");
+      requiresMfa.value = true;
+      sessionStorage.setItem('mfa_email', formData.email);
+      return { success: false, requiresMfa: true };
+    }
+    
+    errorMessage.value = handleAuthError(err, 'login');
+    return { success: false };
+  }
+};
+
+const verifyMfaLogin = async (code: string): Promise<{ success: boolean; role?: string }> => {
+  errorMessage.value = null;
+  try {
+    const email = sessionStorage.getItem('mfa_email');
+    if (!email) {
+      errorMessage.value = 'Session expired. Please login again.';
       return { success: false };
     }
-  };
+
+    const formattedMfaCode = code.replace(/\s/g, '').substring(0, 6).padStart(6, '0');
+
+    const response = await axios.post(
+      LOGIN_URL,
+      { Email: email, MfaCode: formattedMfaCode },
+      { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const data = response.data;
+    const decoded = decodeJwt(data.token);
+    const userRole = decoded?.role?.toLowerCase() || 'student';
+    store.setUser(data.token, data.id, userRole, email);
+
+    await fetchCsrfToken();
+
+    requiresMfa.value = false;
+    sessionStorage.removeItem('mfa_email');
+    return { success: true, role: userRole };
+  } catch (err: any) {
+    errorMessage.value = handleAuthError(err, 'mfa');
+    return { success: false };
+  }
+};
+
+    
+    const formattedCode = code.trim().padStart(6, '0').substring(0, 6);
+    
+    console.log("Verifying MFA code for email:", email);
+    
+    const response = await axios.post(
+      `${API_URL}/users/verify-mfa`,
+      { email, code: formattedCode },
+      { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
+    );
+    
+    console.log("MFA verification response:", response.data);
+    const data = response.data;
+    const decoded = decodeJwt(data.token);
+    const userRole = decoded?.role?.toLowerCase() || 'student';
+    store.setUser(data.token, data.id, userRole, email);
+    
+    sessionStorage.removeItem('mfa_email');
+    requiresMfa.value = false;
+    
+    return { success: true, role: userRole };
+  } catch (err: any) {
+    console.error("MFA verification error:", err.response?.data);
+    errorMessage.value = err.response?.data?.message || 'Invalid verification code';
+    return { success: false };
+  }
+};
 
   const logout = () => {
     store.clearUser();
@@ -128,46 +237,67 @@ export function useAuth() {
   };
 
   const loginWithGoogle = async (
-    isSignup: boolean,
-    role?: string,
-  ): Promise<{ success: boolean; role?: string }> => {
-    const getRoleId = (role: string): number => {
-      switch (role?.toLowerCase()) {
-        case 'admin':
-          return 1;
-        case 'tutor':
-          return 2;
-        default:
-          return 3;
-      }
-    };
+  isSignup: boolean,
+  role?: string,
+  mfaCode?: string
+): Promise<{ success: boolean; role?: string; requiresMfa?: boolean }> => {
+  const getRoleId = (role: string): number => {
+    switch (role?.toLowerCase()) {
+      case 'admin':
+        return 1;
+      case 'tutor':
+        return 2;
+      default:
+        return 3;
+    }
+  };
 
-    return new Promise((resolve) => {
-      const tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
-        scope: 'openid email profile',
-        callback: async (response: any) => {
-          if (!response.access_token) {
-            errorMessage.value = 'Google authentication failed: no access token.';
-            return resolve({ success: false });
+  return new Promise((resolve) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
+      scope: 'openid email profile',
+      callback: async (response: any) => {
+        if (!response.access_token) {
+          errorMessage.value = 'Google authentication failed: no access token.';
+          return resolve({ success: false });
+        }
+
+        try {
+          const googleUserRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${response.access_token}` },
+          });
+          const email = googleUserRes.data.email;
+
+          const endpoint = isSignup ? GOOGLE_REGISTER_URL : GOOGLE_LOGIN_URL;
+          const requestData: any = {
+            email,
+            accessToken: response.access_token,
+            provider: 'google',
+          };
+          
+          if (mfaCode) {
+            requestData.MfaCode = mfaCode;
           }
+          
+          if (isSignup && role) requestData.roleId = getRoleId(role);
 
           try {
-            const googleUserRes = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: { Authorization: `Bearer ${response.access_token}` },
-            });
-            const email = googleUserRes.data.email;
-
-            const endpoint = isSignup ? GOOGLE_REGISTER_URL : GOOGLE_LOGIN_URL;
-            const requestData: any = {
-              email,
-              accessToken: response.access_token,
-              provider: 'google',
-            };
-            if (isSignup && role) requestData.roleId = getRoleId(role);
-
             const res = await axios.post(endpoint, requestData, { withCredentials: true });
             const data = res.data;
+            console.log("Google auth response:", data);
+
+            if (
+              data.requiresMfa === true || 
+              data.message === 'MFA_REQUIRED' ||
+              (Array.isArray(data) && data.includes('MFA_REQUIRED')) ||
+              (typeof data === 'string' && data.includes('MFA_REQUIRED')) ||
+              JSON.stringify(data).includes('MFA_REQUIRED')
+            ) {
+              console.log("MFA required detected for Google auth:", data);
+              requiresMfa.value = true;
+              sessionStorage.setItem('mfa_email', email);
+              return resolve({ success: false, requiresMfa: true });
+            }
 
             const decoded = decodeJwt(data.token);
             const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
@@ -177,15 +307,34 @@ export function useAuth() {
 
             resolve({ success: true, role: userRole });
           } catch (err: any) {
+            console.log("Google auth error:", err.response?.data);
+            
+            if (
+              err.response?.data?.requiresMfa === true ||
+              err.response?.data?.message === 'MFA_REQUIRED' ||
+              err.response?.data?.detail === 'MFA_REQUIRED' || 
+              (Array.isArray(err.response?.data) && err.response.data.includes('MFA_REQUIRED')) ||
+              err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED')
+            ) {
+              console.log("MFA required detected in Google auth error");
+              requiresMfa.value = true;
+              sessionStorage.setItem('mfa_email', email);
+              return resolve({ success: false, requiresMfa: true });
+            }
+            
             errorMessage.value = handleAuthError(err, 'google', isSignup);
             resolve({ success: false });
           }
-        },
-      });
-
-      tokenClient.requestAccessToken();
+        } catch (err: any) {
+          errorMessage.value = handleAuthError(err, 'google', isSignup);
+          resolve({ success: false });
+        }
+      },
     });
-  };
 
-  return { accessToken, currentUser, errorMessage, signup, logout, login, loginWithGoogle };
+    tokenClient.requestAccessToken();
+  });
+};
+
+  return { accessToken, currentUser, errorMessage, requiresMfa, signup, logout, login, loginWithGoogle, verifyMfaLogin  };
 }

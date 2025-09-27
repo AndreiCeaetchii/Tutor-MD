@@ -32,6 +32,7 @@ import AdminUsers from '../components/admin/AdminUsers.vue';
 import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
 import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
+import MFASetupPage from '../pages/MFASetupPage.vue';
 
 
 
@@ -110,7 +111,15 @@ const routes = [
     path: '/student/:id',
     component: GuestPage,
     meta: { requiresAuth: true },
+  },
+  {
+  path: '/mfa-setup',
+  name: 'MFASetup',
+  component: MFASetupPage,
+  meta: {
+    requiresAuth: true
   }
+}
 ];
 
 const router = createRouter({
