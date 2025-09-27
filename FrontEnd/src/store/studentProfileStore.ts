@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import defaultProfileImage from '../assets/DefaultImg.png';
+import { useUserStore } from './userStore.ts';
+import { getStudentProfile } from '../services/studentService.ts';
 
 interface UserProfile {
   phone: string;
@@ -18,6 +20,7 @@ export interface StudentProfileState {
   userProfile: UserProfile;
   photo: string | null;
   isEditing: boolean;
+  isLoading: boolean;
 }
 
 export const useStudentProfileStore = defineStore('studentProfile', {
@@ -36,6 +39,7 @@ export const useStudentProfileStore = defineStore('studentProfile', {
     },
     photo: defaultProfileImage,
     isEditing: false,
+    isLoading: false,
   }),
 
   getters: {
@@ -64,9 +68,30 @@ export const useStudentProfileStore = defineStore('studentProfile', {
       this.grade = newGrade;
       this.class = newClass;
     },
+
     updateUsername(newUsername: string) {
       if (this.userProfile) {
         this.userProfile.username = newUsername;
+      }
+    },
+
+    async loadProfile() {
+      const userStore = useUserStore();
+      if (!userStore.userId) return;
+
+      this.isLoading = true;
+
+      try {
+        const studentProfile = await getStudentProfile();
+
+        if (studentProfile && studentProfile.userProfile) {
+          this.userProfile.firstName = studentProfile.userProfile.firstName || '';
+          this.userProfile.lastName = studentProfile.userProfile.lastName || '';
+        }
+      } catch (error) {
+        console.error('Failed to load student profile.', error);
+      } finally {
+        this.isLoading = false;
       }
     },
 
@@ -85,6 +110,7 @@ export const useStudentProfileStore = defineStore('studentProfile', {
       };
       this.photo = defaultProfileImage;
       this.isEditing = false;
+      this.isLoading = false;
     },
   },
 

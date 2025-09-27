@@ -39,7 +39,7 @@
 
         <div class="bg-white p-4 rounded-lg shadow-md">
           <h3 class="font-bold text-gray-800">Experience</h3>
-          <p class="text-sm text-gray-600 mt-2">{{ profileStore.experience }} ani de experiență</p>
+          <p class="text-sm text-gray-600 mt-2">{{ profileStore.experience }} years of experience</p>
         </div>
 
         <div class="bg-white p-4 rounded-lg shadow-md">

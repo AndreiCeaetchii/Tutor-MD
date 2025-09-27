@@ -33,13 +33,32 @@
 
   const availableSubjects = ref([
     'Mathematics',
+    'English',
+    'Science',
     'Physics',
-    'Computer Science',
     'Chemistry',
     'Biology',
-    'English',
-    'History',
     'Geography',
+    'History',
+    'Foreign languages',
+    'German',
+    'French',
+    'Russian',
+    'Spanish',
+    'Italian',
+    'Computer science',
+    'Economics',
+    'Philosophy',
+    'Psychology',
+    'Sociology',
+    'Physical Education',
+    'Health Education',
+    'Drawing',
+    'Music',
+    'Astronomy',
+    'Literature',
+    'Creative Writing',
+    'Statistics'
   ]);
 
   const addSubject = (subjectName: string) => {

@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import defaultProfileImage from '../assets/DefaultImg.png';
+import { useUserStore } from './userStore.ts';
+import {getTutorProfile } from '../services/tutorService.ts';
 
 interface Subject {
   name: string;
@@ -30,6 +32,7 @@ export interface ProfileState {
   languages: string[];
   subjects: Subject[];
   isEditing: boolean;
+  isLoading: boolean;
 }
 
 export const useProfileStore = defineStore('profile', {
@@ -53,6 +56,7 @@ export const useProfileStore = defineStore('profile', {
     languages: [],
     subjects: [],
     isEditing: false,
+    isLoading: false
   }),
 
   getters: {
@@ -102,6 +106,25 @@ export const useProfileStore = defineStore('profile', {
       this.isEditing = false;
 
       this.$reset();
+    },
+
+    async loadProfile() {
+      const userStore = useUserStore();
+      if (!userStore.userId) return;
+
+      this.isLoading = true;
+
+      try {
+        const profile = await getTutorProfile(Number(userStore.userId));
+        if (profile) {
+          this.firstName = profile.userProfile.firstName || '';
+          this.lastName = profile.userProfile.lastName || '';
+        }
+      } catch (error) {
+        console.error('Failed to load tutor profile.', error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 

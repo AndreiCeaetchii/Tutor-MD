@@ -5,7 +5,11 @@
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faTimes } from '@fortawesome/free-solid-svg-icons';
   import { createTutorProfile } from '../../../services/tutorService.ts';
-  import type { Subject, TutorProfileData, CreateProfileDto } from '../../../services/tutorService.ts';
+  import type {
+    Subject,
+    TutorProfileData,
+    CreateProfileDto,
+  } from '../../../services/tutorService.ts';
   import { useRouter } from 'vue-router';
 
   library.add(faTimes);
@@ -40,13 +44,32 @@
   const allLanguages = ['English', 'French', 'Spanish', 'German', 'Italian', 'Romanian'];
   const allSubjects = [
     'Mathematics',
+    'English',
+    'Science',
     'Physics',
-    'Computer Science',
     'Chemistry',
     'Biology',
-    'English',
-    'History',
     'Geography',
+    'History',
+    'Foreign languages',
+    'German',
+    'French',
+    'Russian',
+    'Spanish',
+    'Italian',
+    'Computer science',
+    'Economics',
+    'Philosophy',
+    'Psychology',
+    'Sociology',
+    'Physical Education',
+    'Health Education',
+    'Drawing',
+    'Music',
+    'Astronomy',
+    'Literature',
+    'Creative Writing',
+    'Statistics',
   ];
 
   const availableLanguages = computed(() => {
@@ -72,7 +95,13 @@
     if (form.value.country === 'Romania') {
       return ['Bucharest', 'Cluj-Napoca', 'Iași'];
     } else if (form.value.country === 'Moldova') {
-      return ['Chișinău', 'Bălți', 'Tiraspol'];
+      return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Strășeni'];
+    } else if (form.value.country === 'Italy') {
+      return ['Rome', 'Milan', 'Florence'];
+    } else if (form.value.country === 'Germany') {
+      return ['Berlin', 'Munich', 'Hamburg'];
+    } else if (form.value.country === 'England') {
+      return ['London', 'Manchester', 'Birmingham'];
     }
     return [];
   });
@@ -263,7 +292,7 @@
                 >Country <span class="text-red-500">*</span></label
               >
               <DropdownSelect
-                :options="['Romania', 'Moldova']"
+                :options="['Romania', 'Moldova', 'Italy', 'Germany', 'England']"
                 placeholder="Select country from list"
                 @update:modelValue="form.country = $event"
               />

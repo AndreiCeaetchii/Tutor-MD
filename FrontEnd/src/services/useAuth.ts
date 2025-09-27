@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/userStore';
+import { fetchCsrfToken } from './csrfService';
 
 declare const google: any;
 
@@ -39,7 +40,7 @@ export function useAuth() {
   const API_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
     (window as any)?.VITE_API_BASE_URL ||
-    'http://localhost:8080/api';
+    'https://localhost:8085/api';
 
   const SIGNUP_URL = `${API_URL}/users/register`;
   const LOGIN_URL = `${API_URL}/users/login`;
@@ -84,6 +85,9 @@ export function useAuth() {
       const data = response.data;
       const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
       store.setUser(data.token, data.id.toString(), userRole, formData.email);
+
+      await fetchCsrfToken();
+      
       return true;
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'signup');
@@ -106,6 +110,9 @@ export function useAuth() {
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
       store.setUser(data.token, data.id, userRole, formData.email);
+
+      await fetchCsrfToken();
+
       return { success: true, role: userRole };
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'login');
@@ -165,6 +172,8 @@ export function useAuth() {
             const decoded = decodeJwt(data.token);
             const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
             store.setUser(data.token, data.id, userRole, email);
+
+            await fetchCsrfToken();
 
             resolve({ success: true, role: userRole });
           } catch (err: any) {

@@ -54,7 +54,7 @@ const joinAsInstructor = () => {
             class="w-full px-8 py-3 font-semibold text-gray-800 transition-colors bg-transparent border border-gray-300 rounded-full sm:w-auto hover:bg-gray-100"
             @click="joinAsInstructor"
           >
-            Join as Instructor
+            Join as Tutor
           </button>
         </div>
         <p class="mt-4 text-sm text-gray-500">

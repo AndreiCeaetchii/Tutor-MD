@@ -36,8 +36,8 @@ public class ReviewService : IReviewService
             return Result.Forbidden("You can only review your own bookings");
 
         var existingReview = await _reviewRepository.FindAsync(r => r.TutorUserId == booking.TutorUserId);
-        if (existingReview.Any())
-            return Result.Conflict("Review already exists for this tutor");
+        // if (existingReview.Any())
+        //     return Result.Conflict("Review already exists for this tutor");
 
         if (createDto.Rating < 1 || createDto.Rating > 5)
             return Result.Error("Rating must be between 1 and 5");
