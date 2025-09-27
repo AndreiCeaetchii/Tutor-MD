@@ -37,7 +37,6 @@ export const useNotificationStore = defineStore('notification', {
       
       try {
         const response = await getUserNotifications();
-        console.log('Raw notification data:', response.notifications[0]);
         
         this.notifications = response.notifications.map((notification: Notification) => {
           const dateValue = notification.createdAt || (notification as ApiNotification).CreatedAt;
@@ -48,10 +47,8 @@ export const useNotificationStore = defineStore('notification', {
               createdAt: new Date(dateValue).toISOString()
             };
           } else {
-            console.warn(`Notification ${notification.id} missing creation date, using fallback`);
             const MS_PER_DAY = 86400000;
             const MS_PER_MINUTE = 60000;
-
             const baseTime = new Date().getTime() - MS_PER_DAY;
             const offset = notification.id * MS_PER_MINUTE;
             const timestamp = new Date(baseTime - offset).toISOString();
