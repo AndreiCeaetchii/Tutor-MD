@@ -1,11 +1,5 @@
-import { createApiClient } from './centralizedService';
-
-const API_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ||
-  (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api/users';
-
-const userAxios = createApiClient(API_URL);
+import axios from 'axios';
+import { useUserStore } from '../store/userStore';
 
 export interface UploadPhotoResponse {
   message: string;
@@ -21,7 +15,29 @@ export interface MfaSetupResponse {
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api/users';
+  'https://localhost:8085/api/users'
+;
+
+const userAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+userAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
 
 export const uploadProfilePhoto = async (photoFile: File) => {
   try {
@@ -50,18 +66,7 @@ export const deleteProfilePhoto = async () => {
 
 export const enableMfa = async () => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    if (!token) throw new Error('Access token not available. Please log in.');
-
-    const response = await axios.put<MfaSetupResponse>(`${API_URL}/enable-mfa`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,
-    });
-
+    const response = await userAxios.put<MfaSetupResponse>(`/enable-mfa`, {});
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -72,19 +77,14 @@ export const enableMfa = async () => {
 
 export const verifyMfaSetup = async (code: string) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    if (!token) throw new Error('Access token not available. Please log in.');
-
     const formattedCode = code.trim().padStart(6, '0').substring(0, 6);
 
-    const response = await axios.put(`${API_URL}/verify-enable-mfa`, { code: formattedCode }, {
+    const response = await userAxios.put(`/verify-enable-mfa`, { 
+      code: formattedCode 
+    }, {
       headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true,
+        'Content-Type': 'application/json',
+      }
     });
 
     return response.data;
@@ -102,22 +102,7 @@ export const verifyMfaSetup = async (code: string) => {
 
 export const disableMfa = async () => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    if (!token) throw new Error('Access token not available. Please log in.');
-
-    const response = await axios.put(
-      `${API_URL}/disable-mfa`, 
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    );
-
+    const response = await userAxios.put(`/disable-mfa`, {});
     return response.data;
   } catch (error: any) {
     console.error('Disable MFA error:', error);
