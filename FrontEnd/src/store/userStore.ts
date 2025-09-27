@@ -9,6 +9,7 @@ interface UserState {
   role: UserRole | null;
   email: string | null;
   hasMfa: boolean;
+  csrfToken: string | null;
 }
 
 // @ts-ignore
@@ -19,6 +20,7 @@ export const useUserStore = defineStore('user', {
     role: null,
     email: null,
     hasMfa: false,
+    csrfToken: null
   }),
   getters: {
     userRole: (state) => state.role,
@@ -31,6 +33,10 @@ export const useUserStore = defineStore('user', {
       this.userId = id;
       this.role = role;
       this.email = email;
+    },
+
+    setCsrfToken(token: string) {
+      this.csrfToken = token;
     },
 
     clearUser() {
@@ -47,6 +53,9 @@ export const useUserStore = defineStore('user', {
       notificationStore.lastFetchTime = 0;
       
       localStorage.removeItem('notification-read-ids');
+
+      this.csrfToken = null;
+
     },
 
     updateRole(newRole: UserRole) {

@@ -8,15 +8,32 @@ const categories = [
   'Mathematics',
   'English',
   'Science',
-  'Social studies',
-  'Drawing',
-  'Music',
-  'Foreign languages',
-  'Computer science',
   'Physics',
   'Chemistry',
-  'Biology'
+  'Biology',
+  'Geography',
+  'History',
+  'Foreign languages',
+  'German',
+  'French',
+  'Russian',
+  'Spanish',
+  'Italian',
+  'Computer science',
+  'Economics',
+  'Philosophy',
+  'Psychology',
+  'Sociology',
+  'Physical Education',
+  'Health Education',
+  'Drawing',
+  'Music',
+  'Astronomy',
+  'Literature',
+  'Creative Writing',
+  'Statistics'
 ];
+
 
 const showDropdown = ref(false);
 const categoryBtnRef = ref<HTMLElement | null>(null);

@@ -33,13 +33,13 @@
   let originalProfile: any = null;
 
   const initializeProfile = async () => {
-    if (!userProfile.value?.firstName) {
+    if (!userProfile.value?.firstName || !userProfile.value?.birthdate) {
       try {
         const serverProfile = await getStudentProfile();
 
         studentStore.updateUserProfile(serverProfile.userProfile);
         studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
-        studentStore.setPhoto(serverProfile.photo.url);
+        studentStore.setPhoto(serverProfile.photo.url || '');
 
         syncProfileWithStore();
       } catch (error) {

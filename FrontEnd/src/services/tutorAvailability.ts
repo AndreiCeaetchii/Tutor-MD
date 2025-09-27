@@ -22,6 +22,18 @@ const removeTutorWithNoAvailability = (tutorId: number): void => {
   if (index !== -1) tutorsWithNoAvailability.splice(index, 1);
 };
 
+const requestStorageAccess = async () => {
+  try {
+    // Request storage access if supported
+    if (document.requestStorageAccess) {
+      await document.requestStorageAccess();
+      console.log('Storage access granted');
+    }
+  } catch (error) {
+    console.error('Storage access request failed:', error);
+  }
+};
+
 const availabilityAxios = axios.create({
   baseURL: `${API_URL}/tutors`,
   withCredentials: true,
@@ -42,6 +54,22 @@ availabilityAxios.interceptors.response.use(
   },
 );
 
+availabilityAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export interface AvailabilitySlot {
   id?: number;
   date: string;
@@ -54,12 +82,7 @@ export const getTutorAvailability = async (tutorId: number) => {
   if (hasTutorWithNoAvailability(tutorId)) return [];
 
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await availabilityAxios.get(`/availability/${tutorId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await availabilityAxios.get(`/availability/${tutorId}`);
 
     if (hasTutorWithNoAvailability(tutorId)) {
       removeTutorWithNoAvailability(tutorId);
@@ -84,8 +107,10 @@ export const getTutorAvailability = async (tutorId: number) => {
 
 export const createAvailability = async (slot: AvailabilitySlot) => {
   try {
+
+    await requestStorageAccess();
+
     const store = useUserStore();
-    const token = store.accessToken;
     const tutorId = Number(store.userId);
 
     const simplifiedSlot = {
@@ -98,7 +123,6 @@ export const createAvailability = async (slot: AvailabilitySlot) => {
     const response = await availabilityAxios.post(`/availability/create`, simplifiedSlot, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -116,13 +140,9 @@ export const createAvailability = async (slot: AvailabilitySlot) => {
 
 export const updateAvailability = async (slot: AvailabilitySlot) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
     const response = await availabilityAxios.put(`/availability/update`, slot, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -136,12 +156,7 @@ export const updateAvailability = async (slot: AvailabilitySlot) => {
 
 export const deleteAvailability = async (id: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await availabilityAxios.delete(`/availability/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await availabilityAxios.delete(`/availability/delete/${id}`);
 
     return response.data;
   } catch (error: any) {

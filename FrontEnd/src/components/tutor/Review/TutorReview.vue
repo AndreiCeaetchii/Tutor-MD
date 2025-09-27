@@ -1,90 +1,117 @@
 <script setup lang="ts">
-  import { ref, computed, onMounted } from 'vue';
-  import ReviewStats from '../Review/ReviewStats.vue';
-  import ReviewCard from '../Review/ReviewCard.vue';
-  import WriteReview from './WriteReview.vue';
-  import { useRoute } from 'vue-router';
-  import { useUserStore } from '../../../store/userStore.ts';
-  import type {
-    TutorReview,
-    TutorReviewsResponse,
-  } from '../../../services/reviewService.ts';
-  import { getTutorReviews } from '../../../services/reviewService.ts';
+import { ref, computed, onMounted } from 'vue';
+import ReviewStats from '../Review/ReviewStats.vue';
+import ReviewCard from '../Review/ReviewCard.vue';
+import WriteReview from './WriteReview.vue';
+import { useRoute } from 'vue-router';
+import { useUserStore } from '../../../store/userStore.ts';
+import type {
+  TutorReview,
+  TutorReviewsResponse,
+} from '../../../services/reviewService.ts';
+import { getTutorReviews } from '../../../services/reviewService.ts';
 
-  const ratingsOpen = ref(false);
-  const selectedRating = ref('All Ratings');
-  const ratingsOptions = ['All Ratings', '5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'];
+const props = defineProps<{
+  bookingIdForReview: number;
+  haveToWriteReview: boolean;
+  tutorName: string | null;
+  subjectName: string | null;
+  tutorPhoto: string | null;
+  lessonDate: string | null;
+}>();
 
-  const sortOpen = ref(false);
-  const selectedSort = ref('Most Recent');
-  const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
+const ratingsOpen = ref(false);
+const selectedRating = ref('All Ratings');
+const ratingsOptions = ['All Ratings', '5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'];
 
-  const reviews = ref<TutorReview[]>([]);
-  const averageRating = ref<number | null>(null);
-  const isLoading = ref(true);
-  const error = ref<string | null>(null);
+const sortOpen = ref(false);
+const selectedSort = ref('Most Recent');
+const sortOptions = ['Most Recent', 'Highest Rated', 'Lowest Rated'];
 
-  const store = useUserStore();
-  const route = useRoute();
-  const idFromUrl = route.params.id as string | undefined;
-  const tutorId = computed(() => (route.params.id as string) || store.userId?.toString() || null);
+const reviews = ref<TutorReview[]>([]);
+const averageRating = ref<number | null>(null);
+const isLoading = ref(true);
+const error = ref<string | null>(null);
 
-  const fetchReviews = async () => {
-    if (!tutorId.value) {
-      error.value = 'Tutor ID is not available.';
-      isLoading.value = false;
-      return;
+const store = useUserStore();
+const route = useRoute();
+const idFromUrl = route.params.id as string | undefined;
+const tutorId = computed(() => (route.params.id as string) || store.userId?.toString() || null);
+
+const fetchReviews = async () => {
+  if (!tutorId.value) {
+    error.value = 'Tutor ID is not available.';
+    isLoading.value = false;
+    return;
+  }
+
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const tutorIdNumber = parseInt(tutorId.value, 10);
+    if (isNaN(tutorIdNumber)) {
+      throw new Error('Invalid tutor ID.');
     }
 
-    isLoading.value = true;
-    error.value = null;
-
-    try {
-      const tutorIdNumber = parseInt(tutorId.value, 10);
-      if (isNaN(tutorIdNumber)) {
-        throw new Error('Invalid tutor ID.');
-      }
-
-      const response: TutorReviewsResponse = await getTutorReviews(tutorIdNumber);
-      reviews.value = response.reviews;
-      averageRating.value = response.averageRating;
-    } catch (err: any) {
-      console.error('Failed to fetch reviews:', err);
-      error.value = err.message || 'Failed to load reviews.';
-    } finally {
-      isLoading.value = false;
-    }
-  };
-
-  onMounted(() => {
-    fetchReviews();
-  });
-
-  function toggleRatingsDropdown() {
-    ratingsOpen.value = !ratingsOpen.value;
-    sortOpen.value = false;
+    const response: TutorReviewsResponse = await getTutorReviews(tutorIdNumber);
+    console.log('Fetched reviews:', response);
+    reviews.value = response.reviews;
+    averageRating.value = response.averageRating;
+  } catch (err: any) {
+    console.error('Failed to fetch reviews:', err);
+    error.value = err.message || 'Failed to load reviews.';
+  } finally {
+    isLoading.value = false;
   }
+};
 
-  function selectRating(rating: string) {
-    selectedRating.value = rating;
-    ratingsOpen.value = false;
-  }
+onMounted(() => {
+  fetchReviews();
+});
 
-  function toggleSortDropdown() {
-    sortOpen.value = !sortOpen.value;
-    ratingsOpen.value = false;
-  }
+function toggleRatingsDropdown() {
+  ratingsOpen.value = !ratingsOpen.value;
+  sortOpen.value = false;
+}
 
-  function selectSort(sort: string) {
-    selectedSort.value = sort;
-    sortOpen.value = false;
-  }
+function selectRating(rating: string) {
+  selectedRating.value = rating;
+  ratingsOpen.value = false;
+}
+
+function toggleSortDropdown() {
+  sortOpen.value = !sortOpen.value;
+  ratingsOpen.value = false;
+}
+
+function selectSort(sort: string) {
+  selectedSort.value = sort;
+  sortOpen.value = false;
+}
+
+const reviewsStatsData = computed(() => ({
+  reviews: reviews.value,
+  averageRating: averageRating.value,
+}));
+
+const { bookingIdForReview, tutorName, subjectName, tutorPhoto, lessonDate, haveToWriteReview } = props;
 </script>
 
 <template>
   <div class="content-container">
-    <WriteReview v-if="idFromUrl" />
-    <ReviewStats v-else />
+    <WriteReview v-if="idFromUrl && haveToWriteReview"
+                 :bookingIdForReview="bookingIdForReview"
+                 :tutorName="tutorName"
+                 :subjectName="subjectName"
+                 :tutorPhoto="tutorPhoto"
+                 :lessonDate="lessonDate"
+    />
+
+    <ReviewStats
+      v-if="!idFromUrl && !isLoading && reviews.length > 0"
+      :reviews-data="reviewsStatsData"
+    />
     <div class="my-6">
       <div class="p-6 bg-white shadow-lg rounded-2xl md:p-8">
         <div
@@ -123,7 +150,7 @@
                     href="#"
                     @click.prevent="selectRating(rating)"
                     class="block px-4 py-2 text-sm text-gray-700 transition-colors duration-200 rounded-lg hover:bg-purple-50 hover:text-purple-600"
-                    >{{ rating }}</a
+                  >{{ rating }}</a
                   >
                 </div>
               </div>
@@ -160,7 +187,7 @@
                     href="#"
                     @click.prevent="selectSort(sort)"
                     class="block px-4 py-2 text-sm text-gray-700 transition-colors duration-200 rounded-lg hover:bg-purple-50 hover:text-purple-600"
-                    >{{ sort }}</a
+                  >{{ sort }}</a
                   >
                 </div>
               </div>
@@ -179,17 +206,3 @@
     </div>
   </div>
 </template>
-
-<style scoped>
-  .content-container {
-    max-width: 1200px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  @media (max-width: 640px) {
-    .content-container {
-      padding: 0 0.5rem;
-    }
-  }
-</style>

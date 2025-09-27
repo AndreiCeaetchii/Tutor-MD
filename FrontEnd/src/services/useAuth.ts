@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../store/userStore';
+import { fetchCsrfToken } from './csrfService';
 
 
 declare const google: any;
@@ -85,6 +86,9 @@ export function useAuth() {
       const data = response.data;
       const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
       store.setUser(data.token, data.id.toString(), userRole, formData.email);
+
+      await fetchCsrfToken();
+      
       return true;
     } catch (err: any) {
       errorMessage.value = handleAuthError(err, 'signup');
@@ -94,14 +98,16 @@ export function useAuth() {
 
   const requiresMfa = ref(false);
 
-  const login = async (formData: {
+  const requiresMfa = ref(false);
+
+const login = async (formData: {
   email: string;
   password: string;
   mfaCode?: string;
 }): Promise<{ success: boolean; role?: string; requiresMfa?: boolean }> => {
   errorMessage.value = null;
   try {
-    const requestData = { 
+    const requestData: any = { 
       Email: formData.email, 
       Password: formData.password 
     };
@@ -136,6 +142,9 @@ export function useAuth() {
     const decoded = decodeJwt(data.token);
     const userRole = decoded?.role?.toLowerCase() || 'student';
     store.setUser(data.token, data.id, userRole, formData.email);
+
+    await fetchCsrfToken();
+
     requiresMfa.value = false;
     return { success: true, role: userRole };
   } catch (err: any) {
@@ -146,7 +155,7 @@ export function useAuth() {
       err.response?.data?.message === 'MFA_REQUIRED' ||
       err.response?.data?.detail === 'MFA_REQUIRED' || 
       (Array.isArray(err.response?.data) && err.response.data.includes('MFA_REQUIRED')) ||
-      err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED')
+      (err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED'))
     ) {
       console.log("MFA required detected in error");
       requiresMfa.value = true;
@@ -159,7 +168,7 @@ export function useAuth() {
   }
 };
 
-  const verifyMfaLogin = async (code: string): Promise<{ success: boolean; role?: string }> => {
+const verifyMfaLogin = async (code: string): Promise<{ success: boolean; role?: string }> => {
   errorMessage.value = null;
   try {
     const email = sessionStorage.getItem('mfa_email');
@@ -167,6 +176,31 @@ export function useAuth() {
       errorMessage.value = 'Session expired. Please login again.';
       return { success: false };
     }
+
+    const formattedMfaCode = code.replace(/\s/g, '').substring(0, 6).padStart(6, '0');
+
+    const response = await axios.post(
+      LOGIN_URL,
+      { Email: email, MfaCode: formattedMfaCode },
+      { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
+    );
+
+    const data = response.data;
+    const decoded = decodeJwt(data.token);
+    const userRole = decoded?.role?.toLowerCase() || 'student';
+    store.setUser(data.token, data.id, userRole, email);
+
+    await fetchCsrfToken();
+
+    requiresMfa.value = false;
+    sessionStorage.removeItem('mfa_email');
+    return { success: true, role: userRole };
+  } catch (err: any) {
+    errorMessage.value = handleAuthError(err, 'mfa');
+    return { success: false };
+  }
+};
+
     
     const formattedCode = code.trim().padStart(6, '0').substring(0, 6);
     
@@ -268,6 +302,8 @@ export function useAuth() {
             const decoded = decodeJwt(data.token);
             const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
             store.setUser(data.token, data.id, userRole, email);
+
+            await fetchCsrfToken();
 
             resolve({ success: true, role: userRole });
           } catch (err: any) {

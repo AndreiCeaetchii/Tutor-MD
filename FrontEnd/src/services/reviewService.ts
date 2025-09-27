@@ -6,6 +6,27 @@ const API_URL =
   (window as any)?.VITE_API_BASE_URL ||
   'https://localhost:8085/api';
 
+const reviewAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+reviewAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export interface TutorReview {
   id: number;
   studentUserId: number;
@@ -21,9 +42,9 @@ export interface TutorReviewsResponse {
 }
 
 export interface CreateReviewDto {
-  BookingId: number;
-  Rating: number;
-  Description: string;
+  bookingId: number;
+  rating: number;
+  description: string;
 }
 
 export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResponse> => {

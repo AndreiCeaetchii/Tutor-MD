@@ -6,6 +6,27 @@ const API_URL =
   (window as any)?.VITE_API_BASE_URL ||
   'https://localhost:8085/api';
 
+const notificationAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+notificationAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export type Notification = {
   id: number;
   type: string;
@@ -21,19 +42,10 @@ export interface NotificationsResponse {
 
 export const getUserNotifications = async (): Promise<NotificationsResponse> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.get<NotificationsResponse>(`${API_URL}/users/notifications`, {
+    const response = await notificationAxios.get<NotificationsResponse>(`/users/notifications`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -52,22 +64,13 @@ export const getUserNotifications = async (): Promise<NotificationsResponse> => 
 
 export const markNotificationAsRead = async (notificationId: number): Promise<void> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    await axios.put(
-      `${API_URL}/users/notification/read/${notificationId}`,
+    await notificationAxios.put(
+      `/users/notification/read/${notificationId}`,
       {},
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
-        withCredentials: true,
       },
     );
   } catch (error) {

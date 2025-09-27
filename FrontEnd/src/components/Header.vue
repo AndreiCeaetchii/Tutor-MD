@@ -364,7 +364,7 @@
           </div>
 
           <div class="pt-4 pb-3 border-t border-gray-100">
-            <div class="flex items-center justify-between px-3">
+            <div v-if="store.isAuthenticated" class="flex items-center justify-between px-3">
               <div class="flex items-center gap-3">
                 <div class="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-full">
                   <User class="w-4 h-4 text-purple-500" />
@@ -374,7 +374,6 @@
               <div class="flex items-center gap-3">
                 <Bell class="w-6 h-6 text-gray-600" />
                 <button
-                  v-if="store.isAuthenticated"
                   @click="handleLogout"
                   class="p-2 text-red-600 rounded-full hover:bg-gray-100"
                 >
@@ -382,6 +381,22 @@
                 </button>
               </div>
             </div>
+
+            <div v-else class="flex items-center justify-center space-x-4 px-3">
+              <router-link
+                to="/login"
+                class="px-4 py-1 text-sm text-purple-600 border border-purple-600 rounded-full hover:text-purple-800"
+              >
+                Login
+              </router-link>
+              <router-link
+                to="/signup"
+                class="bg-[#5f22d9] hover:bg-purple-700 text-white px-4 py-1 rounded-full text-sm"
+              >
+                Sign Up
+              </router-link>
+            </div>
+
           </div>
         </div>
       </div>

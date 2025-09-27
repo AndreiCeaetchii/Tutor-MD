@@ -1,6 +1,33 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'https://localhost:8085/api'
+;
+
+const studentAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+studentAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
+
 export interface CreateProfileDto {
   phone: string;
   username: string;
@@ -38,19 +65,10 @@ const API_URL =
 
 export const createStudentProfile = async (profileData: StudentProfileData) => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.post(`${API_URL}/students/create-student`, profileData, {
+    const response = await studentAxios.post(`/students/create-student`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -65,19 +83,10 @@ export const createStudentProfile = async (profileData: StudentProfileData) => {
 
 export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.put(`${API_URL}/students/update-profile`, profileData, {
+    const response = await studentAxios.put(`/students/update-profile`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
@@ -92,19 +101,10 @@ export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
 
 export const getStudentProfile = async () => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.get(`${API_URL}/students/student-profile`, {
+    const response = await studentAxios.get(`/students/student-profile`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
