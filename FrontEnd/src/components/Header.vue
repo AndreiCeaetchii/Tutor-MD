@@ -149,7 +149,7 @@
           </div>
         </div>
         <div class="items-center hidden space-x-4 md:flex">
-          <NotificationsDropdown @close-other-menus="closeProfileMenu" />
+          <NotificationsDropdown v-if="store.isAuthenticated" @close-other-menus="closeProfileMenu" />
 
           <div v-if="store.isAuthenticated" class="relative">
             <button
