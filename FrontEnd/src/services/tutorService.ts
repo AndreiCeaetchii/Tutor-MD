@@ -182,7 +182,7 @@ export const getTutors = async () => {
 export const addToFavourites = async (tutorId: number) => {
   try {
     const response = await tutorAxios.post(
-      `${favouriteTutorAPI}/favorite/${tutorId}`,
+      `${favouriteTutorAPI}/favorites/${tutorId}`,
       {},
       {
         headers: {
