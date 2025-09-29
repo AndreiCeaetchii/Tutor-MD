@@ -25,7 +25,6 @@ const handleSaveToggled = async (isSaved: boolean, tutorId: number) => {
 };
 </script>
 
-
 <template>
   <div class="favourite-tutors">
     <div class="container px-4 py-6 mx-auto">
@@ -53,8 +52,8 @@ const handleSaveToggled = async (isSaved: boolean, tutorId: number) => {
         </p>
       </div>
       
-      <div v-else>
-        <div v-for="tutor in favouriteTutorStore.favouriteTutors" :key="tutor.id" class="mb-4">
+      <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div v-for="tutor in favouriteTutorStore.favouriteTutors" :key="tutor.id">
           <TutorCards 
             :id="tutor.id"
             :name="tutor.name"
@@ -67,6 +66,7 @@ const handleSaveToggled = async (isSaved: boolean, tutorId: number) => {
             :services="tutor.services"
             :saved="true"
             :workingLocation="tutor.workingLocation"
+            :showHourlyRate="false"
             @save-toggled="(isSaved) => handleSaveToggled(isSaved, tutor.id)"
           />
         </div>
