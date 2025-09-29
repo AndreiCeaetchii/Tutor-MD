@@ -171,11 +171,9 @@ public class UserService : IUserService
 
     public async Task<Result> RequestPasswordResetAsync(string email)
     {
-        Console.Write("Password Reset Request");
         var user = await GetUserByEmailAsync(email);
         if (user == null)
             return Result.Error("User not found with this email");
-        Console.Write(user.Email);
         var token = Guid.NewGuid().ToString("N");
 
         user.ResetToken = token;
@@ -208,7 +206,7 @@ public class UserService : IUserService
 ";
         var result = await _emailService.SendEmailAsync(user.Email, "Password Reset", htmlMessage);
         if (result == false)
-            return Result.Error("Somethin went wrong");
+            return Result.Error("Something went wrong");
         return Result.Success();
     }
 

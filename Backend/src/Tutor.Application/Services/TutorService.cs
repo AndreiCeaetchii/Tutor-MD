@@ -87,7 +87,6 @@ public class TutorService : ITutorService
         var cachedTutor = await _cacheService.GetAsync<TutorProfileDto>(cacheKey);
         if (cachedTutor != null)
         {
-            Console.WriteLine("from cache");
             return Result<TutorProfileDto>.Success(cachedTutor);
         }
 
@@ -118,7 +117,6 @@ public class TutorService : ITutorService
                                (ratings == null || ratings.Length == 0) &&
                                !minPrice.HasValue &&
                                !maxPrice.HasValue;
-        Console.WriteLine(isGetAllRequest);
         if (isGetAllRequest)
         {
             var cachedTutors = await _cacheService.GetAsync<List<TutorProfileDto>>(TutorListKey);
@@ -137,7 +135,6 @@ public class TutorService : ITutorService
                     await _cacheService.SetAsync(cacheKey, tutorDto, TimeSpan.FromHours(1));
                 }
 
-                Console.Write("from cache");
                 return Result<List<TutorProfileDto>>.Success(cachedTutors);
             }
         }

@@ -26,13 +26,11 @@ public class EmailService : IEmailService
         // Check if the request succeeded (status code 2xx)
         if ((int)response.StatusCode >= 200 && (int)response.StatusCode < 300)
         {
-            Console.WriteLine("✓ Email sent successfully!");
             return true;
         }
         else
         {
             var responseBody = await response.Body.ReadAsStringAsync();
-            Console.WriteLine($"❌ Failed to send email. Status: {response.StatusCode}, Body: {responseBody}");
             return false;
         }
     }
