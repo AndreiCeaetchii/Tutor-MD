@@ -278,13 +278,13 @@
           <div v-else class="flex space-x-2">
             <router-link
               to="/login"
-              class="px-4 py-1 text-sm text-purple-600 border border-purple-600 rounded-full hover:text-purple-800"
+              class="px-4 py-1 text-sm text-[#5f22d9] border border-[#5d15ec] rounded-full hover:text-purple-800"
             >
               Login
             </router-link>
             <router-link
               to="/signup"
-              class="bg-[#5f22d9] hover:bg-purple-700 text-white px-4 py-1 rounded-full text-sm"
+              class="bg-[#5f22d9] hover:bg-[#5d15ec] text-white px-4 py-1 rounded-full text-sm"
             >
               Sign Up
             </router-link>
