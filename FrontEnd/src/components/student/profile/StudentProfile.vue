@@ -167,7 +167,7 @@
                 <ProfilePhotoUpload
                   v-if="isEditing"
                   v-model="profile.profileImage"
-                  class="absolute -top-1 -left-1 w-24 h-24"
+                  class="absolute w-24 h-24 -top-1 -left-1"
                 />
                 <img
                   v-else
@@ -179,7 +179,7 @@
 
               <div
                 v-if="isEditing"
-                class="absolute bottom-1 right-0 p-1 bg-white rounded-full shadow-sm"
+                class="absolute right-0 p-1 bg-white rounded-full shadow-sm bottom-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -199,10 +199,10 @@
               
               <div v-if="!isEditing" class="flex flex-wrap gap-2 mt-2">
                 <span class="px-3 py-1 text-sm font-semibold text-indigo-700 bg-indigo-100 rounded-full">
-                  Class {{ profile.class }}
+                  Grade: {{ profile.class }}
                 </span>
                 <span class="px-3 py-1 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
-                  Grade {{ profile.grade }}
+                  GPA: {{ profile.grade }}
                 </span>
               </div>
             </div>
