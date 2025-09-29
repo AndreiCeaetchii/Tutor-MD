@@ -192,6 +192,7 @@
           id="email"
           v-model="email"
           placeholder="Enter your email"
+          autocomplete="username"
           class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2"
           :class="[
             fieldErrors?.email
@@ -245,6 +246,7 @@
             id="password"
             v-model="password"
             placeholder="Enter your password"
+            :autocomplete="isSignupForm ? 'new-password' : 'current-password'"
             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border rounded-lg focus:outline-none focus:ring-2 pr-12"
             :class="[
               fieldErrors?.password

@@ -1,15 +1,19 @@
 <script setup lang="ts">
   import { useProfileStore } from '../../../store/profileStore.ts';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import PricingCard from './PricingCard.vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faPhone, faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
+  import { useUserStore } from '../../../store/userStore.ts'
 
   library.add(faPhone, faEnvelope, faLock);
 
   const profileStore = useProfileStore();
   const router = useRouter();
+  const store = useUserStore();
+  const UserRole = store.userRole;
+  const idFromUrl = useRoute().params.id as string;
 </script>
 
 <template>
@@ -70,12 +74,24 @@
         </div>
 
         <button
+          v-if="UserRole !== 'student'"
           @click="router.push('/mfa-setup')"
           class="flex items-center justify-center w-full gap-2 px-6 py-3 font-semibold text-white transition-opacity rounded-full shadow bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90"
         >
           <font-awesome-icon :icon="['fas', 'lock']" />
           Enable MFA
         </button>
+
+        <button
+          v-else
+          @click="router.push(`/tutor/${idFromUrl}/availability`)"
+          class="flex items-center justify-center w-full gap-2 px-6 py-3 font-semibold text-white transition-opacity rounded-full shadow bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90"
+        >
+          <font-awesome-icon :icon="['fas', 'calendar-alt']" />
+          Book This Tutor
+        </button>
+
+
       </div>
     </div>
   </div>

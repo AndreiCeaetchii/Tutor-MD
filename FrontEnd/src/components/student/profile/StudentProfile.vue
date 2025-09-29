@@ -163,8 +163,12 @@
           <div class="flex flex-col items-center gap-4 sm:flex-row">
             <!-- Profile Photo -->
             <div class="relative flex-shrink-0">
-              <div class="w-24 h-24 overflow-hidden border-4 border-white rounded-full shadow-md">
-                <ProfilePhotoUpload v-if="isEditing" v-model="profile.profileImage" />
+              <div class="w-32 h-32 overflow-hidden border-4 border-white rounded-full shadow-md">
+                <ProfilePhotoUpload
+                  v-if="isEditing"
+                  v-model="profile.profileImage"
+                  class="absolute -top-1 -left-1 w-24 h-24"
+                />
                 <img
                   v-else
                   :src="profile.profileImage"
@@ -172,14 +176,14 @@
                   class="object-cover w-full h-full"
                 />
               </div>
-              
+
               <div
                 v-if="isEditing"
-                class="absolute bottom-0 right-0 p-1 bg-white rounded-full shadow-sm"
+                class="absolute bottom-1 right-0 p-1 bg-white rounded-full shadow-sm"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="w-4 h-4 text-purple-600"
+                  class="w-6 h-6 text-purple-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >

@@ -91,7 +91,6 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.IsEssential = true; 
 });
 
-
 builder.Logging.ClearProviders();
 
 // Add serilog
