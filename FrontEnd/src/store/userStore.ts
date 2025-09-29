@@ -51,8 +51,6 @@ export const useUserStore = defineStore('user', {
       notificationStore.loading = false;
       notificationStore.error = null;
       notificationStore.lastFetchTime = 0;
-      
-      localStorage.removeItem('notification-read-ids');
 
       this.csrfToken = null;
 
