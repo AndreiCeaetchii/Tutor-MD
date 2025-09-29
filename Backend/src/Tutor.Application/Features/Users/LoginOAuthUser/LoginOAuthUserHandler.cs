@@ -31,7 +31,7 @@ public class LoginOAuthUserCommandHandler
         IOAuthService oauthService)
     {
         _userService = userService;
-        _roleService= roleService;
+        _roleService = roleService;
         _jwtTokenService = jwtTokenService;
         _roleRepository = roleRepository;
         _mfaService = mfaService;
@@ -65,25 +65,27 @@ public class LoginOAuthUserCommandHandler
             return Result<UserResponseDto>.Error("Email does not match OAuth account");
 
         var user = await _userService.GetUserByOAuthIdAsync(request.Provider, userInfo.ProviderId);
-        
-        
+
+
         if (user != null)
         {
             var usersRole = await _roleService.GetRoleIdAsync(user.Id);
             if (usersRole == null)
                 return Result<UserResponseDto>.Error($"No role found for user ");
             var role = await _roleRepository.FindAsyncDefault(u => u.Id == usersRole);
-        
+
             if (user.TwoFactorEnabled)
             {
                 if (string.IsNullOrEmpty(request.MfaCode))
                     return Result<UserResponseDto>.Error("MFA_REQUIRED");
-            
-                if (!_mfaService.VerifyCode(user.TwoFactorSecret, request.MfaCode))
+
+                var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
+                if (!_mfaService.VerifyCode(decryptedSecret, request.MfaCode))
                     return Result<UserResponseDto>.Error("Invalid Mfa code");
             }
+
             var token = _jwtTokenService.GenerateToken(user, role);
-            
+
             return Result.Success(user.ToResponseDto(token));
         }
 

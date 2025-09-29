@@ -64,8 +64,9 @@ public class AuthService : IAuthService
         {
             if (string.IsNullOrEmpty(mfaCode))
                 return Result<UserResponseDto>.Error("MFA_REQUIRED");
+            var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
 
-            if (!_mfaService.VerifyCode(user.TwoFactorSecret, mfaCode))
+            if (!_mfaService.VerifyCode(decryptedSecret, mfaCode))
                 return Result<UserResponseDto>.Error("Invalid Mfa code");
         }
 
