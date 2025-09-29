@@ -11,10 +11,21 @@
     CreateProfileDto,
   } from '../../../services/tutorService.ts';
   import { useRouter } from 'vue-router';
+  import AlertMessage from '../../../components/ui/AlertMessage.vue';
 
   library.add(faTimes);
 
   const router = useRouter();
+  
+  const showAlert = ref(false);
+  const alertMessage = ref('');
+  const alertType = ref('success');
+
+  type SubjectForm = {
+    subjectName: string;
+    pricePerHour: number | string;
+    currency: string;
+  };
 
   const form = ref({
     firstName: '',
@@ -24,14 +35,8 @@
     birthdate: '',
     country: '',
     city: '',
-    experienceYears: 1,
-    subjects: [
-      {
-        subjectName: 'Mathematics',
-        pricePerHour: 0,
-        currency: 'MDL',
-      },
-    ],
+    experienceYears: '',
+    subjects: [] as SubjectForm[],
     languages: [] as string[],
     teachingPreferences: {
       myHome: false,
@@ -72,6 +77,65 @@
     'Statistics',
   ];
 
+  const birthDay = ref<number | null>(null);
+  const birthMonth = ref<number | null>(null);
+  const birthYear = ref<number | null>(null);
+
+  const currentYear = new Date().getFullYear();
+  const minYear = 1930;
+  const maxYear = currentYear - 18;
+
+  const teachingLocationError = ref('');
+  const birthDateError = ref('');
+  const phoneError = ref('');
+  const phonePattern = /^\+[0-9]{1,4}[0-9]{6,14}$/;
+
+  const validatePhone = () => {
+    phoneError.value = '';
+    
+    if (!form.value.phone) {
+      phoneError.value = 'Phone number is required';
+      return false;
+    }
+    
+    if (!phonePattern.test(form.value.phone)) {
+      phoneError.value = 'Please enter a valid phone number (e.g., +37360000000)';
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const validateAge = () => {
+    birthDateError.value = '';
+    
+    if (birthYear.value && birthMonth.value && birthDay.value) {
+      const birthDate = new Date(birthYear.value, birthMonth.value - 1, birthDay.value);
+      const today = new Date();
+      const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+      
+      if (birthDate > minAgeDate) {
+        birthDateError.value = 'You must be at least 18 years old to register as a tutor';
+        return false;
+      }
+      
+      const isValidDate = birthDate.getFullYear() === birthYear.value &&
+                          birthDate.getMonth() === birthMonth.value - 1 &&
+                          birthDate.getDate() === birthDay.value;
+                          
+      if (!isValidDate) {
+        birthDateError.value = 'Please enter a valid date';
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  watch([birthDay, birthMonth, birthYear], () => {
+    validateAge();
+  }, { deep: true });
+
   const availableLanguages = computed(() => {
     return allLanguages.filter((lang) => !form.value.languages.includes(lang));
   });
@@ -109,15 +173,13 @@
   const addNewSubject = (subjectName: string) => {
     form.value.subjects.push({
       subjectName: subjectName,
-      pricePerHour: 0,
+      pricePerHour: '',
       currency: 'MDL',
     });
   };
 
   const removeSubject = (index: number) => {
-    if (form.value.subjects.length > 1) {
-      form.value.subjects.splice(index, 1);
-    }
+    form.value.subjects.splice(index, 1);
   };
 
   watch(
@@ -141,8 +203,104 @@
     return 0;
   });
 
+  const closeAlert = () => {
+    showAlert.value = false;
+  };
+
+  const validatePhoneInput = () => {
+    if (!form.value.phone) {
+      phoneError.value = 'Phone number is required';
+    } else if (!phonePattern.test(form.value.phone)) {
+      phoneError.value = 'Please enter a valid phone number (e.g., +37360000000)';
+    } else {
+      phoneError.value = '';
+    }
+  };
+  
+  const clearPhoneError = () => {
+    if (phoneError.value) phoneError.value = '';
+  };
+  
+  const validateBirthdateInputs = () => {
+    validateAge();
+  };
+  
+  const clearBirthdateError = () => {
+    if (birthDateError.value) birthDateError.value = '';
+  };
+  
+  const validateTeachingLocations = () => {
+    const { myHome, studentHome, online } = form.value.teachingPreferences;
+    if (myHome || studentHome || online) {
+      teachingLocationError.value = '';
+    } else {
+      teachingLocationError.value = 'Please select at least one teaching location';
+    }
+  };
+  
+  watch(
+    () => [form.value.teachingPreferences.myHome, form.value.teachingPreferences.studentHome, form.value.teachingPreferences.online], 
+    validateTeachingLocations
+  );
+
+  const bioCharacterCount = computed(() => {
+    return form.value.bio.length;
+  });
+  
+  const bioLimitReached = computed(() => {
+    return bioCharacterCount.value >= 200;
+  });
+  
+  const limitBioText = () => {
+    if (form.value.bio.length > 200) {
+      form.value.bio = form.value.bio.substring(0, 200);
+    }
+  };
+
   const handleSubmit = async () => {
-    const birthdateFormatted = form.value.birthdate ? `${form.value.birthdate}T00:00:00` : '';
+    teachingLocationError.value = '';
+    birthDateError.value = '';
+    phoneError.value = '';
+    
+    const isPhoneValid = validatePhone();
+    const isAgeValid = validateAge();
+    
+    const { myHome, studentHome, online } = form.value.teachingPreferences;
+    const isTeachingLocationValid = myHome || studentHome || online;
+    
+    if (!isTeachingLocationValid) {
+      teachingLocationError.value = 'Please select at least one teaching location';
+      document.getElementById('teachingLocations')?.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    if (form.value.subjects.length === 0) {
+      alertMessage.value = 'Please add at least one subject';
+      alertType.value = 'error';
+      showAlert.value = true;
+      document.querySelector('.subjects-section')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    if (!isPhoneValid || !isAgeValid || !isTeachingLocationValid) {
+      if (!isAgeValid) {
+        document.getElementById('birthdate-section')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+    
+    const pad = (num: number | null) => (num !== null ? String(num).padStart(2, '0') : '');
+
+    const yyyy = birthYear.value;
+    const mm = pad(birthMonth.value);
+    const dd = pad(birthDay.value);
+
+    if (!yyyy || !mm || !dd) {
+      console.error('Birthdate is incomplete.');
+      return;
+    }
+
+    const finalBirthdate = `${yyyy}-${mm}-${dd}`;
+    const birthdateFormatted = finalBirthdate ? `${finalBirthdate}T00:00:00` : '';
 
     const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
       subjectName: subject.subjectName,
@@ -164,7 +322,7 @@
 
     const payload: TutorProfileData = {
       verificationStatus: 'Pending',
-      experienceYears: form.value.experienceYears,
+      experienceYears: Number(form.value.experienceYears),
       subjects: subjectsPayload,
       createProfileDto: profileDto,
       workingLocation: workingLocationId.value,
@@ -172,21 +330,41 @@
 
     try {
       await createTutorProfile(payload);
-      router.push('/tutor-dashboard');
+      
+      alertMessage.value = 'Your tutor profile has been successfully created!';
+      alertType.value = 'success';
+      showAlert.value = true;
+      
+      setTimeout(() => {
+        router.push('/tutor-dashboard');
+      }, 2000);
     } catch (error) {
       console.error('Error creating tutor profile:', error);
+      
+      alertMessage.value = 'An error occurred while creating your profile. Please try again.';
+      alertType.value = 'error';
+      showAlert.value = true;
     }
   };
 </script>
 
 <template>
   <div class="min-h-screen p-6 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 lg:p-12">
+    <AlertMessage 
+      :show="showAlert"
+      :message="alertMessage"
+      :type="alertType"
+      position="top-center"
+      :duration="2000"
+      @close="closeAlert"
+    />
+    
     <div class="max-w-4xl mx-auto">
       <form @submit.prevent="handleSubmit" class="space-y-8">
         <div
           class="bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] p-8 rounded-2xl shadow-2xl text-center"
         >
-          <h1 class="mb-2 text-4xl font-bold text-white">Complete Your Profile</h1>
+          <h1 class="mb-2 text-4xl font-bold text-white">Complete Your Tutor Profile</h1>
           <p class="text-purple-100">Let's create your teaching profile together</p>
         </div>
 
@@ -214,6 +392,7 @@
                 id="firstName"
                 v-model="form.firstName"
                 type="text"
+                placeholder="e.g., John"
                 required
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
               />
@@ -226,6 +405,7 @@
                 id="lastName"
                 v-model="form.lastName"
                 type="text"
+                placeholder="e.g., Doe"
                 required
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
               />
@@ -239,7 +419,7 @@
                 v-model="form.username"
                 type="text"
                 required
-                placeholder="e.g., anna_teacher"
+                placeholder="e.g., john_doe"
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
               />
             </div>
@@ -254,19 +434,69 @@
                 required
                 placeholder="+37360000000"
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                :class="{'border-red-300': phoneError}"
+                @blur="validatePhoneInput"
+                @input="clearPhoneError"
               />
+              <p v-if="phoneError" class="mt-1 text-sm text-red-500">
+                {{ phoneError }}
+              </p>
             </div>
-            <div class="flex flex-col md:col-span-2">
-              <label for="birthdate" class="mb-2 text-sm font-semibold text-gray-700"
-                >Birthdate <span class="text-red-500">*</span></label
+            <div class="flex flex-col md:col-span-2" id="birthdate-section">
+              <label class="mb-2 text-sm font-semibold text-gray-700"
+              >Birthdate <span class="text-red-500">*</span></label
               >
-              <input
-                id="birthdate"
-                v-model="form.birthdate"
-                type="date"
-                required
-                class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
-              />
+              <div class="grid grid-cols-3 gap-4">
+                <input
+                  id="birthDay"
+                  v-model.number="birthDay"
+                  type="number"
+                  placeholder="Day (DD)"
+                  min="1"
+                  max="31"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  :class="{'border-red-300': birthDateError}"
+                  maxlength="2"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                  @blur="validateBirthdateInputs"
+                  @input="clearBirthdateError"
+                />
+                <input
+                  id="birthMonth"
+                  v-model.number="birthMonth"
+                  type="number"
+                  placeholder="Month (MM)"
+                  min="1"
+                  max="12"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  :class="{'border-red-300': birthDateError}"
+                  maxlength="2"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                  @blur="validateBirthdateInputs"
+                  @input="clearBirthdateError"
+                />
+                <input
+                  id="birthYear"
+                  v-model.number="birthYear"
+                  type="number"
+                  placeholder="Year (YYYY)"
+                  :min="minYear"
+                  :max="maxYear"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  :class="{'border-red-300': birthDateError}"
+                  maxlength="4"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                  @blur="validateBirthdateInputs"
+                  @input="clearBirthdateError"
+                />
+              </div>
+              <p v-if="birthDateError" class="mt-2 text-sm font-medium text-red-500">
+                {{ birthDateError }}
+              </p>
+              <p class="mt-1 text-xs text-gray-500" v-else>You must be at least 18 years old to register as a tutor</p>
             </div>
           </div>
         </section>
@@ -298,7 +528,7 @@
               />
               <div v-if="form.country" class="mt-4">
                 <span
-                  class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.country }}
                 </span>
@@ -316,7 +546,7 @@
               />
               <div v-if="form.city" class="mt-4">
                 <span
-                  class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.city }}
                 </span>
@@ -350,6 +580,7 @@
               type="number"
               min="0"
               max="50"
+              placeholder="e.g., 5"
               required
               class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
             />
@@ -357,7 +588,7 @@
         </section>
 
         <section
-          class="relative z-40 p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
+          class="relative z-40 p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl subjects-section"
         >
           <div class="flex items-center mb-6">
             <div
@@ -381,7 +612,8 @@
                 <div class="flex flex-col">
                   <label class="mb-2 text-sm font-semibold text-gray-700">Subject</label>
                   <div
-                    class="px-4 py-3 font-medium text-gray-800 bg-white border-2 border-gray-200 shadow-sm rounded-xl hover:shadow-md"
+                    class="px-4 py-3 font-medium bg-white border-2 border-gray-200 shadow-sm rounded-xl hover:shadow-md"
+                    :class="subject.subjectName ? 'text-gray-800' : 'text-gray-400'"
                   >
                     {{ subject.subjectName }}
                   </div>
@@ -397,7 +629,7 @@
                     step="0.01"
                     min="0"
                     required
-                    placeholder="25.50"
+                    placeholder="200"
                     class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
                   />
                 </div>
@@ -405,8 +637,7 @@
                   <button
                     type="button"
                     @click="removeSubject(index)"
-                    :disabled="form.subjects.length === 1"
-                    class="px-4 py-2 text-white transition-colors duration-300 bg-red-500 rounded-xl hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    class="px-4 py-2 text-white transition-colors duration-300 bg-red-500 rounded-xl hover:bg-red-600"
                   >
                     Remove
                   </button>
@@ -414,10 +645,11 @@
               </div>
             </div>
 
-            <div v-if="availableSubjects.length > 0">
+            <div class="flex justify-center">
               <DropdownSelect
                 :options="availableSubjects"
-                placeholder="+ Add Another Subject"
+                placeholder="+ Add Subject"
+                class="w-full"
                 @update:modelValue="addNewSubject"
               />
             </div>
@@ -461,7 +693,9 @@
         </section>
 
         <section
+          id="teachingLocations"
           class="p-8 transition-all duration-300 border shadow-xl bg-white/80 backdrop-blur-sm border-white/50 rounded-2xl hover:shadow-2xl"
+          :class="{'border-red-300 shadow-red-100': teachingLocationError}"
         >
           <div class="flex items-center mb-6">
             <div
@@ -472,44 +706,54 @@
             <h2
               class="text-2xl font-bold text-transparent bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text"
             >
-              I can teach on
+              Teaching Location Preferences <span class="text-red-500">*</span>
             </h2>
           </div>
           <div class="flex flex-wrap gap-6">
             <div
               class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl hover:shadow-md"
+              :class="{'border-red-200 bg-red-50/30': teachingLocationError}"
             >
               <input
                 id="myHome"
                 type="checkbox"
                 v-model="form.teachingPreferences.myHome"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
+                @change="validateTeachingLocations"
               />
               <label for="myHome" class="font-medium text-gray-700">My home</label>
             </div>
             <div
               class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-green-100 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl hover:shadow-md"
+              :class="{'border-red-200 bg-red-50/30': teachingLocationError}"
             >
               <input
                 id="studentHome"
                 type="checkbox"
                 v-model="form.teachingPreferences.studentHome"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
+                @change="validateTeachingLocations"
               />
               <label for="studentHome" class="font-medium text-gray-700">Student's home</label>
             </div>
             <div
               class="flex items-center px-4 py-3 space-x-3 transition-all duration-300 border border-purple-100 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl hover:shadow-md"
+              :class="{'border-red-200 bg-red-50/30': teachingLocationError}"
             >
               <input
                 id="online"
                 type="checkbox"
                 v-model="form.teachingPreferences.online"
                 class="rounded-lg text-[#5f22d9] focus:ring-[#5f22d9] w-4 h-4"
+                @change="validateTeachingLocations"
               />
               <label for="online" class="font-medium text-gray-700">Online</label>
             </div>
           </div>
+          
+          <p v-if="teachingLocationError" class="mt-2 text-sm font-medium text-red-500">
+            {{ teachingLocationError }}
+          </p>
         </section>
 
         <section
@@ -530,9 +774,19 @@
           <textarea
             v-model="form.bio"
             rows="6"
+            maxlength="200"
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md resize-none"
             placeholder="Tell us about yourself, your teaching experience, and what makes you passionate about education..."
+            @input="limitBioText"
+            :class="{'border-red-300': bioLimitReached}"
           ></textarea>
+          <div class="mt-2 text-sm text-right" :class="{
+            'text-gray-500': bioCharacterCount < 150,
+            'text-orange-500': bioCharacterCount >= 150 && bioCharacterCount < 200,
+            'text-red-500': bioCharacterCount >= 200
+          }">
+            {{ bioCharacterCount }}/200 characters
+          </div>
         </section>
 
         <div class="flex justify-center pt-4">
