@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faFacebookF, faTwitter, faInstagram, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+
+library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
+</script>
+
 <template>
   <footer class="py-12 text-gray-700 bg-gray-100 lg:py-16">
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -82,11 +90,3 @@
     </div>
   </footer>
 </template>
-
-<script setup lang="ts">
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faFacebookF, faTwitter, faInstagram, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-
-library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
-</script>

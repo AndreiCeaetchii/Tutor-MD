@@ -1,13 +1,21 @@
 import { defineStore } from 'pinia';
+import type { BookingRequest } from '../services/studentBookings';
+import { 
+  getStudentBookings as getStudentBookingsAPI, 
+  createBooking as createBookingAPI, 
+  cancelStudentBooking 
+} from '../services/studentBookings';
 
 export interface Booking {
   id: number;
   studentName: string;
   subject: string;
+  subjectName: string;
   status: string;
   date: string;
-  startTime: string;
-  endTime: string;
+  startTime?: string;
+  endTime?: string;
+  time?: string;
   duration?: string;
   message: string;
   studentImage?: string | null;
@@ -15,6 +23,7 @@ export interface Booking {
   tutorId?: number;
   studentId?: number;
   description?: string;
+  tutorImage?: string | null;
 }
 
 export interface TimeSlot {
@@ -24,7 +33,19 @@ export interface TimeSlot {
   isAvailable: boolean;
 }
 
+const mapApiStatusToString = (statusCode: number): string => {
+  switch (statusCode) {
+    case 0: return 'Pending';
+    case 1: return 'Accepted';
+    case 2: return 'Completed';
+    case 3: return 'Cancelled';
+    default: return 'Unknown';
+  }
+};
+
 const calculateDuration = (startTime: string, endTime: string): string => {
+  if (!startTime || !endTime) return 'Duration unavailable';
+  
   const [startHour, startMinute] = startTime.split(':').map(Number);
   const [endHour, endMinute] = endTime.split(':').map(Number);
   
@@ -41,11 +62,8 @@ const calculateDuration = (startTime: string, endTime: string): string => {
 export const useBookingStore = defineStore('booking', {
   state: () => ({
     bookings: [] as Booking[],
-    
     studentBookings: [] as Booking[],
-    
     availableTimeSlots: [] as TimeSlot[],
-    
     loading: false,
     error: null as string | null,
   }),
@@ -63,70 +81,43 @@ export const useBookingStore = defineStore('booking', {
       if (studentBooking) studentBooking.status = status;
     },
     
-    fetchStudentBookings(studentId: number) {
+    async fetchStudentBookings(_studentId?: number) {
       this.loading = true;
+      this.error = null;
       
-      // Mock data for student bookings
-      this.studentBookings = [
-        {
-          id: 1,
-          studentName: "Current Student",
-          tutorName: "Alexandru Munteanu",
-          subject: "Matematică",
-          status: "confirmed",
-          date: "2025-09-25",
-          startTime: "14:00",
-          endTime: "15:00",
-          duration: "1 oră",
-          message: "Am nevoie de ajutor cu exercițiile de trigonometrie.",
-          tutorId: 101
-        },
-        {
-          id: 2,
-          studentName: "Current Student",
-          tutorName: "Maria Popescu",
-          subject: "Fizică",
-          status: "pending",
-          date: "2025-09-26",
-          startTime: "10:00",
-          endTime: "11:30",
-          duration: "1 oră 30 minute",
-          message: "Aș dori să clarific conceptele de mecanică cuantică.",
-          tutorId: 102
-        },
-        {
-          id: 3,
-          studentName: "Current Student",
-          tutorName: "Ion Ionescu",
-          subject: "Informatică",
-          status: "cancelled",
-          date: "2025-09-20",
-          startTime: "16:00",
-          endTime: "17:00",
-          duration: "1 oră",
-          message: "Am nevoie de ajutor cu algoritmii de sortare.",
-          tutorId: 103
-        },
-        {
-          id: 4,
-          studentName: "Current Student",
-          tutorName: "Elena Codreanu",
-          subject: "Chimie",
-          status: "completed",
-          date: "2025-09-15",
-          startTime: "11:30",
-          endTime: "12:30",
-          duration: "1 oră",
-          message: "Am nevoie de ajutor cu reacțiile organice.",
-          tutorId: 104
-        }
-      ];
-      console.log(`Fetching bookings for student ${studentId}`);
-      
-      this.loading = false;
+      try {
+        const apiBookings = await getStudentBookingsAPI();
+        
+        const transformedBookings: Booking[] = apiBookings.map(booking => {
+          return {
+            id: booking.id,
+            studentName: "Current Student",
+            tutorName: booking.tutorName,
+            subject: booking.subjectName,
+            subjectName: booking.subjectName,
+            status: mapApiStatusToString(booking.status),
+            date: booking.date,
+            startTime: booking.startTime.substring(0, 5),
+            endTime: booking.endTime.substring(0, 5),
+            time: booking.startTime.substring(0, 5),
+            duration: calculateDuration(booking.startTime.substring(0, 5), booking.endTime.substring(0, 5)),
+            message: booking.description,
+            tutorImage: booking.tutorPhoto,
+            tutorId: booking.tutorUserId,
+          };
+        });
+        
+        this.studentBookings = transformedBookings;
+        
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to fetch bookings';
+        console.error('Error fetching student bookings:', error);
+      } finally {
+        this.loading = false;
+      }
     },
     
-    getAvailableTimeSlots(tutorId: number, date: string) {
+    getAvailableTimeSlots() {
       this.availableTimeSlots = [
         { id: 1, startTime: "09:00", endTime: "10:00", isAvailable: true },
         { id: 2, startTime: "10:00", endTime: "11:00", isAvailable: true },
@@ -137,46 +128,71 @@ export const useBookingStore = defineStore('booking', {
         { id: 7, startTime: "16:00", endTime: "17:00", isAvailable: true }
       ].filter(slot => slot.isAvailable);
 
-      console.log(`Getting available slots for tutor ${tutorId} on ${date}`);
       
       return this.availableTimeSlots;
     },
     
-    createBooking(bookingData: Partial<Booking> & { time?: string }) {
-      let startTime = bookingData.startTime || "";
-      let endTime = bookingData.endTime || "";
+    async createBooking(bookingData: any) {
+      this.loading = true;
+      this.error = null;
       
-      if (bookingData.time && bookingData.time.includes(' - ')) {
-        const [start, end] = bookingData.time.split(' - ');
-        startTime = start;
-        endTime = end;
+      try {
+        const bookingRequest: BookingRequest = {
+          tutorUserId: bookingData.tutorId,
+          subjectId: bookingData.subjectId, 
+          availabilityRuleId: bookingData.timeSlotId || 1,
+          description: bookingData.message || bookingData.description || '',
+          status: 'Pending'
+        };
+        
+        const response = await createBookingAPI(bookingRequest);
+        
+        const newBooking: Booking = {
+          id: response.id || Date.now(),
+          studentName: "Current Student",
+          tutorName: bookingData.tutorName || "Selected Tutor",
+          subject: bookingData.subject || "",
+          subjectName: bookingData.subjectName || "",
+          status: "Pending",
+          date: bookingData.date || "",
+          startTime: bookingData.startTime || "",
+          endTime: bookingData.endTime || "",
+          time: bookingData.startTime || "",
+          duration: calculateDuration(bookingData.startTime || "", bookingData.endTime || ""),
+          message: bookingData.message || bookingData.description || "",
+          tutorId: bookingData.tutorId,
+          studentId: bookingData.studentId
+        };
+        
+        this.studentBookings.unshift(newBooking);
+        
+        return newBooking;
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to create booking';
+        console.error('Error creating booking:', error);
+        throw error;
+      } finally {
+        this.loading = false;
       }
-      
-      const duration = startTime && endTime ? calculateDuration(startTime, endTime) : "";
-      
-      const newBooking: Booking = {
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        studentName: "Current Student",
-        tutorName: bookingData.tutorName || "Selected Tutor",
-        subject: bookingData.subject || "",
-        status: "pending",
-        date: bookingData.date || "",
-        startTime,
-        endTime,
-        duration,
-        message: bookingData.message || bookingData.description || "",
-        tutorId: bookingData.tutorId,
-        studentId: bookingData.studentId
-      };
-      
-      this.studentBookings.unshift(newBooking);
-      return newBooking;
     },
     
-    cancelBooking(bookingId: number) {
-      const index = this.studentBookings.findIndex(b => b.id === bookingId);
-      if (index !== -1) {
-        this.studentBookings[index].status = 'cancelled';
+    async cancelBooking(bookingId: number) {
+      this.loading = true;
+      this.error = null;
+      
+      try {
+        await cancelStudentBooking(bookingId);
+        
+        const index = this.studentBookings.findIndex(b => b.id === bookingId);
+        if (index !== -1) {
+          this.studentBookings[index].status = 'Cancelled';
+        }
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to cancel booking';
+        console.error('Error canceling booking:', error);
+        throw error;
+      } finally {
+        this.loading = false;
       }
     }
   },

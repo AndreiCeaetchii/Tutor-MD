@@ -94,8 +94,12 @@ builder.Services.AddExceptionHandler<ExceptionHandler>();
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
-});
+    options.Cookie.SameSite = SameSiteMode.None;
 
+    //Instead of Always we use SameAsRequest to allow local testing over http
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; 
+    options.Cookie.IsEssential = true; 
+});
 
 builder.Logging.ClearProviders();
 

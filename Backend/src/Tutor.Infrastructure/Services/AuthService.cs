@@ -66,9 +66,15 @@ public class AuthService : IAuthService
                 return Result<UserResponseDto>.Error("MFA_REQUIRED");
             var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
 
+
+            //  Decriptează cheia înainte
+            var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
+
+            //  Folosește cheia decriptată
             if (!_mfaService.VerifyCode(decryptedSecret, mfaCode))
                 return Result<UserResponseDto>.Error("Invalid Mfa code");
         }
+
 
         var token = _tokenService.GenerateToken(user, role);
         var refreshTokenInitial = _tokenService.GenerateRefreshToken();

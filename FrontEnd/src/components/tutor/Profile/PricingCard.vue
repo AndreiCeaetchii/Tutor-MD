@@ -15,7 +15,7 @@
     </div>
     <div class="text-lg font-bold text-[#5f22d9] text-right">
       {{ price }}<br />
-      <span class="text-sm font-normal text-gray-500">/ oră</span>
+      <span class="text-sm font-normal text-gray-500">/hour</span>
     </div>
   </div>
 </template>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, computed } from 'vue';
+  import { useFavouriteTutorStore } from '../../../store/favouriteTutorStore';
   import { library } from '@fortawesome/fontawesome-svg-core';
+  import DefaultProfileImage from '../../../assets/DefaultImg.png';
   import { useRouter } from 'vue-router';
   import {
     faHome,
@@ -21,7 +23,10 @@
     hourlyRate: { type: String, default: '712.93' },
     rating: { type: Number, default: 5.0 },
     reviews: { type: Number, default: 4448 },
-    profileImage: { type: String, default: 'https://randomuser.me/api/portraits/women/44.jpg' },
+    profileImage: {
+      type: String,
+      default: () => DefaultProfileImage,
+    },
     description: {
       type: String,
       default:
@@ -32,11 +37,15 @@
       default: () => ['My home', "Student's home", 'Online'],
     },
     saved: { type: Boolean, default: false },
+    workingLocation: { type: Number, required: true },
+    showHourlyRate: { type: Boolean, default: true },
   });
 
   const emit = defineEmits(['save-toggled']);
   const router = useRouter();
   const isSaved = ref(props.saved);
+
+  const favouriteTutorStore = useFavouriteTutorStore();
 
   watch(
     () => props.saved,
@@ -45,26 +54,53 @@
     },
   );
 
-  function toggleSave() {
-    isSaved.value = !isSaved.value;
-    emit('save-toggled', isSaved.value);
+  async function toggleSave() {
+    try {
+      if (isSaved.value) {
+        const success = await favouriteTutorStore.removeFromFavourites(props.id);
+        if (success) {
+          isSaved.value = false;
+        }
+      } else {
+        const success = await favouriteTutorStore.addToFavourites(props.id);
+        if (success) {
+          isSaved.value = true;
+        }
+      }
+      emit('save-toggled', isSaved.value);
+    } catch (error) {
+      console.error('Failed to toggle favorite status', error);
+    }
   }
 
   function goToProfile() {
     router.push(`/tutor/${props.id}/profile`);
   }
+  
+  const visibleLocations = computed(() => {
+    const locationId = props.workingLocation;
+    return {
+      home: locationId === 1 || locationId === 4 || locationId === 5 || locationId === 7,
+      online: locationId === 2 || locationId === 4 || locationId === 6 || locationId === 7,
+      studentHome: locationId === 3 || locationId === 5 || locationId === 6 || locationId === 7,
+    };
+  });
 </script>
 
 <template>
   <div class="p-4 mb-5 bg-white border border-gray-100 rounded-lg shadow">
     <div class="relative">
-      <div class="absolute top-0 right-0 text-right">
+      <div v-if="showHourlyRate" class="absolute top-0 right-0 text-right">
         <div class="text-xs text-gray-500">Starting from:</div>
-        <div class="text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+        <div class="text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
       </div>
 
-      <div class="flex flex-col gap-3 pr-32 sm:flex-row sm:items-center sm:pr-0">
-        <img :src="profileImage" alt="Profile" class="object-cover rounded-lg w-14 h-14" />
+      <div class="flex flex-col gap-3" :class="showHourlyRate ? 'pr-32 sm:flex-row sm:items-center sm:pr-0' : 'sm:flex-row sm:items-center'">
+        <img
+          :src="profileImage && profileImage.trim() !== '' ? profileImage : DefaultProfileImage"
+          alt="Profile"
+          class="object-cover rounded-lg w-14 h-14"
+        />
         <div class="flex-1">
           <div class="flex items-center gap-1">
             <h3 class="text-lg font-semibold">{{ name }}</h3>
@@ -83,9 +119,9 @@
           </div>
         </div>
 
-        <div class="hidden sm:block">
+        <div class="hidden sm:block" v-if="showHourlyRate">
           <div class="invisible text-xs text-gray-500">Starting from:</div>
-          <div class="invisible text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+          <div class="invisible text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
         </div>
       </div>
     </div>
@@ -100,7 +136,7 @@
       </div>
       <div class="flex justify-center gap-1 sm:justify-start sm:gap-4">
         <div
-          v-if="services.includes('My home')"
+          v-if="visibleLocations.home"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[30%] sm:w-28 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon
@@ -111,7 +147,7 @@
         </div>
 
         <div
-          v-if="services.includes('Student\'s home')"
+          v-if="visibleLocations.studentHome"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[40%] sm:w-36 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon
@@ -125,7 +161,7 @@
         </div>
 
         <div
-          v-if="services.includes('Online')"
+          v-if="visibleLocations.online"
           class="flex flex-col items-center p-1 sm:p-2 transition-colors rounded cursor-pointer w-[30%] sm:w-28 bg-gray-50 hover:bg-gray-200"
         >
           <font-awesome-icon
@@ -146,16 +182,16 @@
         @click="toggleSave"
       >
         <font-awesome-icon :icon="['fas', 'heart']" class="w-4 h-4" />
-        <span class="text-sm">{{ isSaved ? 'Saved' : 'Add to save' }}</span>
+        <span class="text-sm">{{ isSaved ? 'Favourite Tutor' : 'Add to favourite' }}</span>
       </div>
       <div class="flex gap-2">
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-gray-500 transition bg-white border border-gray-300 rounded-md sm:flex-none hover:bg-gray-100"
+          class="w-auto px-3 py-1.5 text-xs text-gray-500 transition bg-white border border-gray-300 rounded-md sm:px-5 sm:text-sm hover:bg-gray-100"
         >
           Let's chat
         </button>
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-white transition bg-purple-700 rounded-md sm:flex-none hover:bg-purple-800"
+          class="w-auto px-3 py-1.5 text-xs text-white transition bg-purple-700 rounded-md sm:px-5 sm:text-sm hover:bg-purple-800"
           @click="goToProfile"
         >
           View full profile

@@ -130,10 +130,11 @@ public static class ApplicationSetup
             {
                 if (allowedOrigins.Length > 0)
                 {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://tutormd.online",
+                            "https://tutormd.online")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 }
                 else
                 {

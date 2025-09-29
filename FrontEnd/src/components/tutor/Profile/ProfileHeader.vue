@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useProfileStore } from '../../store/profileStore.ts';
+  import { useProfileStore } from '../../../store/profileStore.ts';
   import { computed } from 'vue';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';

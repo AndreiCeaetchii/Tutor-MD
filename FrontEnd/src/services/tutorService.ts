@@ -1,7 +1,31 @@
-// tutorService.ts
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
+
+const API_URL =
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
+  'http://localhost:8080/api';
+const tutorAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+tutorAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
 
 export interface Subject {
   subjectName: string;
@@ -30,26 +54,24 @@ export interface CreateProfileDto {
 }
 
 export interface TutorProfileData {
-  verificationStatus: 'verified';
+  verificationStatus: 'Pending';
   experienceYears: number;
   subjects: Subject[];
   createProfileDto: CreateProfileDto;
+  workingLocation: number;
 }
 
-const API_URL = 'https://localhost:7123/api/tutors';
+const tutorsAPI = `${API_URL}/tutors`;
+const favouriteTutorAPI = `${API_URL}/students`;
 
 export const createTutorProfile = async (profileData: TutorProfileData) => {
   try {
-    const store = useUserStore();
     const profileStore = useProfileStore();
-    const token = store.accessToken;
 
-    const response = await axios.post(`${API_URL}/create-tutor`, profileData, {
+    const response = await tutorAxios.post(`${tutorsAPI}/create-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     profileStore.userName = profileData.createProfileDto.username;
@@ -57,50 +79,34 @@ export const createTutorProfile = async (profileData: TutorProfileData) => {
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la crearea profilului de tutore:',
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to create tutor profile.',
     );
-    throw error;
   }
 };
 
 export const getTutorProfile = async (userId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.get(`${API_URL}/get-tutor/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,
-    });
-
+    const response = await tutorAxios.get(`${tutorsAPI}/get-tutor/${userId}`);
     return response.data;
   } catch (error: any) {
-    if (error.response && error.response.status === 404) {
-      // Profilul nu există
+    if (error.response?.status === 404) {
       return null;
     }
-    console.error('Eroare la preluarea profilului tutorului:', error.message);
-    throw error;
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to fetch tutor profile.',
+    );
   }
 };
 
 export const editTutorProfile = async (profileData: any) => {
   try {
-    const store = useUserStore();
     const profileStore = useProfileStore();
-    const token = store.accessToken;
 
-    // Asigură-te că profileData are structura corectă înainte de a fi trimisă
-    const response = await axios.put(`${API_URL}/update-tutor`, profileData, {
+    const response = await tutorAxios.put(`${tutorsAPI}/update-tutor`, profileData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     if (response.data.userProfile?.username) {
@@ -109,104 +115,95 @@ export const editTutorProfile = async (profileData: any) => {
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la editarea profilului de tutore:',
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to edit tutor profile.',
     );
-    throw error;
   }
 };
 
 export const addSubject = async (subjectData: Subject) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.post(`${API_URL}/add-subject`, subjectData, {
+    const response = await tutorAxios.post(`${tutorsAPI}/add-subject`, subjectData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la adăugarea subiectului:',
-      error.response ? error.response.data : error.message,
-    );
-    throw error;
+    throw new Error(error.response?.data?.message || error.message || 'Failed to add subject.');
   }
 };
 
 export const deleteSubject = async (subjectId: number) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.delete(`${API_URL}/delete-subject/${subjectId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,
-    });
-
+    const response = await tutorAxios.delete(`${tutorsAPI}/delete-subject/${subjectId}`);
     return response.data;
   } catch (error: any) {
-    console.error(
-      `Eroare la ștergerea subiectului cu id ${subjectId}:`,
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        `Failed to delete subject with id ${subjectId}.`,
     );
-    throw error;
   }
 };
 
 export const updateSubject = async (subjectData: UpdateSubject) => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
-
-    const response = await axios.put(`${API_URL}/update-subject`, subjectData, {
+    const response = await tutorAxios.put(`${tutorsAPI}/update-subject`, subjectData, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
-      withCredentials: true,
     });
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      `Eroare la actualizarea subiectului cu id ${subjectData.subjectId}:`,
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        `Failed to update subject with id ${subjectData.subjectId}.`,
     );
-    throw error;
   }
 };
 
 export const getTutors = async () => {
   try {
-    const store = useUserStore();
-    const token = store.accessToken;
+    const response = await tutorAxios.get(`${tutorsAPI}/get-tutors`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to fetch tutors list.',
+    );
+  }
+};
 
-    if (!token) {
-      throw new Error('User not authenticated. Access token is missing.');
-    }
-
-    const response = await axios.get(`${API_URL}/get-tutors`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+export const addToFavourites = async (tutorId: number) => {
+  try {
+    const response = await tutorAxios.post(
+      `${favouriteTutorAPI}/favorites/${tutorId}`,
+      {},
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-      withCredentials: true,
-    });
+    );
 
     return response.data;
   } catch (error: any) {
-    console.error(
-      'Eroare la preluarea listei de tutori:',
-      error.response ? error.response.data : error.message,
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to add tutor to favourites.',
     );
-    throw error;
+  }
+};
+
+export const removeFromFavourites = async (tutorId: number) => {
+  try {
+    const response = await tutorAxios.delete(`${favouriteTutorAPI}/favorites/${tutorId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || 'Failed to remove tutor from favourites.',
+    );
   }
 };

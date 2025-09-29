@@ -14,10 +14,8 @@ import TutorAvailability from '../components/tutor/Availability/TutorAvailabilit
 
 import ProfilePage from '../pages/ProfilePage.vue';
 
-import CreateProfile from '../components/profile/CreateProfile.vue';
+import CreateProfile from '../components/tutor/Profile/CreateProfile.vue';
 import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
-
-const StudentReviews = { template: '<div>Reviews (work in progress)</div>' };
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
@@ -25,9 +23,21 @@ import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
 import StudentChat from '../components/student/Chat/StudentChat.vue';
-// import StudentSearchPage from '../pages/StudentSearchPage.vue';
+import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
 
 import GuestPage from '../pages/GuestPage.vue';
+
+import AdminDashboard from '../pages/AdminDashboard.vue';
+import AdminUsers from '../components/admin/AdminUsers.vue';
+import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
+import AdminOverview from '../components/admin/AdminOverview.vue';
+import AdminNotifications from '../components/admin/AdminNotifications.vue';
+import MFASetupPage from '../pages/MFASetupPage.vue';
+
+
+
+const AdminReviews = { template: '<div>Admin Reviews</div>' };
+const AdminSettings = { template: '<div>Admin Settings</div>' };
 
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
@@ -50,10 +60,10 @@ const routes = [
     component: StudentDashboard,
     meta: { requiresAuth: true, role: 'student' },
     children: [
-      { path: '', redirect: '/student-dashboard/find' },
-      { path: 'find', component: FindTutor },
+      { path: '', redirect: '/student-dashboard/find-tutors' },
+      { path: 'find-tutors', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
-      { path: 'reviews', component: StudentReviews },
+      { path: 'favourite-tutors', component: FavouriteTutors },
       { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
     ],
@@ -74,6 +84,19 @@ const routes = [
   },
 
   {
+    path: '/admin-dashboard',
+    component: AdminDashboard,
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      { path: '', redirect: '/admin-dashboard/overview' },
+      { path: 'overview', component: AdminOverview },
+      { path: 'users', component: AdminUsers },
+      { path: 'notifications', component: AdminNotifications },
+      { path: 'analytics', component: AdminAnalytics },
+    ],
+  },
+
+  {
     path: '/tutor/:id',
     component: GuestPage,
     meta: { requiresAuth: true },
@@ -84,52 +107,91 @@ const routes = [
       { path: 'reviews', component: TutorReview },
     ],
   },
+  {
+    path: '/student/:id',
+    component: GuestPage,
+    meta: { requiresAuth: true },
+  },
+  {
+  path: '/mfa-setup',
+  name: 'MFASetup',
+  component: MFASetupPage,
+  meta: {
+    requiresAuth: true
+  }
+}
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    return { top: 0 }
+  },
 });
 
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
   const store = useUserStore();
   const hasToken = store.isAuthenticated;
   const userRole = store.userRole;
   const profileStore = useProfileStore();
   const studentProfileStore = useStudentProfileStore();
 
-  if (to.path === '/create-profile') {
-    if (profileStore.firstName && profileStore.lastName) {
+  if (to.meta.requiresAuth && !hasToken) {
+    next('/login');
+    return;
+  }
+
+  if (hasToken) {
+    if (userRole === 'tutor' && !profileStore.firstName) {
+      await profileStore.loadProfile();
+    }
+    else if (userRole === 'student' && !studentProfileStore.userProfile.firstName) {
+      await studentProfileStore.loadProfile();
+    }
+  }
+  const isTutorProfileCreated = profileStore.firstName && profileStore.lastName;
+  const isStudentProfileCreated = studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName;
+
+  if (hasToken && userRole) {
+    const isTutorCreationRoute = to.path === '/create-profile';
+    const isStudentCreationRoute = to.path === '/create-student-profile';
+
+    if (userRole === 'tutor' && !isTutorProfileCreated && !isTutorCreationRoute) {
+      next('/create-profile');
+      return;
+    }
+
+    if (userRole === 'student' && !isStudentProfileCreated && !isStudentCreationRoute) {
+      next('/create-student-profile');
+      return;
+    }
+
+    if (isTutorCreationRoute && isTutorProfileCreated) {
       next('/tutor-dashboard');
       return;
     }
-  }
-
-  if (to.path === '/create-student-profile') {
-    if (studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName) {
+    if (isStudentCreationRoute && isStudentProfileCreated) {
       next('/student-dashboard');
       return;
     }
   }
 
-  if (to.meta.requiresAuth) {
-    if (!hasToken) {
-      next('/login');
-      return;
-    }
-    if (to.meta.role && to.meta.role !== userRole) {
-      if (userRole === 'tutor') next('/tutor-dashboard');
-      else if (userRole === 'student') next('/student-dashboard');
-      else next('/landing');
-      return;
-    }
-    next();
+  if (hasToken && to.meta.role && to.meta.role !== userRole) {
+    if (userRole === 'tutor') next('/tutor-dashboard');
+    else if (userRole === 'student') next('/student-dashboard');
+    else if (userRole === 'admin') next('/admin-dashboard');
+    else next('/landing');
     return;
   }
 
   if (to.meta.requiresGuest && hasToken) {
     if (userRole === 'tutor') next('/tutor-dashboard');
     else if (userRole === 'student') next('/student-dashboard');
+    else if (userRole === 'admin') next('/admin-dashboard');
     else next('/landing');
     return;
   }

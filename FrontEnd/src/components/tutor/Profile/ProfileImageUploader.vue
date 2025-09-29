@@ -20,8 +20,8 @@
 
 <script setup lang="ts">
   import { ref, watchEffect } from 'vue';
-  import { deleteProfilePhoto, uploadProfilePhoto } from '../../services/userService.ts'; // Ajustează calea
-  import { useProfileStore } from '../../store/profileStore.ts';
+  import { deleteProfilePhoto, uploadProfilePhoto } from '../../../services/userService.ts';
+  import { useProfileStore } from '../../../store/profileStore.ts';
 
   const props = defineProps({
     modelValue: {
@@ -59,9 +59,8 @@
         await deleteProfilePhoto();
       }
 
-      const uploadResponse = await uploadProfilePhoto(file);
+      await uploadProfilePhoto(file);
 
-      profileStore.setProfileImage(uploadResponse.url);
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -71,7 +70,7 @@
 
       emit('update:modelValue', file);
     } catch (error) {
-      console.error('Procesul de actualizare a fotografiei a eșuat:', error);
+      console.error('Error:', error);
     } finally {
       loading.value = false;
     }
