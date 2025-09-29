@@ -38,6 +38,7 @@
     },
     saved: { type: Boolean, default: false },
     workingLocation: { type: Number, required: true },
+    showHourlyRate: { type: Boolean, default: true },
   });
 
   const emit = defineEmits(['save-toggled']);
@@ -89,12 +90,12 @@
 <template>
   <div class="p-4 mb-5 bg-white border border-gray-100 rounded-lg shadow">
     <div class="relative">
-      <div class="absolute top-0 right-0 text-right">
+      <div v-if="showHourlyRate" class="absolute top-0 right-0 text-right">
         <div class="text-xs text-gray-500">Starting from:</div>
         <div class="text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
       </div>
 
-      <div class="flex flex-col gap-3 pr-32 sm:flex-row sm:items-center sm:pr-0">
+      <div class="flex flex-col gap-3" :class="showHourlyRate ? 'pr-32 sm:flex-row sm:items-center sm:pr-0' : 'sm:flex-row sm:items-center'">
         <img
           :src="profileImage && profileImage.trim() !== '' ? profileImage : DefaultProfileImage"
           alt="Profile"
@@ -118,7 +119,7 @@
           </div>
         </div>
 
-        <div class="hidden sm:block">
+        <div class="hidden sm:block" v-if="showHourlyRate">
           <div class="invisible text-xs text-gray-500">Starting from:</div>
           <div class="invisible text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
         </div>
@@ -185,12 +186,12 @@
       </div>
       <div class="flex gap-2">
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-gray-500 transition bg-white border border-gray-300 rounded-md sm:flex-none hover:bg-gray-100"
+          class="w-auto px-3 py-1.5 text-xs text-gray-500 transition bg-white border border-gray-300 rounded-md sm:px-5 sm:text-sm hover:bg-gray-100"
         >
           Let's chat
         </button>
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-white transition bg-purple-700 rounded-md sm:flex-none hover:bg-purple-800"
+          class="w-auto px-3 py-1.5 text-xs text-white transition bg-purple-700 rounded-md sm:px-5 sm:text-sm hover:bg-purple-800"
           @click="goToProfile"
         >
           View full profile

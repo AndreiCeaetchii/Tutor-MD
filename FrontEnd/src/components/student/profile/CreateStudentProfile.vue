@@ -246,7 +246,7 @@ const handleSubmit = async () => {
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="grade" class="mb-2 text-sm font-semibold text-gray-700"
-              >Current Grade</label
+              >Current GPA</label
               >
               <input
                 id="grade"
@@ -259,7 +259,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col">
               <label for="class" class="mb-2 text-sm font-semibold text-gray-700"
-              >Current Class</label
+              >Current Grade</label
               >
               <input
                 id="class"

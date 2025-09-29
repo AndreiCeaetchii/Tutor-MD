@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking } from '../../../services/studentBookings';
+import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking, addBookingToGoogleCalendar } from '../../../services/studentBookings';
 
 const bookingStore = useBookingStore();
 
@@ -74,6 +74,82 @@ const cancelBooking = async (bookingId: number) => {
   } catch (error) {
     console.error("Failed to cancel booking:", error);
     alert(`Cancellation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleAddToGoogleCalendar = async (bookingId: number) => {
+  try {
+    loading.value = true;
+    const googleAuthOptions = {
+      client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
+      scope: 'https://www.googleapis.com/auth/calendar',
+      response_type: 'token',
+      redirect_uri: window.location.origin
+    };
+    
+    const authUrl = `https://accounts.google.com/o/oauth2/auth?${new URLSearchParams({
+  ...googleAuthOptions,
+  prompt: 'consent'
+})}&include_granted_scopes=true`;
+      
+    // Calculate center position for the popup
+    const width = 400;
+    const height = 600;
+    const left = (window.innerWidth - width) / 2 + window.screenX;
+    const top = (window.innerHeight - height) / 2 + window.screenY;
+    
+    // Open popup with center position
+    const popup = window.open(
+      authUrl, 
+      'googleAuth', 
+      `width=${width},height=${height},left=${left},top=${top},toolbar=0,location=0,menubar=0`
+    );
+    
+    const pollTimer = window.setInterval(() => {
+      try {
+        if (popup?.closed) {
+          window.clearInterval(pollTimer);
+          loading.value = false;
+          return;
+        }
+        
+        if (!popup || popup.closed || popup.closed === undefined) {
+          window.clearInterval(pollTimer);
+          loading.value = false;
+          return;
+        }
+        
+        if (popup.location.href.includes('access_token')) {
+          window.clearInterval(pollTimer);
+          const urlParams = new URLSearchParams(new URL(popup.location.href).hash.substring(1));
+          const accessToken = urlParams.get('access_token');
+          
+          if (accessToken) {
+            popup.close();
+            completeAddToCalendar(bookingId, accessToken);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }, 500);
+    
+  } catch (err) {
+    console.error('Error starting Google Calendar flow:', err);
+    loading.value = false;
+    alert('Failed to connect to Google Calendar');
+  }
+};
+
+const completeAddToCalendar = async (bookingId: number, accessToken: string) => {
+  try {
+    await addBookingToGoogleCalendar(bookingId, accessToken);
+    alert('Booking added to Google Calendar successfully');
+  } catch (err) {
+    console.error('Error adding to Google Calendar:', err);
+    alert(`Failed to add booking to Google Calendar: ${err instanceof Error ? err.message : 'Unknown error'}`);
   } finally {
     loading.value = false;
   }
@@ -245,15 +321,14 @@ onMounted(async () => {
           <div class="flex justify-end mt-4" v-if="booking.status === 'pending' || booking.status === 'confirmed'">
             <div class="flex gap-2">
               <button 
-                @click="cancelBooking(booking.id)" 
-                class="flex items-center px-4 py-2 text-red-700 transition-colors bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100"
+                @click="handleAddToGoogleCalendar(booking.id)"
+                class="flex items-center px-4 py-2 text-blue-700 transition-colors bg-blue-100 rounded-full shadow-sm hover:bg-blue-200"
               >
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                Cancel
+                Add to Calendar
               </button>
-              
               <button 
                 class="flex items-center px-4 py-2 text-purple-700 transition-colors bg-purple-100 rounded-full shadow-sm hover:bg-purple-200"
               >
@@ -261,6 +336,16 @@ onMounted(async () => {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                 </svg>
                 Chat
+              </button>
+              
+              <button 
+                @click="cancelBooking(booking.id)" 
+                class="flex items-center px-4 py-2 text-red-700 transition-colors bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100"
+              >
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Cancel
               </button>
             </div>
           </div>
