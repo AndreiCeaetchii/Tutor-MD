@@ -87,7 +87,9 @@ builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
     options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+
+    //Instead of Always we use SameAsRequest to allow local testing over http
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; 
     options.Cookie.IsEssential = true; 
 });
 
