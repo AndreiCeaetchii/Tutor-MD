@@ -1,87 +1,105 @@
 <script setup lang="ts">
-  import { ref, watch, computed } from 'vue';
-  import DropdownSelect from '../../profile/DropdownSelect.vue';
-  import { useRouter } from 'vue-router';
-  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
-  import { createStudentProfile } from '../../../services/studentService.ts';
+import { ref, watch, computed } from 'vue';
+import DropdownSelect from '../../../components/tutor/Profile/DropdownSelect.vue';
+import { useRouter } from 'vue-router';
+import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
+import { createStudentProfile } from '../../../services/studentService.ts';
 
-  interface CreateProfileDto {
-    phone: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-    city: string;
-    country: string;
-    bio: string;
-    birthdate: string;
+interface CreateProfileDto {
+  phone: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  city: string;
+  country: string;
+  bio: string;
+  birthdate: string;
+}
+
+interface StudentProfileData {
+  grade: number;
+  class: number;
+  createProfileDto: CreateProfileDto;
+}
+
+const router = useRouter();
+
+const studentProfileStore = useStudentProfileStore();
+
+const form = ref<StudentProfileData>({
+  grade: 8,
+  class: 11,
+  createProfileDto: {
+    phone: '',
+    username: '',
+    firstName: '',
+    lastName: '',
+    city: '',
+    country: '',
+    bio: '',
+    birthdate: '',
+  },
+});
+
+const birthDay = ref<number | null>(null);
+const birthMonth = ref<number | null>(null);
+const birthYear = ref<number | null>(null);
+
+const currentYear = new Date().getFullYear();
+const minYear = 1930;
+const maxYear = currentYear - 5;
+
+const cities = computed(() => {
+  if (form.value.createProfileDto.country === 'Romania') {
+    return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
+  } else if (form.value.createProfileDto.country === 'Moldova') {
+    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Orhei'];
+  }
+  return [];
+});
+
+watch(
+  () => form.value.createProfileDto.country,
+  () => {
+    form.value.createProfileDto.city = '';
+  },
+);
+
+const handleSubmit = async () => {
+  const pad = (num: number | null) => (num !== null ? String(num).padStart(2, '0') : '');
+
+  const yyyy = birthYear.value;
+  const mm = pad(birthMonth.value);
+  const dd = pad(birthDay.value);
+
+  if (!yyyy || !mm || !dd) {
+    console.error('Birthdate is incomplete.');
+    return;
   }
 
-  interface StudentProfileData {
-    grade: number;
-    class: number;
-    createProfileDto: CreateProfileDto;
-  }
+  const finalBirthdate = `${yyyy}-${mm}-${dd}`;
+  const birthdateFormatted = finalBirthdate ? `${finalBirthdate}T00:00:00` : '';
 
-  const router = useRouter();
-
-  const studentProfileStore = useStudentProfileStore();
-
-  const form = ref<StudentProfileData>({
-    grade: 8,
-    class: 11,
+  const payload: StudentProfileData = {
+    grade: form.value.grade,
+    class: form.value.class,
     createProfileDto: {
-      phone: '',
-      username: '',
-      firstName: '',
-      lastName: '',
-      city: '',
-      country: '',
-      bio: '',
-      birthdate: '',
+      ...form.value.createProfileDto,
+      birthdate: birthdateFormatted,
     },
-  });
-
-  const cities = computed(() => {
-    if (form.value.createProfileDto.country === 'Romania') {
-      return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
-    } else if (form.value.createProfileDto.country === 'Moldova') {
-      return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Orhei'];
-    }
-    return [];
-  });
-
-  watch(
-    () => form.value.createProfileDto.country,
-    () => {
-      form.value.createProfileDto.city = '';
-    },
-  );
-
-  const handleSubmit = async () => {
-    const birthdateFormatted = form.value.createProfileDto.birthdate
-      ? `${form.value.createProfileDto.birthdate}T00:00:00`
-      : '';
-
-    const payload: StudentProfileData = {
-      grade: form.value.grade,
-      class: form.value.class,
-      createProfileDto: {
-        ...form.value.createProfileDto,
-        birthdate: birthdateFormatted,
-      },
-    };
-
-    try {
-      await createStudentProfile(payload);
-
-      studentProfileStore.updateGradeAndClass(form.value.grade, form.value.class);
-      studentProfileStore.updateUserProfile(payload.createProfileDto);
-
-      router.push('/student-dashboard');
-    } catch (error) {
-      console.error('Error creating student profile:', error);
-    }
   };
+
+  try {
+    await createStudentProfile(payload);
+
+    studentProfileStore.updateGradeAndClass(form.value.grade, form.value.class);
+    studentProfileStore.updateUserProfile(payload.createProfileDto);
+
+    router.push('/student-dashboard');
+  } catch (error) {
+    console.error('Error creating student profile:', error);
+  }
+};
 </script>
 
 <template>
@@ -113,31 +131,34 @@
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="firstName" class="mb-2 text-sm font-semibold text-gray-700"
-                >First name <span class="text-red-500">*</span></label
+              >First name <span class="text-red-500">*</span></label
               >
               <input
                 id="firstName"
                 v-model="form.createProfileDto.firstName"
                 type="text"
+                placeholder="e.g., John"
                 required
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
               />
+
             </div>
             <div class="flex flex-col">
               <label for="lastName" class="mb-2 text-sm font-semibold text-gray-700"
-                >Last name <span class="text-red-500">*</span></label
+              >Last name <span class="text-red-500">*</span></label
               >
               <input
                 id="lastName"
                 v-model="form.createProfileDto.lastName"
                 type="text"
+                placeholder="e.g., Doe"
                 required
                 class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
               />
             </div>
             <div class="flex flex-col">
               <label for="username" class="mb-2 text-sm font-semibold text-gray-700"
-                >Username <span class="text-red-500">*</span></label
+              >Username <span class="text-red-500">*</span></label
               >
               <input
                 id="username"
@@ -150,7 +171,7 @@
             </div>
             <div class="flex flex-col">
               <label for="phone" class="mb-2 text-sm font-semibold text-gray-700"
-                >Phone <span class="text-red-500">*</span></label
+              >Phone <span class="text-red-500">*</span></label
               >
               <input
                 id="phone"
@@ -162,16 +183,47 @@
               />
             </div>
             <div class="flex flex-col md:col-span-2">
-              <label for="birthdate" class="mb-2 text-sm font-semibold text-gray-700"
-                >Birthdate <span class="text-red-500">*</span></label
+              <label class="mb-2 text-sm font-semibold text-gray-700"
+              >Birthdate <span class="text-red-500">*</span></label
               >
-              <input
-                id="birthdate"
-                v-model="form.createProfileDto.birthdate"
-                type="date"
-                required
-                class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
-              />
+              <div class="grid grid-cols-3 gap-4">
+                <input
+                  id="birthDay"
+                  v-model.number="birthDay"
+                  type="number"
+                  placeholder="Day (DD)"
+                  min="1"
+                  max="31"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  maxlength="2"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                />
+                <input
+                  id="birthMonth"
+                  v-model.number="birthMonth"
+                  type="number"
+                  placeholder="Month (MM)"
+                  min="1"
+                  max="12"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  maxlength="2"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                />
+                <input
+                  id="birthYear"
+                  v-model.number="birthYear"
+                  type="number"
+                  placeholder="Year (YYYY)"
+                  :min="minYear"
+                  :max="maxYear"
+                  required
+                  class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  maxlength="4"
+                  oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -194,7 +246,7 @@
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="grade" class="mb-2 text-sm font-semibold text-gray-700"
-                >Current Grade</label
+              >Current GPA</label
               >
               <input
                 id="grade"
@@ -207,7 +259,7 @@
             </div>
             <div class="flex flex-col">
               <label for="class" class="mb-2 text-sm font-semibold text-gray-700"
-                >Current Class</label
+              >Current Grade</label
               >
               <input
                 id="class"
@@ -237,7 +289,7 @@
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="country" class="mb-2 text-sm font-semibold text-gray-700"
-                >Country <span class="text-red-500">*</span></label
+              >Country <span class="text-red-500">*</span></label
               >
               <DropdownSelect
                 :options="['Romania', 'Moldova']"
@@ -255,7 +307,7 @@
 
             <div class="flex flex-col">
               <label for="city" class="mb-2 text-sm font-semibold text-gray-700"
-                >City <span class="text-red-500">*</span></label
+              >City <span class="text-red-500">*</span></label
               >
               <DropdownSelect
                 :options="cities"

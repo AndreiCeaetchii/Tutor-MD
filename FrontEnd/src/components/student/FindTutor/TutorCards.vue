@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, watch, computed } from 'vue';
+  import { useFavouriteTutorStore } from '../../../store/favouriteTutorStore';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import DefaultProfileImage from '../../../assets/DefaultImg.png';
   import { useRouter } from 'vue-router';
@@ -37,11 +38,14 @@
     },
     saved: { type: Boolean, default: false },
     workingLocation: { type: Number, required: true },
+    showHourlyRate: { type: Boolean, default: true },
   });
 
   const emit = defineEmits(['save-toggled']);
   const router = useRouter();
   const isSaved = ref(props.saved);
+
+  const favouriteTutorStore = useFavouriteTutorStore();
 
   watch(
     () => props.saved,
@@ -50,9 +54,23 @@
     },
   );
 
-  function toggleSave() {
-    isSaved.value = !isSaved.value;
-    emit('save-toggled', isSaved.value);
+  async function toggleSave() {
+    try {
+      if (isSaved.value) {
+        const success = await favouriteTutorStore.removeFromFavourites(props.id);
+        if (success) {
+          isSaved.value = false;
+        }
+      } else {
+        const success = await favouriteTutorStore.addToFavourites(props.id);
+        if (success) {
+          isSaved.value = true;
+        }
+      }
+      emit('save-toggled', isSaved.value);
+    } catch (error) {
+      console.error('Failed to toggle favorite status', error);
+    }
   }
 
   function goToProfile() {
@@ -72,12 +90,12 @@
 <template>
   <div class="p-4 mb-5 bg-white border border-gray-100 rounded-lg shadow">
     <div class="relative">
-      <div class="absolute top-0 right-0 text-right">
+      <div v-if="showHourlyRate" class="absolute top-0 right-0 text-right">
         <div class="text-xs text-gray-500">Starting from:</div>
-        <div class="text-xl font-bold text-blue-500">${{ hourlyRate }}/hr</div>
+        <div class="text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
       </div>
 
-      <div class="flex flex-col gap-3 pr-32 sm:flex-row sm:items-center sm:pr-0">
+      <div class="flex flex-col gap-3" :class="showHourlyRate ? 'pr-32 sm:flex-row sm:items-center sm:pr-0' : 'sm:flex-row sm:items-center'">
         <img
           :src="profileImage && profileImage.trim() !== '' ? profileImage : DefaultProfileImage"
           alt="Profile"
@@ -101,7 +119,7 @@
           </div>
         </div>
 
-        <div class="hidden sm:block">
+        <div class="hidden sm:block" v-if="showHourlyRate">
           <div class="invisible text-xs text-gray-500">Starting from:</div>
           <div class="invisible text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
         </div>
@@ -164,16 +182,16 @@
         @click="toggleSave"
       >
         <font-awesome-icon :icon="['fas', 'heart']" class="w-4 h-4" />
-        <span class="text-sm">{{ isSaved ? 'Saved' : 'Add to save' }}</span>
+        <span class="text-sm">{{ isSaved ? 'Favourite Tutor' : 'Add to favourite' }}</span>
       </div>
       <div class="flex gap-2">
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-gray-500 transition bg-white border border-gray-300 rounded-md sm:flex-none hover:bg-gray-100"
+          class="w-auto px-3 py-1.5 text-xs text-gray-500 transition bg-white border border-gray-300 rounded-md sm:px-5 sm:text-sm hover:bg-gray-100"
         >
           Let's chat
         </button>
         <button
-          class="flex-1 px-5 py-1.5 text-sm text-white transition bg-purple-700 rounded-md sm:flex-none hover:bg-purple-800"
+          class="w-auto px-3 py-1.5 text-xs text-white transition bg-purple-700 rounded-md sm:px-5 sm:text-sm hover:bg-purple-800"
           @click="goToProfile"
         >
           View full profile

@@ -3,7 +3,7 @@
   import { useRouter } from 'vue-router';
   import BaseAuthForm from '../auth/AuthForm.vue';
   import { useAuth } from '../../services/useAuth.ts';
-  import Notification from '../ui/NotificationMessage.vue';
+  import Notification from '../ui/AlertMessage.vue';
 
   interface SignupFormData {
     email: string;

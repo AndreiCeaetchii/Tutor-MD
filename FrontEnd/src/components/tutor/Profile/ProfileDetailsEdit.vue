@@ -5,7 +5,7 @@
   import { faPhone, faEnvelope, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
   import DropdownSelect from './DropdownSelect.vue';
   import EditableSubjectCard from './EditableSubjectCard.vue';
-  import { deleteSubject } from '../../services/tutorService.ts';
+  import { deleteSubject } from '../../../services/tutorService.ts';
 
   library.add(faPhone, faEnvelope, faTrash, faTimes);
 
@@ -33,13 +33,32 @@
 
   const availableSubjects = ref([
     'Mathematics',
+    'English',
+    'Science',
     'Physics',
-    'Computer Science',
     'Chemistry',
     'Biology',
-    'English',
-    'History',
     'Geography',
+    'History',
+    'Foreign languages',
+    'German',
+    'French',
+    'Russian',
+    'Spanish',
+    'Italian',
+    'Computer science',
+    'Economics',
+    'Philosophy',
+    'Psychology',
+    'Sociology',
+    'Physical Education',
+    'Health Education',
+    'Drawing',
+    'Music',
+    'Astronomy',
+    'Literature',
+    'Creative Writing',
+    'Statistics'
   ]);
 
   const addSubject = (subjectName: string) => {
@@ -158,7 +177,7 @@
           <h3 class="font-bold text-gray-800">Languages</h3>
           <div class="flex flex-wrap gap-2 mt-2 text-sm">
             <div
-              v-for="(index) in editedProfile.languages.length"
+              v-for="index in editedProfile.languages.length"
               :key="index"
               class="relative flex items-center bg-purple-100 text-[#5f22d9] rounded-full pr-8 pl-3 py-1"
             >

@@ -4,7 +4,28 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'http://localhost:8080/api';
+  'https://localhost:8085/api';
+
+const reviewAxios = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+reviewAxios.interceptors.request.use(async (config) => {
+  const store = useUserStore();
+  const token = store.accessToken;
+  const csrfToken = store.csrfToken;
+
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  if (csrfToken) {
+    config.headers['X-CSRF-TOKEN'] = csrfToken;
+  }
+
+  return config;
+});
 
 export interface TutorReview {
   id: number;
@@ -21,9 +42,9 @@ export interface TutorReviewsResponse {
 }
 
 export interface CreateReviewDto {
-  BookingId: number;
-  Rating: number;
-  Description: string;
+  bookingId: number;
+  rating: number;
+  description: string;
 }
 
 export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResponse> => {
@@ -79,11 +100,10 @@ export const createReview = async (reviewData: CreateReviewDto) => {
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error(
-        'Error creating review:',
-        error.response ? error.response.data : error.message,
+      console.error('Error creating review:', error.response ? error.response.data : error.message);
+      throw new Error(
+        error.response?.data?.message || 'An error occurred while creating the review.',
       );
-      throw new Error(error.response?.data?.message || 'An error occurred while creating the review.');
     } else {
       console.error('Unknown error:', String(error));
       throw new Error('An unexpected error occurred.');

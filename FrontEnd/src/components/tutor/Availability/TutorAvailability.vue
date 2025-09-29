@@ -28,6 +28,7 @@
 </script>
 
 <template>
+  <div>
   <div v-if="error" class="p-3 mb-4 text-sm text-red-600 bg-red-100 rounded-md">
     {{ error }}
   </div>
@@ -41,4 +42,5 @@
     <TutorSlots :date="selectedDate" />
   </div>
   <TutorSlotCards />
+  </div>
 </template>
