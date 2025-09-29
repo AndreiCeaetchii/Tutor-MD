@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking, addBookingToGoogleCalendar } from '../../../services/studentBookings';
+import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking } from '../../../services/studentBookings';
+import { addBookingToGoogleCalendar } from '../../../services/tutorBookings.ts';
 
 const bookingStore = useBookingStore();
+declare const google: any;
 
 const loading = ref(false);
 const statusFilter = ref('all');
@@ -73,86 +75,43 @@ const cancelBooking = async (bookingId: number) => {
     await fetchStudentBookingsFromAPI();
   } catch (error) {
     console.error("Failed to cancel booking:", error);
-    alert(`Cancellation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   } finally {
     loading.value = false;
   }
 };
 
-const handleAddToGoogleCalendar = async (bookingId: number) => {
-  try {
-    loading.value = true;
-    const googleAuthOptions = {
+const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
+  loading.value = true;
+
+  return new Promise((resolve, reject) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
-      scope: 'https://www.googleapis.com/auth/calendar',
-      response_type: 'token',
-      redirect_uri: window.location.origin
-    };
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/auth?${new URLSearchParams({
-  ...googleAuthOptions,
-  prompt: 'consent'
-})}&include_granted_scopes=true`;
-      
-    // Calculate center position for the popup
-    const width = 400;
-    const height = 600;
-    const left = (window.innerWidth - width) / 2 + window.screenX;
-    const top = (window.innerHeight - height) / 2 + window.screenY;
-    
-    // Open popup with center position
-    const popup = window.open(
-      authUrl, 
-      'googleAuth', 
-      `width=${width},height=${height},left=${left},top=${top},toolbar=0,location=0,menubar=0`
-    );
-    
-    const pollTimer = window.setInterval(() => {
-      try {
-        if (popup?.closed) {
-          window.clearInterval(pollTimer);
-          loading.value = false;
-          return;
-        }
-        
-        if (!popup || popup.closed || popup.closed === undefined) {
-          window.clearInterval(pollTimer);
-          loading.value = false;
-          return;
-        }
-        
-        if (popup.location.href.includes('access_token')) {
-          window.clearInterval(pollTimer);
-          const urlParams = new URLSearchParams(new URL(popup.location.href).hash.substring(1));
-          const accessToken = urlParams.get('access_token');
-          
-          if (accessToken) {
-            popup.close();
-            completeAddToCalendar(bookingId, accessToken);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }, 500);
-    
-  } catch (err) {
-    console.error('Error starting Google Calendar flow:', err);
-    loading.value = false;
-    alert('Failed to connect to Google Calendar');
-  }
-};
+      scope: 'https://www.googleapis.com/auth/calendar.events',
 
-const completeAddToCalendar = async (bookingId: number, accessToken: string) => {
-  try {
-    await addBookingToGoogleCalendar(bookingId, accessToken);
-    alert('Booking added to Google Calendar successfully');
-  } catch (err) {
-    console.error('Error adding to Google Calendar:', err);
-    alert(`Failed to add booking to Google Calendar: ${err instanceof Error ? err.message : 'Unknown error'}`);
-  } finally {
-    loading.value = false;
-  }
+      callback: async (response: any) => {
+
+        if (!response || !response.access_token) {
+          loading.value = false;
+          return reject(new Error('Google authorization failed or was canceled.'));
+        }
+
+        const accessToken = response.access_token;
+
+        try {
+          await addBookingToGoogleCalendar(bookingId, accessToken);
+          resolve();
+
+        } catch (err) {
+          console.error('Error adding to Google Calendar:', err);
+          reject(err);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+
+    tokenClient.requestAccessToken();
+  });
 };
 
 const mapStatusToString = (status: number): string => {

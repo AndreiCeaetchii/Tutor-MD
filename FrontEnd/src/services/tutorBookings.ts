@@ -87,8 +87,8 @@ export const addBookingToGoogleCalendar = async (
   googleAccessToken: string
 ): Promise<any> => {
   try {
-    const response = await bookingAxios.post(`/students/booking/add-calendar/${bookingId}`, 
-      { accessToken: googleAccessToken },
+    const response = await bookingAxios.put(`/students/booking/add-calendar/${bookingId}`,
+      JSON.stringify(googleAccessToken),
       {
         headers: {
           'Content-Type': 'application/json',

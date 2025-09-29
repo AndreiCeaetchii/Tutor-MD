@@ -212,6 +212,7 @@ export function useAuth() {
     role?: string,
     mfaCode?: string
   ): Promise<{ success: boolean; role?: string; requiresMfa?: boolean }> => {
+
     const getRoleId = (role: string): number => {
       switch (role?.toLowerCase()) {
         case 'admin':

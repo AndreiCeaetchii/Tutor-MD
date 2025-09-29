@@ -192,76 +192,53 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
   return `${pad(startHour)}:${pad(startMinute)} - ${pad(endHour)}:${pad(endMinute)} ${duration ? `(${duration})` : ''}`;
 }
 
-const handleAddToGoogleCalendar = async (bookingId: number) => {
-  try {
-    loading.value = true;
-    const googleAuthOptions = {
+declare const google: any;
+
+const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
+  loading.value = true;
+
+  return new Promise((resolve, reject) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
-      scope: 'https://www.googleapis.com/auth/calendar',
-      response_type: 'token',
-      redirect_uri: window.location.origin
-    };
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/auth?${new URLSearchParams(googleAuthOptions)}`;
-    
-    const popup = window.open(authUrl, 'googleAuth', 'width=400,height=600');
-    
-    const pollTimer = window.setInterval(() => {
-      try {
-        if (popup?.closed) {
-          window.clearInterval(pollTimer);
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+
+      callback: async (response: any) => {
+        if (!response || !response.access_token) {
           loading.value = false;
-          return;
+
+          notificationMessage.value = 'Adding to calendar was canceled or failed.';
+          notificationType.value = 'error';
+          showNotification.value = true;
+          return reject(new Error('Google authorization failed or was canceled.'));
         }
-        
-        if (!popup || popup.closed || popup.closed === undefined) {
-          window.clearInterval(pollTimer);
+
+        const accessToken = response.access_token;
+
+        try {
+          await addBookingToGoogleCalendar(bookingId, accessToken);
+
+          notificationMessage.value = 'Booking added to Google Calendar successfully.';
+          notificationType.value = 'success';
+          showNotification.value = true;
+          resolve();
+
+        } catch (err) {
+          console.error('Error adding to Google Calendar:', err);
+
+          notificationMessage.value = 'Failed to add booking to Google Calendar.';
+          notificationType.value = 'error';
+          showNotification.value = true;
+          reject(err);
+        } finally {
           loading.value = false;
-          return;
         }
-        
-        if (popup.location.href.includes('access_token')) {
-          window.clearInterval(pollTimer);
-          const urlParams = new URLSearchParams(new URL(popup.location.href).hash.substring(1));
-          const accessToken = urlParams.get('access_token');
-          
-          if (accessToken) {
-            popup.close();
-            completeAddToCalendar(bookingId, accessToken);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }, 500);
-    
-  } catch (err) {
-    console.error('Error starting Google Calendar flow:', err);
-    loading.value = false;
-    
-    notificationMessage.value = 'Failed to connect to Google Calendar';
-    notificationType.value = 'error';
-    showNotification.value = true;
-  }
+      },
+    });
+
+    tokenClient.requestAccessToken();
+  });
 };
 
-const completeAddToCalendar = async (bookingId: number, accessToken: string) => {
-  try {
-    await addBookingToGoogleCalendar(bookingId, accessToken);
-    
-    notificationMessage.value = 'Booking added to Google Calendar successfully';
-    notificationType.value = 'success';
-    showNotification.value = true;
-  } catch (err) {
-    console.error('Error adding to Google Calendar:', err);
-    
-    notificationMessage.value = 'Failed to add booking to Google Calendar';
-    notificationType.value = 'error';
-    showNotification.value = true;
-  } finally {
-    loading.value = false;
-  }
-};
 </script>
 
 <template>
