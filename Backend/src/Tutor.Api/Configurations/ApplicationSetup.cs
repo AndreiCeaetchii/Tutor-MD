@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System;
 using System.Text;
 using Tutor.Api.Filters.Guards;
@@ -51,6 +52,16 @@ public static class ApplicationSetup
         services.AddScoped<IAuthorizationHandler, ActiveUserHandler>();
         services.AddScoped<IMFAService, MFAService>();
         services.AddScoped<IGoogleCalendarService, GoogleCalendarService>();
+        services.AddSingleton<ICacheService, RedisCacheService>();
+        services.AddSingleton<IConnectionMultiplexer>(sp => 
+            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+        services.AddSingleton<IEmailService>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var apiKey = config["SendGrid:ApiKey"];
+            return new EmailService(apiKey);
+        });
+
 
 
         services.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));

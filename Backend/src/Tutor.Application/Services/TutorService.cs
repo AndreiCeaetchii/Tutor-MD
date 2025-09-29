@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,9 @@ public class TutorService : ITutorService
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
     private readonly IGenericRepository<Favorites, int> _favoritesRepository;
+    private readonly ICacheService _cacheService;
+    private readonly ILogger<TutorService> _logger;
+
 
     public TutorService(
         IGenericRepository<User, int> userRepository,
@@ -30,6 +34,8 @@ public class TutorService : ITutorService
         IUserRoleService userRoleService,
         ITutorSubjectService tutorSubjectService,
         IGenericRepository<Favorites, int> favoritesRepository,
+        ICacheService cacheService,
+        ILogger<TutorService> logger,
         IMapper mapper)
     {
         _userRepository = userRepository;
@@ -39,7 +45,12 @@ public class TutorService : ITutorService
         _tutorSubjectService = tutorSubjectService;
         _favoritesRepository = favoritesRepository;
         _mapper = mapper;
+        _cacheService = cacheService;
+        _logger = logger;
     }
+
+    private const string TutorByIdKey = "tutor:{0}";
+    private const string TutorListKey = "tutors:list";
 
     public async Task<Result<TutorProfileDto>> CreateTutorProfileAsync(CreateTutorProfileDto createTutorProfileDto,
         int userId)
@@ -65,18 +76,27 @@ public class TutorService : ITutorService
 
 
         await _tutorSubjectService.AddTutorSubjectsAsync(userId, createTutorProfileDto.Subjects);
-
+        await _cacheService.RemoveByPatternAsync("tutors:filtered:");
         var result = await GetTutorProfileAsync(userId);
         return result;
     }
 
     public async Task<Result<TutorProfileDto>> GetTutorProfileAsync(int userId)
     {
+        var cacheKey = string.Format(TutorByIdKey, userId);
+        var cachedTutor = await _cacheService.GetAsync<TutorProfileDto>(cacheKey);
+        if (cachedTutor != null)
+        {
+            return Result<TutorProfileDto>.Success(cachedTutor);
+        }
+
         var profile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == userId);
         if (profile is null)
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
+        var profileDto = _mapper.Map<TutorProfileDto>(profile);
+        await _cacheService.SetAsync(cacheKey, profileDto, TimeSpan.FromHours(1));
 
-        return _mapper.Map<TutorProfileDto>(profile);
+        return profileDto;
     }
 
     public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsync(
@@ -89,21 +109,42 @@ public class TutorService : ITutorService
         decimal? maxPrice = null,
         string? sortBy = null,
         bool sortDescending = false
-        )
+    )
     {
-        var profiles = await _tutorProfileRepository.GetAll();
-        if (profiles is null || profiles.Count() == 0)
-            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
+        bool isGetAllRequest = string.IsNullOrEmpty(city) &&
+                               string.IsNullOrEmpty(country) &&
+                               (subjectIds == null || subjectIds.Length == 0) &&
+                               (ratings == null || ratings.Length == 0) &&
+                               !minPrice.HasValue &&
+                               !maxPrice.HasValue;
+        if (isGetAllRequest)
+        {
+            var cachedTutors = await _cacheService.GetAsync<List<TutorProfileDto>>(TutorListKey);
+            if (cachedTutors != null && cachedTutors.Any())
+            {
+                var tutorIdsCache = cachedTutors.Select(t => t.UserId).ToList();
+                var favoritesCache =
+                    await _favoritesRepository.FindAsync(f =>
+                        f.StudentUserId == userId && tutorIdsCache.Contains(f.TutorUserId));
 
-        // Filter verified profiles first
+                var favoritesIdsCache = favoritesCache.Select(t => t.TutorUserId).ToList();
+                foreach (var tutorDto in cachedTutors)
+                {
+                    tutorDto.IsFavorite = favoritesIdsCache.Contains(tutorDto.UserId);
+                    var cacheKey = string.Format(TutorByIdKey, tutorDto.UserId);
+                    await _cacheService.SetAsync(cacheKey, tutorDto, TimeSpan.FromHours(1));
+                }
+
+                return Result<List<TutorProfileDto>>.Success(cachedTutors);
+            }
+        }
+
+        var profiles = await _tutorProfileRepository.GetAll();
         var verifiedProfiles = profiles
             .Where(profile => profile.VerificationStatus == VerificationStatus.Verified &&
                               profile.User.IsActive == true)
             .ToList();
-
-        // Apply all filters client-side
         var filteredProfiles = verifiedProfiles.AsEnumerable();
-
         if (!string.IsNullOrEmpty(city))
         {
             filteredProfiles = filteredProfiles.Where(profile =>
@@ -147,7 +188,6 @@ public class TutorService : ITutorService
                 ratings.Contains((int)Math.Floor(profile.Reviews.Average(r => r.Rating))));
         }
 
-        // Apply sorting
         IOrderedEnumerable<TutorProfile> orderedProfiles;
         switch (sortBy?.ToLower())
         {
@@ -188,30 +228,45 @@ public class TutorService : ITutorService
 
         var resultList = orderedProfiles.ToList();
 
-        if (resultList.Count == 0)
-            return Result<List<TutorProfileDto>>.NotFound("No tutors found matching the criteria");
-
         var result = _mapper.Map<List<TutorProfileDto>>(resultList);
-        // Get all tutor IDs from the result list
         var tutorIds = result.Select(t => t.UserId).ToList();
-
         var favorites =
-            await _favoritesRepository.FindAsync(f => f.StudentUserId == userId && tutorIds.Contains(f.TutorUserId));
+            await _favoritesRepository.FindAsync(f =>
+                f.StudentUserId == userId && tutorIds.Contains(f.TutorUserId));
         var favoritesIds = favorites.Select(t => t.TutorUserId).ToList();
-    // Set IsFavorite using for loop
         foreach (var tutorDto in result)
         {
             tutorDto.IsFavorite = favoritesIds.Contains(tutorDto.UserId);
+            var cacheKey = string.Format(TutorByIdKey, tutorDto.UserId);
+            await _cacheService.SetAsync(cacheKey, tutorDto, TimeSpan.FromHours(1));
         }
+
+        if (isGetAllRequest)
+        {
+            await _cacheService.SetAsync(TutorListKey, result, TimeSpan.FromHours(1));
+        }
+
         return Result<List<TutorProfileDto>>.Success(result);
     }
 
     public async Task<Result<List<TutorProfileDto>>> GetAllTutorProfileAsyncForAdmin()
     {
         var profiles = await _tutorProfileRepository.GetAll();
-        if (profiles is null || profiles.Count() == 0)
-            return Result<List<TutorProfileDto>>.NotFound("Tutor profiles not found");
-        var result = _mapper.Map<List<TutorProfileDto>>(profiles);
+        var filteredProfiles = new List<TutorProfile>();
+        foreach (var profile in profiles)
+        {
+            int? role = await _userRoleService.GetRoleIdAsync(profile.UserId);
+            if (role == 3)
+                filteredProfiles.Add(profile);
+        }
+
+        var result = _mapper.Map<List<TutorProfileDto>>(filteredProfiles);
+        foreach (var tutorDto in result)
+        {
+            var cacheKey = string.Format(TutorByIdKey, tutorDto.UserId);
+            await _cacheService.SetAsync(cacheKey, tutorDto, TimeSpan.FromHours(1));
+        }
+
         return Result<List<TutorProfileDto>>.Success(result);
     }
 
@@ -222,7 +277,9 @@ public class TutorService : ITutorService
             return Result<TutorProfileDto>.NotFound("Tutor profile not found");
         profile.VerificationStatus = VerificationStatus.Verified;
         await _tutorProfileRepository.Update(profile);
-
+        var cacheKey = string.Format(TutorByIdKey, userId);
+        await _cacheService.RemoveAsync(cacheKey);
+        await _cacheService.RemoveAsync(TutorListKey);
         return _mapper.Map<TutorProfileDto>(profile);
     }
 
@@ -234,11 +291,14 @@ public class TutorService : ITutorService
 
         profile.VerificationStatus = VerificationStatus.Rejected;
         await _tutorProfileRepository.Update(profile);
-
+        var cacheKey = string.Format(TutorByIdKey, userId);
+        await _cacheService.RemoveAsync(cacheKey);
+        await _cacheService.RemoveAsync(TutorListKey);
         return _mapper.Map<TutorProfileDto>(profile);
     }
 
-    public async Task<Result<TutorProfileDto>> UpdateTutorAsync(int userId, UpdateTutorProfileDto updateTutorProfileDto)
+    public async Task<Result<TutorProfileDto>> UpdateTutorAsync(int userId,
+        UpdateTutorProfileDto updateTutorProfileDto)
     {
         var userProfileDto = _mapper.Map<CreateProfileDto>(updateTutorProfileDto);
 
@@ -251,7 +311,9 @@ public class TutorService : ITutorService
         tutorProfile.ExperienceYears = updateTutorProfileDto.ExperienceYears;
         tutorProfile.WorkingLocation = updateTutorProfileDto.WorkingLocation;
         await _tutorProfileRepository.Update(tutorProfile);
-
+        var cacheKey = string.Format(TutorByIdKey, userId);
+        await _cacheService.RemoveAsync(cacheKey);
+        await _cacheService.RemoveAsync(TutorListKey);
         return Result<TutorProfileDto>.Success(_mapper.Map<TutorProfileDto>(tutorProfile));
     }
 
@@ -262,20 +324,19 @@ public class TutorService : ITutorService
         {
             return Result<bool>.Error("Tutor profile not found.");
         }
-        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f => 
+
+        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f =>
             f.StudentUserId == userId && f.TutorUserId == tutorProfileId);
         if (existingFavorite != null)
         {
             return Result<bool>.Error("This tutor is already in your favorites.");
         }
-        var favorite = new Favorites
-        {
-            StudentUserId = userId,
-            TutorUserId = tutorProfileId,
-        };
+
+        var favorite = new Favorites { StudentUserId = userId, TutorUserId = tutorProfileId, };
         await _favoritesRepository.Create(favorite);
         return Result<bool>.Success(true, "Tutor added to favorites successfully.");
     }
+
     public async Task<Result<bool>> DeleteFavorite(int userId, int tutorProfileId)
     {
         var tutorProfile = await _tutorProfileRepository.FindAsyncDefault(tp => tp.UserId == tutorProfileId);
@@ -283,12 +344,14 @@ public class TutorService : ITutorService
         {
             return Result<bool>.Error("Tutor profile not found.");
         }
-        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f => 
+
+        var existingFavorite = await _favoritesRepository.FindAsyncDefault(f =>
             f.StudentUserId == userId && f.TutorUserId == tutorProfileId);
         if (existingFavorite == null)
         {
             return Result<bool>.Error("Your favorite does not exist.");
         }
+
         await _favoritesRepository.Delete(existingFavorite);
         return Result<bool>.Success(true, "Tutor deleted from favorites successfully.");
     }

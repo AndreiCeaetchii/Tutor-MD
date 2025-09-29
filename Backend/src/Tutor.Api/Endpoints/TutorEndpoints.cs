@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Tutor.Api.Filters;
 using Tutor.Api.Filters.Atributes;
 using Tutor.Application.Features.Tutors.AddTutorSubject;
 using Tutor.Application.Features.Tutors.Approve_Tutor;
@@ -51,6 +52,7 @@ public static class TutorEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
+            .AddEndpointFilter<ValidationFilter>() 
             .WithName("CreateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
@@ -76,6 +78,7 @@ public static class TutorEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
+            .AddEndpointFilter<ValidationFilter>() 
             .WithName("UpdateTutorProfile")
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .RequireAuthorization("ActiveUserOnly")
@@ -185,6 +188,7 @@ public static class TutorEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 }).WithName("AddSubject")
+            .AddEndpointFilter<ValidationFilter>() 
             .Produces<TutorProfileDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .RequireAuthorization("TutorPolicy")
@@ -247,7 +251,9 @@ public static class TutorEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("CreateAvailability")
+                })
+            .AddEndpointFilter<ValidationFilter>() 
+            .WithName("CreateAvailability")
             .Produces<AvailabilityDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorPolicy")
             .RequireAuthorization("ActiveUserOnly")
