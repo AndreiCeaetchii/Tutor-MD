@@ -110,3 +110,23 @@ export const fetchTutorSubjects = async (tutorId: number) => {
     return [];
   }
 };
+
+export const addBookingToGoogleCalendar = async (
+  bookingId: number,
+  googleAccessToken: string
+): Promise<any> => {
+  try {
+    const response = await bookingAxios.post(`/students/booking/add-calendar/${bookingId}`, 
+      { accessToken: googleAccessToken },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error adding booking to Google Calendar:', error.response?.data || error);
+    throw new Error(error.response?.data || 'Failed to add booking to Google Calendar');
+  }
+};
