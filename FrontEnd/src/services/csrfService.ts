@@ -4,7 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api';
+  'http://localhost:8080/api';
 
 export const fetchCsrfToken = async (): Promise<string | null> => {
   try {
@@ -18,17 +18,17 @@ export const fetchCsrfToken = async (): Promise<string | null> => {
 
     const response = await axios.get(`${API_URL}/users/csrf-token`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       withCredentials: true,
     });
-    
+
     if (response.data && response.data.csrfToken) {
       const csrfToken = response.data.csrfToken;
       store.setCsrfToken(csrfToken);
       return csrfToken;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Failed to fetch CSRF token:', error);
