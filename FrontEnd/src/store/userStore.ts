@@ -27,12 +27,13 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.accessToken,
   },
   actions: {
-    setUser(token: string, id: string, role: UserRole, email: string) {
+    setUser(token: string, id: string, role: UserRole, email: string, hasMfa: boolean = false) {
 
       this.accessToken = token;
       this.userId = id;
       this.role = role;
       this.email = email;
+      this.hasMfa = hasMfa;
     },
 
     setCsrfToken(token: string) {
@@ -44,7 +45,6 @@ export const useUserStore = defineStore('user', {
       this.userId = null;
       this.role = null;
       this.email = null;
-      this.hasMfa = false;
       const notificationStore = useNotificationStore();
       notificationStore.notifications = [];
       notificationStore.locallyReadIds = [];

@@ -86,7 +86,7 @@ export function useAuth() {
       );
       const data = response.data;
       const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id.toString(), userRole, formData.email);
+      store.setUser(data.token, data.id.toString(), userRole, formData.email, data.hasMfa);
 
       await fetchCsrfToken();
       
@@ -140,7 +140,7 @@ export function useAuth() {
       
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id, userRole, formData.email);
+      store.setUser(data.token, data.id, userRole, formData.email, data.hasMfa);
 
       await fetchCsrfToken();
 
@@ -187,7 +187,7 @@ export function useAuth() {
       const data = response.data;
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id, userRole, email);
+      store.setUser(data.token, data.id, userRole, email, true);
 
       await fetchCsrfToken();
 
@@ -272,7 +272,7 @@ export function useAuth() {
 
               const decoded = decodeJwt(data.token);
               const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
-              store.setUser(data.token, data.id, userRole, email);
+              store.setUser(data.token, data.id, userRole, email, data.hasMfa);
 
               await fetchCsrfToken();
 
