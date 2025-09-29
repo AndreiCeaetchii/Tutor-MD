@@ -12,7 +12,7 @@ public static class AdminSeeder
     public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasher passwordHasher)
     {
         var adminEmail = "admina@test.com";
-        var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+        var existingAdmin = await context.AppUsers.FirstOrDefaultAsync(u => u.Email == adminEmail);
 
         if (existingAdmin == null)
         {

@@ -150,7 +150,7 @@ app.Use(async (context, next) =>
          HttpMethods.IsPut(context.Request.Method) ||
          HttpMethods.IsDelete(context.Request.Method))
         && !(path.Contains("/login") || path.Contains("/register")
-                                     || path.Contains("/login-auth") || path.Contains("/register-auth")))
+                                     || path.Contains("/login-auth") || path.Contains("/register-auth")|| path.Contains("/password")))
     {
         if (!context.Request.Headers.ContainsKey("X-CSRF-TOKEN"))
         {

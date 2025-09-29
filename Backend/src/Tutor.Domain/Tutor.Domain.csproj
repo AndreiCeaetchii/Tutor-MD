@@ -29,6 +29,7 @@
     <PackageReference Include="NodaTime.Serialization.JsonNet" />
     <PackageReference Include="Otp.NET" />
     <PackageReference Include="QRCoder" />
+    <PackageReference Include="SendGrid" />
     <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="StronglyTypedId" PrivateAssets="all" ExcludeAssets="runtime" />
     <PackageReference Include="StronglyTypedId.Templates" PrivateAssets="all" ExcludeAssets="runtime" />

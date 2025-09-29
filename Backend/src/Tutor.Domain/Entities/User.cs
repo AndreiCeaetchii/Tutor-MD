@@ -25,6 +25,10 @@ public class User : Entity<int>
     public string? TwoFactorRecoveryCodes { get; set; }
     
     public string? RefreshToken { get; set; }
+    
+    public string ResetToken { get; set; } = string.Empty;
+    
+    public DateTime ResetTokenExpiresAt { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
     // Navigation properties

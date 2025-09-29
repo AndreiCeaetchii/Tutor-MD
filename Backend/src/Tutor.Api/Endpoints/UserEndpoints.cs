@@ -22,11 +22,13 @@ using Tutor.Application.Features.Photos.DTOs;
 using Tutor.Application.Features.Users.DisableMFA;
 using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Features.Users.EnableMfa;
+using Tutor.Application.Features.Users.GetResetPassword;
 using Tutor.Application.Features.Users.LoginOAuthUser;
 using Tutor.Application.Features.Users.LoginUser;
 using Tutor.Application.Features.Users.RefreshToken;
 using Tutor.Application.Features.Users.RegisterOAuthUser;
 using Tutor.Application.Features.Users.RegisterUser;
+using Tutor.Application.Features.Users.ResetPassword;
 using Tutor.Application.Features.Users.VerifyMFA;
 
 namespace Tutor.Api.Endpoints;
@@ -41,7 +43,6 @@ public static class UserEndpoints
         group.MapPost("/register",
                 async (IMediator mediator, [FromBody] RegisterUserDto registerUserDto, HttpContext context) =>
                 {
-                    
                     var command = new RegisterUserCommand(registerUserDto);
                     var result = await mediator.Send(command);
 
@@ -68,7 +69,7 @@ public static class UserEndpoints
                         return Results.BadRequest(result.Errors);
                     }
                 })
-            .AddEndpointFilter<ValidationFilter>() 
+            .AddEndpointFilter<ValidationFilter>()
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterUser");
@@ -210,6 +211,28 @@ public static class UserEndpoints
                 }).Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginAuthUser");
+        group.MapPut("/password",
+                async (IMediator mediator, [FromBody] GetResetTokenDto resetTokenDto) =>
+                {
+                    var command = new GetResetPasswordCommand(resetTokenDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("RequestResetPassword")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+        group.MapPut("/password-reset",
+                async (IMediator mediator, [FromBody] ResetPasswordDto resetPasswordDto) =>
+                {
+                    var command = new ResetPasswordCommand(resetPasswordDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                }).WithName("ResetPassword")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/enable-mfa",
                 async (IMediator mediator, HttpContext httpContext) =>
@@ -393,7 +416,6 @@ public static class UserEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 }).WithName("ChangeIsActiveStatus")
-            
             .RequireAuthorization("AdminPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
@@ -412,12 +434,14 @@ public static class UserEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
+
+
         group.MapGet("/csrf-token", (IAntiforgery antiforgery, HttpContext context) =>
-        {
-            var tokens = antiforgery.GetAndStoreTokens(context);
-            return Results.Ok(new { csrfToken = tokens.RequestToken });
-        }).WithName("GetCsrfToken")
-        .RequireAuthorization("AdminOrTutorOrStudentPolicy");
+            {
+                var tokens = antiforgery.GetAndStoreTokens(context);
+                return Results.Ok(new { csrfToken = tokens.RequestToken });
+            }).WithName("GetCsrfToken")
+            .RequireAuthorization("AdminOrTutorOrStudentPolicy");
 
 
         var healthGroup = builder.MapGroup("health")

@@ -55,6 +55,12 @@ public static class ApplicationSetup
         services.AddSingleton<ICacheService, RedisCacheService>();
         services.AddSingleton<IConnectionMultiplexer>(sp => 
             ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+        services.AddSingleton<IEmailService>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var apiKey = config["SendGrid:ApiKey"];
+            return new EmailService(apiKey);
+        });
 
 
 

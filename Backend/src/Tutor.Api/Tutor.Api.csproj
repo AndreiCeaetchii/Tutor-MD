@@ -54,6 +54,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
     <PackageReference Include="Otp.NET" />
     <PackageReference Include="QRCoder" />
+    <PackageReference Include="SendGrid" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Exceptions" />
