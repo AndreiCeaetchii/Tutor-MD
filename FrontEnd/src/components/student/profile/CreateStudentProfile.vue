@@ -53,7 +53,14 @@ const currentYear = new Date().getFullYear();
 const minYear = 1930;
 const maxYear = currentYear - 5;
 
-const attemptedSubmit = ref(false);
+// Direct validation refs
+const phoneError = ref('');
+const birthDateError = ref('');
+const countryError = ref('');
+const cityError = ref('');
+
+// Phone validation pattern
+const phonePattern = /^\+[0-9]{1,4}[0-9]{6,14}$/;
 
 const cities = computed(() => {
   if (form.value.createProfileDto.country === 'Romania') {
@@ -65,88 +72,164 @@ const cities = computed(() => {
 });
 
 watch(
-    () => form.value.createProfileDto.country,
-    () => {
-      form.value.createProfileDto.city = '';
-    },
+  () => form.value.createProfileDto.country,
+  () => {
+    form.value.createProfileDto.city = '';
+    countryError.value = '';
+  },
 );
 
-const isCountryInvalid = computed(() => attemptedSubmit.value && !form.value.createProfileDto.country);
-const isCityInvalid = computed(() => attemptedSubmit.value && !form.value.createProfileDto.city);
+const validatePhone = () => {
+  phoneError.value = '';
+  
+  if (!form.value.createProfileDto.phone) {
+    phoneError.value = 'Phone number is required';
+    return false;
+  }
+  
+  if (!phonePattern.test(form.value.createProfileDto.phone)) {
+    phoneError.value = 'Please enter a valid phone number (e.g., +37360000000)';
+    return false;
+  }
+  
+  return true;
+};
 
-// --- Funcție de Validare Reutilizabilă (doar Max) ---
-// Aceasta corectează valoarea doar dacă depășește limita maximă.
-// Permite null/0/valori mici pentru o editare fluentă.
+const validateAge = () => {
+  birthDateError.value = '';
+  
+  if (!birthDay.value || !birthMonth.value || !birthYear.value) {
+    birthDateError.value = 'Complete birthdate is required';
+    return false;
+  }
+  
+  const birthDate = new Date(birthYear.value, birthMonth.value - 1, birthDay.value);
+  const today = new Date();
+  const minAgeDate = new Date(today.getFullYear() - 6, today.getMonth(), today.getDate());
+  
+  if (birthDate > minAgeDate) {
+    birthDateError.value = 'You must be at least 6 years old to register as a student';
+    return false;
+  }
+  
+  const isValidDate = birthDate.getFullYear() === birthYear.value &&
+                    birthDate.getMonth() === birthMonth.value - 1 &&
+                    birthDate.getDate() === birthDay.value;
+                    
+  if (!isValidDate) {
+    birthDateError.value = 'Please enter a valid date';
+    return false;
+  }
+  
+  return true;
+};
+
+const validateLocation = () => {
+  let isValid = true;
+  
+  if (!form.value.createProfileDto.country) {
+    countryError.value = 'Please select a country';
+    isValid = false;
+  }
+  
+  if (!form.value.createProfileDto.city) {
+    cityError.value = 'Please select a city';
+    isValid = false;
+  }
+  
+  return isValid;
+};
+
+// Event handlers
+const validatePhoneInput = () => {
+  validatePhone();
+};
+
+const clearPhoneError = () => {
+  if (phoneError.value) phoneError.value = '';
+};
+
+const validateBirthdateInputs = () => {
+  validateAge();
+};
+
+const clearBirthdateError = () => {
+  if (birthDateError.value) birthDateError.value = '';
+};
+
+// Limit enforcement
 const enforceMax = (val: number | null, maxLimit: number, targetRef: any) => {
-  // Permite ștergerea (null)
   if (val === null) return;
-
-  // Corectează doar dacă valoarea depășește limita maximă.
   if (val > maxLimit) {
     targetRef.value = maxLimit;
   }
 };
 
-// --- Aplicarea Logicii de Validare ---
-
 // Birthdate Limits
 watch(birthDay, (newVal) => enforceMax(newVal, 31, birthDay));
 watch(birthMonth, (newVal) => enforceMax(newVal, 12, birthMonth));
 
-
 // Academic Limits
-const MAX_GPA = 10;    // Limita noua pentru GPA (Nota)
-const MAX_CLASS = 12;  // Limita noua pentru Clasa
+const MAX_GPA = 10;
+const MAX_CLASS = 12;
 
-// 1. Validare Current GPA (Grade) - Max 10
 watch(() => form.value.grade, (newVal) => enforceMax(newVal, MAX_GPA, form.value.grade));
-
-// 2. Validare Current School Year (Class) - Max 12
 watch(() => form.value.class, (newVal) => enforceMax(newVal, MAX_CLASS, form.value.class));
 
+// Bio character limit
+const bioCharacterCount = computed(() => {
+  return form.value.createProfileDto.bio.length;
+});
 
-// ---------------------------------------------
+const bioLimitReached = computed(() => {
+  return bioCharacterCount.value >= 200;
+});
 
+const limitBioText = () => {
+  if (form.value.createProfileDto.bio.length > 200) {
+    form.value.createProfileDto.bio = form.value.createProfileDto.bio.substring(0, 200);
+  }
+};
+
+const closeAlert = () => {
+  showAlert.value = false;
+};
 
 const handleSubmit = async () => {
-  attemptedSubmit.value = true;
+  const isPhoneValid = validatePhone();
+  const isAgeValid = validateAge();
+  const isLocationValid = validateLocation();
+  
+  if (!isPhoneValid || !isAgeValid || !isLocationValid) {
+    if (!isAgeValid) {
+      document.getElementById('birthdate-section')?.scrollIntoView({ behavior: 'smooth' });
+    }
+    return;
+  }
 
+  const gradeValue = form.value.grade;
+  const classValue = form.value.class;
+
+  if (
+    gradeValue === null || classValue === null ||
+    gradeValue < 1 || gradeValue > MAX_GPA ||
+    classValue < 1 || classValue > MAX_CLASS
+  ) {
+    return;
+  }
+  
   const pad = (num: number | null) => (num !== null ? String(num).padStart(2, '0') : '');
 
   const yyyy = birthYear.value;
   const mm = pad(birthMonth.value);
   const dd = pad(birthDay.value);
 
-  // Verifică datele de naștere
-  if (!yyyy || !mm || !dd) {
-    console.error('Birthdate is incomplete.');
-    return;
-  }
-
-  // Verifică GPA și Clasa la trimitere
-  const gradeValue = form.value.grade;
-  const classValue = form.value.class;
-
-  if (
-      gradeValue === null || classValue === null ||
-      gradeValue < 1 || gradeValue > MAX_GPA ||
-      classValue < 1 || classValue > MAX_CLASS
-  ) {
-    console.error('Academic details are incomplete or contain invalid values.');
-    return;
-  }
-
-  if (isCountryInvalid.value || isCityInvalid.value) {
-    return;
-  }
-
-
   const finalBirthdate = `${yyyy}-${mm}-${dd}`;
   const birthdateFormatted = finalBirthdate ? `${finalBirthdate}T00:00:00` : '';
 
-  const payload: StudentProfileData = {
-    grade: form.value.grade,
-    class: form.value.class,
+  const payload = {
+    grade: form.value.grade as number,
+    class: form.value.class as number,
     createProfileDto: {
       ...form.value.createProfileDto,
       birthdate: birthdateFormatted,
@@ -156,7 +239,7 @@ const handleSubmit = async () => {
   try {
     await createStudentProfile(payload);
 
-    studentProfileStore.updateGradeAndClass(form.value.grade, form.value.class);
+    studentProfileStore.updateGradeAndClass(form.value.grade as number, form.value.class as number);
     studentProfileStore.updateUserProfile(payload.createProfileDto);
 
     alertMessage.value = 'Your student profile has been successfully created!';
@@ -190,7 +273,7 @@ const handleSubmit = async () => {
     <div class="max-w-4xl mx-auto">
       <form @submit.prevent="handleSubmit" class="space-y-8">
         <div
-            class="bg-gradient-to-r from-[#5f22d9] to-[#3a22d9] p-8 rounded-2xl shadow-2xl text-center"
+            class="p-8 text-center shadow-2xl bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl"
         >
           <h1 class="mb-2 text-4xl font-bold text-white">Complete Your Student Profile</h1>
           <p class="text-purple-100">Let's create your academic profile together</p>
@@ -214,7 +297,7 @@ const handleSubmit = async () => {
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="firstName" class="mb-2 text-sm font-semibold text-gray-700"
-              >First name</label
+              >First name <span class="text-red-500">*</span></label
               >
               <input
                   id="firstName"
@@ -227,7 +310,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col">
               <label for="lastName" class="mb-2 text-sm font-semibold text-gray-700"
-              >Last name</label
+              >Last name <span class="text-red-500">*</span></label
               >
               <input
                   id="lastName"
@@ -240,7 +323,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col">
               <label for="username" class="mb-2 text-sm font-semibold text-gray-700"
-              >Username</label
+              >Username <span class="text-red-500">*</span></label
               >
               <input
                   id="username"
@@ -253,7 +336,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col">
               <label for="phone" class="mb-2 text-sm font-semibold text-gray-700"
-              >Phone</label
+              >Phone <span class="text-red-500">*</span></label
               >
               <input
                   id="phone"
@@ -262,6 +345,9 @@ const handleSubmit = async () => {
                   required
                   placeholder="+37360000000"
                   class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                  :class="{'border-red-300': phoneError}"
+                  @blur="validatePhoneInput"
+                  @input="clearPhoneError"
               />
               <p v-if="phoneError" class="mt-1 text-sm text-red-500">
                 {{ phoneError }}
@@ -269,7 +355,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col md:col-span-2" id="birthdate-section">
               <label class="mb-2 text-sm font-semibold text-gray-700"
-              >Birthdate</label
+              >Birthdate <span class="text-red-500">*</span></label
               >
               <div class="grid grid-cols-3 gap-4">
                 <input
@@ -281,8 +367,11 @@ const handleSubmit = async () => {
                     max="31"
                     required
                     class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                    :class="{'border-red-300': birthDateError}"
                     maxlength="2"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    @blur="validateBirthdateInputs"
+                    @input="clearBirthdateError"
                 />
                 <input
                     id="birthMonth"
@@ -293,8 +382,11 @@ const handleSubmit = async () => {
                     max="12"
                     required
                     class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                    :class="{'border-red-300': birthDateError}"
                     maxlength="2"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    @blur="validateBirthdateInputs"
+                    @input="clearBirthdateError"
                 />
                 <input
                     id="birthYear"
@@ -305,8 +397,11 @@ const handleSubmit = async () => {
                     :max="maxYear"
                     required
                     class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                    :class="{'border-red-300': birthDateError}"
                     maxlength="4"
                     oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
+                    @blur="validateBirthdateInputs"
+                    @input="clearBirthdateError"
                 />
               </div>
               <p v-if="birthDateError" class="mt-2 text-sm font-medium text-red-500">
@@ -384,19 +479,19 @@ const handleSubmit = async () => {
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
               <label for="country" class="mb-2 text-sm font-semibold text-gray-700"
-              >Country</label
+              >Country <span class="text-red-500">*</span></label
               >
               <DropdownSelect
                   :options="['Romania', 'Moldova']"
                   placeholder="Select country from list"
                   @update:modelValue="form.createProfileDto.country = $event"
-                  :class="{'border-red-500': isCountryInvalid}"
+                  :class="{'border-red-300': countryError}"
               />
-              <p v-if="isCountryInvalid" class="mt-1 text-xs text-red-500">Please select a country.</p>
+              <p v-if="countryError" class="mt-1 text-xs text-red-500">{{ countryError }}</p>
 
               <div v-if="form.createProfileDto.country" class="mt-4">
                 <span
-                    class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                    class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.createProfileDto.country }}
                 </span>
@@ -405,19 +500,19 @@ const handleSubmit = async () => {
 
             <div class="flex flex-col">
               <label for="city" class="mb-2 text-sm font-semibold text-gray-700"
-              >City</label
+              >City <span class="text-red-500">*</span></label
               >
               <DropdownSelect
                   :options="cities"
                   placeholder="Select city from list"
                   @update:modelValue="form.createProfileDto.city = $event"
-                  :class="{'border-red-500': isCityInvalid}"
+                  :class="{'border-red-300': cityError}"
               />
-              <p v-if="isCityInvalid" class="mt-1 text-xs text-red-500">Please select a city.</p>
+              <p v-if="cityError" class="mt-1 text-xs text-red-500">{{ cityError }}</p>
 
               <div v-if="form.createProfileDto.city" class="mt-4">
                 <span
-                    class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                    class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.createProfileDto.city }}
                 </span>
@@ -444,25 +539,23 @@ const handleSubmit = async () => {
           <textarea
               v-model="form.createProfileDto.bio"
               rows="6"
-              maxlength="400"
+              maxlength="200"
               required
               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md resize-none"
               placeholder="Tell us about your academic interests, goals, and what you're looking for in a tutor..."
+              @input="limitBioText"
+              :class="{'border-red-300': bioLimitReached}"
           ></textarea>
 
-          <div class="mt-2 text-sm text-right">
-            <p
-                v-if="form.createProfileDto.bio && form.createProfileDto.bio.length >= 400"
-                class="font-semibold text-red-500"
-            >
-              Maximum limit of 400 characters reached.
-            </p>
-
-            <p
-                class="text-gray-500"
-            >
-              {{ form.createProfileDto.bio ? form.createProfileDto.bio.length : 0 }} / 400 characters
-            </p>
+          <div 
+            class="mt-2 text-sm text-right" 
+            :class="{
+                'text-gray-500': bioCharacterCount < 150,
+                'text-orange-500': bioCharacterCount >= 150 && bioCharacterCount < 200,
+                'text-red-500': bioCharacterCount >= 200
+            }"
+          >
+            {{ bioCharacterCount }} / 200 characters
           </div>
         </section>
 
