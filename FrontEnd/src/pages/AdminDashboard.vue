@@ -7,9 +7,8 @@
   <div class="min-h-screen bg-gray-50">
     <div class="p-4 mx-auto md:p-8 max-w-7xl">
       <div class="mb-6">
-        <h1 class="mb-2 font-bold">
-          <span class="block text-2xl md:text-3xl">Welcome to the</span>
-          <span class="text-3xl text-purple-600 md:text-4xl">Admin Dashboard</span>
+        <h1 class="mb-2 text-2xl font-bold md:text-3xl">
+          Welcome to the <span class="text-purple-600">Admin Dashboard</span>
         </h1>
         <p class="mt-2 text-sm text-gray-600 md:text-base">
           Manage <span class="font-semibold text-purple-600">users</span>, monitor
