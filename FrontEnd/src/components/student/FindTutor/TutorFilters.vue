@@ -38,7 +38,7 @@
 
   const ratings = [5, 4, 3, 2, 1];
 
-  const services = ['My home', "Student's home", 'Online'];
+  const services = ['My home', "Tutor's home", 'Online'];
 
   const debouncedUpdatePriceRange = debounce(() => {
     tutorStore.priceMin = localPriceMin.value;

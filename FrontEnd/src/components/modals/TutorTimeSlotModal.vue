@@ -201,38 +201,38 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="relative w-full max-w-md p-6 mx-auto bg-white rounded-lg shadow-xl">
-      <button @click="closeModal" class="absolute text-gray-500 top-4 right-4 hover:text-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div class="relative w-full max-w-sm p-4 mx-auto bg-white rounded-lg shadow-xl sm:p-6">
+      <button @click="closeModal" class="absolute text-gray-500 top-3 right-3 sm:top-4 sm:right-4 hover:text-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
       
-      <h2 class="mb-6 text-xl font-semibold text-gray-800">
+      <h2 class="mb-4 text-lg font-semibold text-gray-800 sm:mb-6 sm:text-xl">
         {{ props.editingSlot ? 'Edit Time Slot' : 'Add Time Slot' }}
       </h2>
       
-      <div v-if="errorMessage" class="p-3 mb-4 text-sm text-red-600 bg-red-100 rounded-md">
+      <div v-if="errorMessage" class="p-2 mb-3 text-xs text-red-600 bg-red-100 rounded-md sm:p-3 sm:mb-4 sm:text-sm">
         {{ errorMessage }}
       </div>
       
-      <div class="mb-6">
-        <label class="block mb-2 text-sm font-medium text-gray-700">Start Time</label>
+      <div class="mb-4 sm:mb-6">
+        <label class="block mb-1 text-xs font-medium text-gray-700 sm:mb-2 sm:text-sm">Start Time</label>
         <div ref="startTimeRef" class="relative">
           <button 
             @click="toggleStartTimeDropdown"
-            class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="flex items-center justify-between w-full px-3 py-1.5 sm:px-4 sm:py-2 text-sm text-left bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <span class="block text-gray-700 truncate">{{ startTimeText }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <span class="block text-xs text-gray-700 truncate sm:text-sm">{{ startTimeText }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 sm:w-5 sm:h-5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
           
           <div 
             v-show="showStartTimeDropdown"
-            class="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-60"
+            class="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-40 sm:max-h-60"
           >
             <ul class="py-1">
               <li 
@@ -240,14 +240,14 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
                 :key="`start-${time}`"
                 @click="selectStartTime(time)"
                 :class="[
-                  'px-4 py-2 text-sm cursor-pointer flex items-center',
+                  'px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm cursor-pointer flex items-center',
                   time === startTime ? 'bg-gray-100 font-medium text-gray-800' : 'text-gray-600 hover:bg-gray-50',
                   wouldCauseOverlap(time, true) ? 'opacity-50 cursor-not-allowed' : ''
                 ]"
                 :style="{ pointerEvents: wouldCauseOverlap(time, true) ? 'none' : 'auto' }"
               >
                 <span class="w-4 mr-2">
-                  <svg v-if="time === startTime" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                  <svg v-if="time === startTime" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-blue-500 sm:w-4 sm:h-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </span>
@@ -258,22 +258,22 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
         </div>
       </div>
       
-      <div class="mb-8">
-        <label class="block mb-2 text-sm font-medium text-gray-700">End Time</label>
+      <div class="mb-6">
+        <label class="block mb-1 text-xs font-medium text-gray-700 sm:mb-2 sm:text-sm">End Time</label>
         <div ref="endTimeRef" class="relative">
           <button 
             @click="toggleEndTimeDropdown"
-            class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="flex items-center justify-between w-full px-3 py-1.5 sm:px-4 sm:py-2 text-sm text-left bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <span class="block text-gray-700 truncate">{{ endTimeText }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <span class="block text-xs text-gray-700 truncate sm:text-sm">{{ endTimeText }}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 sm:w-5 sm:h-5" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
           </button>
           
           <div 
             v-show="showEndTimeDropdown"
-            class="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-60"
+            class="absolute z-10 w-full mt-1 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-lg max-h-40 sm:max-h-60"
           >
             <ul class="py-1">
               <li 
@@ -302,7 +302,7 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
       <button 
         @click="saveTimeSlot"
         :disabled="!startTime || !endTime"
-        class="w-full py-3 text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full py-2 text-xs text-white transition-colors bg-orange-500 rounded-md sm:py-3 sm:text-sm hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {{ props.editingSlot ? 'Save Changes' : 'Add Time Slot' }}
       </button>
@@ -311,6 +311,10 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
 </template>
 
 <style scoped>
+.max-h-40 {
+  max-height: 12rem;
+}
+
 .max-h-60 {
   max-height: 15rem;
 }
@@ -320,7 +324,7 @@ const wouldCauseOverlap = (time: string, isStartTime: boolean) => {
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 .overflow-y-auto::-webkit-scrollbar-track {
   background: transparent;

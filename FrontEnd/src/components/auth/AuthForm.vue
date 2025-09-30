@@ -1,150 +1,160 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { useUserStore } from '../../store/userStore';
-  import {
-    faEye,
-    faEyeSlash,
-    faChalkboardTeacher,
-    faUserGraduate,
-  } from '@fortawesome/free-solid-svg-icons';
-  import logoImage from '../../assets/tutor2.png';
-  import type { UserRole } from '../../store/userStore';
+import { ref, computed } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { useUserStore } from '../../store/userStore';
+import {
+  faEye,
+  faEyeSlash,
+  faChalkboardTeacher,
+  faUserGraduate,
+} from '@fortawesome/free-solid-svg-icons';
+import logoImage from '../../assets/tutor2.png';
+import type { UserRole } from '../../store/userStore';
 
-  library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
+library.add(faEye, faEyeSlash, faChalkboardTeacher, faUserGraduate);
 
-  interface Role {
-    value: string;
-    label: string;
-    icon: [string, string];
+interface Role {
+  value: string;
+  label: string;
+  icon: [string, string];
+}
+
+interface AuthFormProps {
+  title?: string;
+  subtitle?: string;
+  logoSrc?: string;
+  showRoleSelector?: boolean;
+  roles?: Role[];
+  submitButtonText?: string;
+  googleButtonText?: string;
+  footerText?: string;
+  footerLinkText?: string;
+  footerLinkPath?: string;
+  isSignupForm?: boolean;
+  isLogin: boolean;
+  errorMessage?: string;
+  fieldErrors?: Record<string, string>;
+  showPhoneNumber?: boolean;
+  forgotPasswordPath?: string; // Nou: Calea pentru 'Am uitat parola'
+}
+
+interface FormData {
+  email: string;
+  password: string;
+  role: string;
+  phoneNumber?: string;
+}
+
+interface SocialLoginPayload {
+  provider: string;
+  role?: UserRole;
+}
+
+const props = withDefaults(defineProps<AuthFormProps>(), {
+  title: 'Tutor',
+  isSignupForm: false,
+  showRoleSelector: false,
+  fieldErrors: () => ({}),
+  showPhoneNumber: false,
+});
+
+const defaultRoles: Role[] = [
+  { value: 'tutor', label: 'Tutor', icon: ['fas', 'chalkboard-teacher'] },
+  { value: 'student', label: 'Student', icon: ['fas', 'user-graduate'] },
+];
+
+const roles = props.roles ?? defaultRoles;
+
+const emit = defineEmits<{
+  (e: 'submit', formData: FormData): void;
+  (e: 'socialLogin', payload: SocialLoginPayload): void;
+  (e: 'fieldBlur', field: string): void;
+  (e: 'fieldInput', field: string, value: string): void;
+}>();
+
+const logoSrc = props.logoSrc || logoImage;
+const email = ref('');
+const phoneNumber = ref('');
+const password = ref('');
+
+const showPassword = ref(false);
+const store = useUserStore();
+
+const selectRole = (role: UserRole) => {
+  selectedRole.value = role;
+  emit('fieldInput', 'role', role);
+};
+
+const selectedRole = ref<UserRole | string>(store.userRole || '');
+
+const handleSubmit = () => {
+  const formData: FormData = {
+    email: email.value,
+    password: password.value,
+    role: selectedRole.value || '',
+  };
+
+  if (props.isSignupForm) {
+    formData.phoneNumber = phoneNumber.value ? `+373${phoneNumber.value}` : '';
   }
 
-  interface AuthFormProps {
-    title?: string;
-    subtitle?: string;
-    logoSrc?: string;
-    showRoleSelector?: boolean;
-    roles?: Role[];
-    submitButtonText?: string;
-    googleButtonText?: string;
-    footerText?: string;
-    footerLinkText?: string;
-    footerLinkPath?: string;
-    isSignupForm?: boolean;
-    isLogin: boolean;
-    errorMessage?: string;
-    fieldErrors?: Record<string, string>;
-    showPhoneNumber?: boolean;
-  }
-  
-  interface FormData {
-    email: string;
-    password: string;
-    role: string;
-    phoneNumber?: string;
+  emit('submit', formData);
+};
+
+const handleSocialLogin = (provider: string): void => {
+  if (!props.showRoleSelector) {
+    emit('socialLogin', { provider });
+    return;
   }
 
-  interface SocialLoginPayload {
-    provider: string;
-    role?: UserRole;
+  if (!selectedRole.value) {
+    emit('fieldBlur', 'role');
+    return;
   }
 
-  const props = withDefaults(defineProps<AuthFormProps>(), {
-    title: 'Tutor',
-    isSignupForm: false,
-    showRoleSelector: false,
-    fieldErrors: () => ({}),
-    showPhoneNumber: false,
+  emit('socialLogin', {
+    provider,
+    role: selectedRole.value as UserRole,
   });
+};
 
-  const defaultRoles: Role[] = [
-    { value: 'tutor', label: 'Tutor', icon: ['fas', 'chalkboard-teacher'] },
-    { value: 'student', label: 'Student', icon: ['fas', 'user-graduate'] },
-  ];
+const actionText = computed(() => {
+  if (!props.submitButtonText) return props.isLogin ? 'Log in' : 'Sign up';
+  return props.submitButtonText?.includes('Log in') ? 'Log in' : 'Sign up';
+});
 
-  const roles = props.roles ?? defaultRoles;
+const dynamicSubmitButtonText = computed(() => {
+  const currentRole = roles.find((r) => r.value === selectedRole.value);
 
-  const emit = defineEmits<{
-    (e: 'submit', formData: FormData): void;
-    (e: 'socialLogin', payload: SocialLoginPayload): void;
-    (e: 'fieldBlur', field: string): void;
-    (e: 'fieldInput', field: string, value: string): void;
-  }>();
+  if (props.showRoleSelector && !selectedRole.value) {
+    return actionText.value;
+  }
 
-  const logoSrc = props.logoSrc || logoImage;
-  const email = ref('');
-  const phoneNumber = ref('');
-  const password = ref('');
+  if (currentRole) {
+    return `${actionText.value} as ${currentRole.label}`;
+  }
 
-  const showPassword = ref(false);
-  const store = useUserStore();
+  return props.submitButtonText || actionText.value;
+});
 
-  const selectRole = (role: UserRole) => {
-    selectedRole.value = role;
-    emit('fieldInput', 'role', role);
-  };
+const handleEmailInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  email.value = target.value;
+  emit('fieldInput', 'email', target.value);
+};
 
-  const selectedRole = ref<UserRole | string>(store.userRole || '');
+const handlePasswordInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  password.value = target.value;
+  emit('fieldInput', 'password', target.value);
+};
 
-  const handleSubmit = () => {
-    const formData: FormData = {
-      email: email.value,
-      password: password.value,
-      role: selectedRole.value || '',
-    };
-
-    if (props.isSignupForm) {
-      formData.phoneNumber = phoneNumber.value ? `+373${phoneNumber.value}` : '';
-    }
-
-    emit('submit', formData);
-  };
-
-  const handleSocialLogin = (provider: string): void => {
-    if (!props.showRoleSelector) {
-      emit('socialLogin', { provider });
-      return;
-    }
-    
-    if (!selectedRole.value) {
-      emit('fieldBlur', 'role');
-      return;
-    }
-
-    emit('socialLogin', {
-      provider,
-      role: selectedRole.value as UserRole,
-    });
-  };
-
-  const actionText = computed(() => {
-    if (!props.submitButtonText) return 'Submit';
-    return props.submitButtonText.includes('Log in') ? 'Log in as' : 'Sign up as';
-  });
-
-  const dynamicSubmitButtonText = computed(() => {
-    const currentRole = roles.find((r) => r.value === selectedRole.value);
-    return `${actionText.value} ${currentRole?.label || 'Tutor or Student'}`;
-  });
-  
-  const handleEmailInput = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    email.value = target.value;
-    emit('fieldInput', 'email', target.value);
-  };
-  
-  const handlePasswordInput = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    password.value = target.value;
-    emit('fieldInput', 'password', target.value);
-  };
-  
-  const handlePhoneNumberInput = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    phoneNumber.value = target.value;
-    emit('fieldInput', 'phoneNumber', target.value);
-  };
+const handlePhoneNumberInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  phoneNumber.value = target.value;
+  emit('fieldInput', 'phoneNumber', target.value);
+};
 </script>
 
 <template>
@@ -268,6 +278,15 @@
         <p v-if="fieldErrors?.password" class="mt-1 text-sm text-red-500">
           {{ fieldErrors.password }}
         </p>
+
+        <div v-if="isLogin && forgotPasswordPath" class="mt-1 text-right">
+          <router-link
+            :to="forgotPasswordPath"
+            class="text-sm text-[#5f22d9] font-medium hover:underline"
+          >
+            Forgot your password?
+          </router-link>
+        </div>
       </div>
 
       <slot name="fields-after"></slot>
@@ -319,7 +338,7 @@
           <router-link
             :to="footerLinkPath || '/'"
             class="text-[#5f22d9] font-medium hover:underline"
-            >{{ footerLinkText }}</router-link
+          >{{ footerLinkText }}</router-link
           >
         </p>
       </slot>
