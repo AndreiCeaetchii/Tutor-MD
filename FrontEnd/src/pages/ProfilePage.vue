@@ -80,7 +80,7 @@
         subjects: serverData.tutorSubjects.map((s: any) => ({
           name: s.subjectName || '',
           price: s.price || 0,
-          currency: s.currency || 'mdl',
+          currency: s.currency || 'MDL',
           subjectId: s.subjectId,
           isNew: false,
           isModified: false,
@@ -136,7 +136,7 @@
             subjectName: subject.name,
             subjectSlug: subject.name.toLowerCase().replace(/\s+/g, '-'),
             pricePerHour: subject.price,
-            currency: subject.currency.toLowerCase(),
+            currency: subject.currency,
           });
           subject.isNew = false;
         } else if (subject.isModified) {

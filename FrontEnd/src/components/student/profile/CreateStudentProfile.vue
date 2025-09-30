@@ -55,7 +55,45 @@ const cities = computed(() => {
   if (form.value.createProfileDto.country === 'Romania') {
     return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
   } else if (form.value.createProfileDto.country === 'Moldova') {
-    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Orhei'];
+    return [
+      'Anenii Noi',
+      'Basarabeasca',
+      'Briceni',
+      'Cahul',
+      'Cantemir',
+      'Călărași',
+      'Căușeni',
+      'Chișinău',
+      'Cimișlia',
+      'Criuleni',
+      'Dondușeni',
+      'Drochia',
+      'Dubăsari',
+      'Edineț',
+      'Fălești',
+      'Florești',
+      'Glodeni',
+      'Hîncești',
+      'Ialoveni',
+      'Leova',
+      'Nisporeni',
+      'Ocnița',
+      'Orhei',
+      'Rezina',
+      'Rîșcani',
+      'Sîngerei',
+      'Soroca',
+      'Strășeni',
+      'Șoldănești',
+      'Ștefan Vodă',
+      'Taraclia',
+      'Telenești',
+      'Ungheni',
+      'Bălți',
+      'Comrat',
+      'Tighina',
+      'Tiraspol',
+    ];
   }
   return [];
 });
@@ -70,38 +108,26 @@ watch(
 const isCountryInvalid = computed(() => attemptedSubmit.value && !form.value.createProfileDto.country);
 const isCityInvalid = computed(() => attemptedSubmit.value && !form.value.createProfileDto.city);
 
-// --- Funcție de Validare Reutilizabilă (doar Max) ---
-// Aceasta corectează valoarea doar dacă depășește limita maximă.
-// Permite null/0/valori mici pentru o editare fluentă.
+
 const enforceMax = (val: number | null, maxLimit: number, targetRef: any) => {
-  // Permite ștergerea (null)
   if (val === null) return;
 
-  // Corectează doar dacă valoarea depășește limita maximă.
   if (val > maxLimit) {
     targetRef.value = maxLimit;
   }
 };
 
-// --- Aplicarea Logicii de Validare ---
 
-// Birthdate Limits
 watch(birthDay, (newVal) => enforceMax(newVal, 31, birthDay));
 watch(birthMonth, (newVal) => enforceMax(newVal, 12, birthMonth));
 
 
-// Academic Limits
-const MAX_GPA = 10;    // Limita noua pentru GPA (Nota)
-const MAX_CLASS = 12;  // Limita noua pentru Clasa
+const MAX_GPA = 10;
+const MAX_CLASS = 12;
 
-// 1. Validare Current GPA (Grade) - Max 10
 watch(() => form.value.grade, (newVal) => enforceMax(newVal, MAX_GPA, form.value.grade));
 
-// 2. Validare Current School Year (Class) - Max 12
 watch(() => form.value.class, (newVal) => enforceMax(newVal, MAX_CLASS, form.value.class));
-
-
-// ---------------------------------------------
 
 
 const handleSubmit = async () => {
@@ -113,13 +139,11 @@ const handleSubmit = async () => {
   const mm = pad(birthMonth.value);
   const dd = pad(birthDay.value);
 
-  // Verifică datele de naștere
   if (!yyyy || !mm || !dd) {
     console.error('Birthdate is incomplete.');
     return;
   }
 
-  // Verifică GPA și Clasa la trimitere
   const gradeValue = form.value.grade;
   const classValue = form.value.class;
 
@@ -367,7 +391,7 @@ const handleSubmit = async () => {
 
               <div v-if="form.createProfileDto.country" class="mt-4">
                 <span
-                    class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.createProfileDto.country }}
                 </span>
@@ -388,7 +412,7 @@ const handleSubmit = async () => {
 
               <div v-if="form.createProfileDto.city" class="mt-4">
                 <span
-                    class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.createProfileDto.city }}
                 </span>

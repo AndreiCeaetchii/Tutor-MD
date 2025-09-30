@@ -128,7 +128,45 @@ const cities = computed(() => {
   if (form.value.country === 'Romania') {
     return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
   } else if (form.value.country === 'Moldova') {
-    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Strășeni', 'Orhei'];
+    return [
+      'Anenii Noi',
+      'Basarabeasca',
+      'Briceni',
+      'Cahul',
+      'Cantemir',
+      'Călărași',
+      'Căușeni',
+      'Chișinău',
+      'Cimișlia',
+      'Criuleni',
+      'Dondușeni',
+      'Drochia',
+      'Dubăsari',
+      'Edineț',
+      'Fălești',
+      'Florești',
+      'Glodeni',
+      'Hîncești',
+      'Ialoveni',
+      'Leova',
+      'Nisporeni',
+      'Ocnița',
+      'Orhei',
+      'Rezina',
+      'Rîșcani',
+      'Sîngerei',
+      'Soroca',
+      'Strășeni',
+      'Șoldănești',
+      'Ștefan Vodă',
+      'Taraclia',
+      'Telenești',
+      'Ungheni',
+      'Bălți',
+      'Comrat',
+      'Tighina',
+      'Tiraspol',
+    ];
   } else if (form.value.country === 'Italy') {
     return ['Rome', 'Milan', 'Florence', 'Naples', 'Turin'];
   } else if (form.value.country === 'Germany') {
@@ -376,7 +414,7 @@ const handleSubmit = async () => {
               <p v-if="isCountryInvalid" class="mt-1 text-xs text-red-500">Please select a country.</p>
               <div v-if="form.country" class="mt-4">
                 <span
-                  class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.country }}
                 </span>
@@ -394,7 +432,7 @@ const handleSubmit = async () => {
               <p v-if="isCityInvalid" class="mt-1 text-xs text-red-500">Please select a city.</p>
               <div v-if="form.city" class="mt-4">
                 <span
-                  class="px-5 py-2 bg-gradient-to-r from-emerald-100 to-teal-100 border border-emerald-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
+                  class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
                 >
                   {{ form.city }}
                 </span>

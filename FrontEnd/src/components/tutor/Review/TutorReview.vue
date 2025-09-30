@@ -55,7 +55,6 @@ const fetchReviews = async () => {
     }
 
     const response: TutorReviewsResponse = await getTutorReviews(tutorIdNumber);
-    console.log('Fetched reviews:', response);
     reviews.value = response.reviews;
     averageRating.value = response.averageRating;
   } catch (err: any) {

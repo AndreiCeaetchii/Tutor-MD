@@ -114,7 +114,6 @@ export function useAuth() {
       if (formData.mfaCode) {
         const formattedMfaCode = formData.mfaCode.replace(/\s/g, '').substring(0, 6).padStart(6, '0');
         Object.assign(requestData, { MfaCode: formattedMfaCode });
-        console.log("Using formatted MFA code:", formattedMfaCode);
       }
       
       const response = await axios.post(
@@ -132,7 +131,6 @@ export function useAuth() {
         (typeof data === 'string' && data.includes('MFA_REQUIRED')) ||
         JSON.stringify(data).includes('MFA_REQUIRED')
       ) {
-        console.log("MFA required detected:", data);
         requiresMfa.value = true;
         sessionStorage.setItem('mfa_email', formData.email);
         return { success: false, requiresMfa: true };
@@ -147,8 +145,7 @@ export function useAuth() {
       requiresMfa.value = false;
       return { success: true, role: userRole };
     } catch (err: any) {
-      console.log("Login error response:", err.response?.data);
-      
+
       if (
         err.response?.data?.requiresMfa === true ||
         err.response?.data?.message === 'MFA_REQUIRED' ||
@@ -156,7 +153,6 @@ export function useAuth() {
         (Array.isArray(err.response?.data) && err.response.data.includes('MFA_REQUIRED')) ||
         (err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED'))
       ) {
-        console.log("MFA required detected in error");
         requiresMfa.value = true;
         sessionStorage.setItem('mfa_email', formData.email);
         return { success: false, requiresMfa: true };
@@ -256,7 +252,6 @@ export function useAuth() {
             try {
               const res = await axios.post(endpoint, requestData, { withCredentials: true });
               const data = res.data;
-              console.log("Google auth response:", data);
 
               if (
                 data.requiresMfa === true || 
@@ -265,7 +260,6 @@ export function useAuth() {
                 (typeof data === 'string' && data.includes('MFA_REQUIRED')) ||
                 JSON.stringify(data).includes('MFA_REQUIRED')
               ) {
-                console.log("MFA required detected for Google auth:", data);
                 requiresMfa.value = true;
                 sessionStorage.setItem('mfa_email', email);
                 return resolve({ success: false, requiresMfa: true });
@@ -279,8 +273,7 @@ export function useAuth() {
 
               resolve({ success: true, role: userRole });
             } catch (err: any) {
-              console.log("Google auth error:", err.response?.data);
-              
+
               if (
                 err.response?.data?.requiresMfa === true ||
                 err.response?.data?.message === 'MFA_REQUIRED' ||
@@ -288,7 +281,6 @@ export function useAuth() {
                 (Array.isArray(err.response?.data) && err.response.data.includes('MFA_REQUIRED')) ||
                 (err.response?.status === 401 && JSON.stringify(err.response?.data).includes('MFA_REQUIRED'))
               ) {
-                console.log("MFA required detected in Google auth error");
                 requiresMfa.value = true;
                 sessionStorage.setItem('mfa_email', email);
                 return resolve({ success: false, requiresMfa: true });

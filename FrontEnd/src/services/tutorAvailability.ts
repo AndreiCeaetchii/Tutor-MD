@@ -24,10 +24,8 @@ const removeTutorWithNoAvailability = (tutorId: number): void => {
 
 const requestStorageAccess = async () => {
   try {
-    // Request storage access if supported
     if (document.requestStorageAccess) {
       await document.requestStorageAccess();
-      console.log('Storage access granted');
     }
   } catch (error) {
     console.error('Storage access request failed:', error);
