@@ -64,8 +64,6 @@ public class AuthService : IAuthService
         {
             if (string.IsNullOrEmpty(mfaCode))
                 return Result<UserResponseDto>.Error("MFA_REQUIRED");
-            var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
-
 
             //  Decriptează cheia înainte
             var decryptedSecret = _mfaService.Decrypt(user.TwoFactorSecret);
