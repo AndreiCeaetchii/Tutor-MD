@@ -29,16 +29,68 @@
 </script>
 
 <template>
-  <nav class="flex items-center p-1 bg-white rounded-full shadow-sm overflow-x-auto">
+  <div class="flex p-2 mb-6 bg-gray-100 rounded-full navigation-bar">
     <router-link
       v-for="tab in tabs"
       :key="tab.name"
       :to="fullPath(tab.path)"
-      class="flex flex-1 items-center justify-center px-4 py-2 text-sm font-medium rounded-full transition-all"
-      :class="isActive(tab.path) ? 'bg-purple-500 text-white' : 'text-gray-700 hover:bg-gray-100'"
+      class="flex items-center justify-center flex-1 px-4 py-2 text-center transition-colors rounded-full"
+      :class="
+        isActive(tab.path)
+          ? 'bg-white shadow-sm text-purple-700'
+          : 'text-gray-600 hover:bg-purple-50'
+      "
     >
-      <span class="mr-2 text-base material-icons">{{ tab.icon }}</span>
-      <span>{{ tab.name }}</span>
+      <span class="mr-1 text-sm material-icons md:text-base md:mr-2">{{ tab.icon }}</span>
+      <span class="text-sm md:text-base">{{ tab.name }}</span>
     </router-link>
-  </nav>
+  </div>
 </template>
+
+<style scoped>
+  .navigation-bar {
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  button,
+  .router-link-active {
+    white-space: nowrap;
+    transition: all 0.3s ease;
+  }
+
+  .router-link-active {
+    color: #7e22ce;
+  }
+
+  button:hover,
+  a:hover {
+    color: #7e22ce;
+  }
+
+  button.bg-white,
+  a.bg-white {
+    color: #7e22ce;
+  }
+
+  @media (max-width: 640px) {
+    .navigation-bar {
+      justify-content: flex-start;
+      border-radius: 1rem;
+    }
+
+    a {
+      flex: 0 0 auto;
+    }
+  }
+</style>
