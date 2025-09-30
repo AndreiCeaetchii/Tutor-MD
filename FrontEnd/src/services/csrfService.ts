@@ -22,6 +22,7 @@ export const fetchCsrfToken = async (): Promise<string | null> => {
       },
       withCredentials: true,
     });
+        console.log('document.cookie (accessible cookies):', document.cookie);
 
     if (response.data && response.data.csrfToken) {
       const csrfToken = response.data.csrfToken;
