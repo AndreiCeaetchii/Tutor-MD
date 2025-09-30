@@ -17,7 +17,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1507003211169-0a6dd7228f2d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Michael Mueller">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="Michael Mueller">
               <div>
                 <h4 class="font-semibold text-gray-900">Michael Mueller</h4>
                 <p class="text-sm text-gray-500">5th Standard, Dubai UAE</p>

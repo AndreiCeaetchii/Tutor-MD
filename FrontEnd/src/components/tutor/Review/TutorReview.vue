@@ -201,7 +201,7 @@ const { bookingIdForReview, tutorName, subjectName, tutorPhoto, lessonDate, have
         <div v-else-if="reviews.length > 0" class="space-y-6">
           <ReviewCard v-for="review in reviews" :key="review.id" :review="review" />
         </div>
-        <div v-else class="text-center text-gray-500">Nu există recenzii pentru acest tutore.</div>
+        <div v-else class="text-center text-gray-500">There are no reviews for this tutor.</div>
       </div>
     </div>
   </div>

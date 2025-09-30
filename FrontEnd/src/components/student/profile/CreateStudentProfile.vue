@@ -259,8 +259,7 @@ const handleSubmit = async () => {
             </div>
             <div class="flex flex-col">
               <label for="class" class="mb-2 text-sm font-semibold text-gray-700"
-              >Current Grade</label
-              >
+              >Current School Year</label>
               <input
                 id="class"
                 v-model.number="form.class"
