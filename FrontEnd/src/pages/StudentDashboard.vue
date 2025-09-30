@@ -28,11 +28,13 @@
   <div class="min-h-screen bg-gray-50">
     <div class="p-4 mx-auto md:p-8 max-w-7xl">
       <div class="mb-6">
-        <h1 class="mb-2 text-2xl font-bold">Student Dashboard</h1>
-        <p class="text-gray-600">
-          Welcome to your dashboard! Here you can manage your sessions, view progress, and update
-          your profile.
-
+        <h1 class="mb-2 text-2xl font-bold md:text-3xl">
+          Welcome to your <span class="text-purple-600">Student Dashboard</span>
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 md:text-base">
+          Find the perfect <span class="font-semibold text-purple-600">tutor</span>, manage your 
+          <span class="font-semibold text-purple-600">learning sessions</span>, and track your 
+          <span class="font-semibold text-purple-600">educational progress</span> with ease.
         </p>
       </div>
 

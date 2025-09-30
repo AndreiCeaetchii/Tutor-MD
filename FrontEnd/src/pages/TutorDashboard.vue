@@ -26,10 +26,13 @@
   <div class="min-h-screen bg-gray-50">
     <div class="p-4 mx-auto md:p-8 max-w-7xl">
       <div class="mb-6">
-        <h1 class="mb-2 text-2xl font-bold">Tutor Dashboard</h1>
-        <p class="text-gray-600">
-          Welcome to your dashboard! Here you can manage your tutoring sessions, view student
-          progress, and update your profile.
+        <h1 class="mb-2 text-2xl font-bold md:text-3xl">
+          Welcome to your <span class="text-purple-600">Tutor Dashboard</span>
+        </h1>
+        <p class="mt-2 text-sm text-gray-600 md:text-base">
+          Manage your <span class="font-semibold text-purple-600">tutoring sessions</span>, track
+          <span class="font-semibold text-purple-600">student progress</span>, and customize your
+          <span class="font-semibold text-purple-600">professional profile</span> with ease.
         </p>
       </div>
 

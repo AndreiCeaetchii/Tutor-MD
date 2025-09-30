@@ -2,8 +2,10 @@
 import { ref, onMounted, computed } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
 import { getStudentBookings as getStudentBookingsAPI, cancelStudentBooking } from '../../../services/studentBookings';
+import { addBookingToGoogleCalendar } from '../../../services/tutorBookings.ts';
 
 const bookingStore = useBookingStore();
+declare const google: any;
 
 const loading = ref(false);
 const statusFilter = ref('all');
@@ -73,10 +75,43 @@ const cancelBooking = async (bookingId: number) => {
     await fetchStudentBookingsFromAPI();
   } catch (error) {
     console.error("Failed to cancel booking:", error);
-    alert(`Cancellation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   } finally {
     loading.value = false;
   }
+};
+
+const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
+  loading.value = true;
+
+  return new Promise((resolve, reject) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+
+      callback: async (response: any) => {
+
+        if (!response || !response.access_token) {
+          loading.value = false;
+          return reject(new Error('Google authorization failed or was canceled.'));
+        }
+
+        const accessToken = response.access_token;
+
+        try {
+          await addBookingToGoogleCalendar(bookingId, accessToken);
+          resolve();
+
+        } catch (err) {
+          console.error('Error adding to Google Calendar:', err);
+          reject(err);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+
+    tokenClient.requestAccessToken();
+  });
 };
 
 const mapStatusToString = (status: number): string => {
@@ -143,65 +178,67 @@ onMounted(async () => {
 
 <template>
   <div class="container px-4 py-6 mx-auto">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex border-b border-gray-200">
-        <button 
-          @click="statusFilter = 'all'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'all' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          All
-        </button>
-        <button 
-          @click="statusFilter = 'pending'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'pending' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Pending
-        </button>
-        <button 
-          @click="statusFilter = 'confirmed'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'confirmed' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Confirmed
-        </button>
-        <button 
-          @click="statusFilter = 'completed'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'completed' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Completed
-        </button>
-        <button 
-          @click="statusFilter = 'cancelled'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'cancelled' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Cancelled
-        </button>
-      </div>
+    <div class="mb-6 -mx-4 sm:mx-0">
+  <div class="overflow-x-auto hide-scrollbar">
+    <div class="flex px-4 border-b border-gray-200 min-w-max sm:px-0">
+      <button 
+        @click="statusFilter = 'all'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'all' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        All
+      </button>
+      <button 
+        @click="statusFilter = 'pending'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'pending' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Pending
+      </button>
+      <button 
+        @click="statusFilter = 'confirmed'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'confirmed' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Confirmed
+      </button>
+      <button 
+        @click="statusFilter = 'completed'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'completed' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Completed
+      </button>
+      <button 
+        @click="statusFilter = 'cancelled'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'cancelled' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Cancelled
+      </button>
     </div>
+  </div>
+</div>
 
     <div v-if="loading" class="flex justify-center mb-6">
       <div class="w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
@@ -245,15 +282,14 @@ onMounted(async () => {
           <div class="flex justify-end mt-4" v-if="booking.status === 'pending' || booking.status === 'confirmed'">
             <div class="flex gap-2">
               <button 
-                @click="cancelBooking(booking.id)" 
-                class="flex items-center px-4 py-2 text-red-700 transition-colors bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100"
+                @click="handleAddToGoogleCalendar(booking.id)"
+                class="flex items-center px-4 py-2 text-blue-700 transition-colors bg-blue-100 rounded-full shadow-sm hover:bg-blue-200"
               >
                 <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                Cancel
+                Add to Calendar
               </button>
-              
               <button 
                 class="flex items-center px-4 py-2 text-purple-700 transition-colors bg-purple-100 rounded-full shadow-sm hover:bg-purple-200"
               >
@@ -261,6 +297,16 @@ onMounted(async () => {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                 </svg>
                 Chat
+              </button>
+              
+              <button 
+                @click="cancelBooking(booking.id)" 
+                class="flex items-center px-4 py-2 text-red-700 transition-colors bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100"
+              >
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Cancel
               </button>
             </div>
           </div>
@@ -307,5 +353,14 @@ onMounted(async () => {
 
 .btn-chat:hover {
   background-color: #e9d5ff;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 </style>

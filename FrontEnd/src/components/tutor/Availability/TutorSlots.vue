@@ -286,10 +286,10 @@ const editSlot = (slot: any) => {
 </script>
 
 <template>
-  <div class="p-6 bg-white shadow-lg rounded-2xl">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex items-center">
-        <h2 class="text-xl font-semibold text-gray-800">
+  <div class="p-3 bg-white shadow-lg sm:p-4 md:p-6 rounded-2xl">
+    <div class="flex flex-col justify-between mb-3 sm:flex-row sm:items-center sm:mb-6">
+      <div class="mb-3 sm:mb-0">
+        <h2 class="text-base font-semibold text-gray-800 sm:text-lg md:text-xl">
           Time slots for {{ store.formattedDate }}
         </h2>
       </div>
@@ -297,7 +297,7 @@ const editSlot = (slot: any) => {
         v-if="!isViewingAsStudent"
         @click="openAddSlotModal"
         :disabled="loading"
-        class="flex items-center px-4 py-2 text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        class="inline-flex self-start items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm text-white transition-colors bg-orange-500 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span class="mr-1">+</span>
         Add Time Slot
@@ -327,23 +327,23 @@ const editSlot = (slot: any) => {
     </div>
     
     <div v-else class="max-h-[400px] overflow-y-auto pr-1">
-      <div class="space-y-4">
+      <div class="space-y-2 sm:space-y-3">
         <div 
           v-for="slot in store.slots" 
           :key="slot.id"
-          class="flex items-center justify-between p-4 transition-colors rounded-lg bg-gray-50 hover:bg-gray-100"
+          class="flex items-center justify-between p-2 transition-colors rounded-lg sm:p-3 bg-gray-50 hover:bg-gray-100"
         >
           <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 mr-1 text-gray-400 sm:w-3.5 sm:h-3.5 sm:mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="text-lg font-medium">{{ slot.startTime }} - {{ slot.endTime }}</span>
+            <span class="text-xs font-medium sm:text-sm md:text-base">{{ slot.startTime }} - {{ slot.endTime }}</span>
           </div>
           
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center gap-1 sm:gap-2">
             <span 
               :class="[
-                'px-3 py-1 text-sm font-medium rounded-full',
+                'px-1.5 py-0.5 text-xs font-medium rounded-full whitespace-nowrap sm:px-2 sm:py-0.5 sm:text-xs',
                 slot.activeStatus === true ? 
                   (isViewingAsStudent && currentUserName === slot.studentName ? 'bg-green-100 text-green-800' : 
                   (slot.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')) 
@@ -353,17 +353,11 @@ const editSlot = (slot: any) => {
               <span v-if="slot.activeStatus === true">
                 <span v-if="isViewingAsStudent && currentUserName === slot.studentName">
                   <template v-if="slot.status === 'completed'">Done</template>
-                  <template v-else>Booked by You</template>
+                  <template v-else>Booked</template>
                 </span>
-                <span v-else-if="slot.status === 'completed'">
-                  Done
-                </span>
-                <span v-else-if="isViewingAsStudent">
-                  Reserved
-                </span>
-                <span v-else>
-                  Booked by - {{ slot.studentName || 'Student' }}
-                </span>
+                <span v-else-if="slot.status === 'completed'">Done</span>
+                <span v-else-if="isViewingAsStudent">Reserved</span>
+                <span v-else class="text-xs">Booked</span>
               </span>
               <span v-else>Available</span>
             </span>
@@ -372,19 +366,19 @@ const editSlot = (slot: any) => {
               v-if="isViewingAsStudent && slot.activeStatus === false"
               @click="openBookingModal(slot)"
               :disabled="loading"
-              class="px-4 py-1 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-2 py-0.5 text-xs font-medium text-white bg-purple-600 rounded sm:text-xs sm:rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Book
             </button>
 
-            <template v-if="!isViewingAsStudent">
+            <div v-if="!isViewingAsStudent" class="flex items-center">
               <button 
                 v-if="slot.activeStatus === false || slot.status === 'completed'"
                 @click="editSlot(slot)" 
                 :disabled="loading || slot.status === 'completed'"
-                class="flex items-center justify-center w-10 h-10 text-gray-600 rounded-full hover:bg-white hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex items-center justify-center w-6 h-6 text-gray-600 rounded-full sm:w-8 sm:h-8 hover:bg-white hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
               </button>
@@ -393,13 +387,13 @@ const editSlot = (slot: any) => {
                 v-if="slot.activeStatus === false || slot.status === 'completed'"
                 @click="deleteSlot(slot.id)" 
                 :disabled="loading || slot.status === 'completed'"
-                class="flex items-center justify-center w-10 h-10 text-gray-600 bg-red-100 rounded-full hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex items-center justify-center w-6 h-6 ml-1 text-gray-600 bg-red-100 rounded-full sm:w-8 sm:h-8 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
-            </template>
+            </div>
           </div>
         </div>
       </div>

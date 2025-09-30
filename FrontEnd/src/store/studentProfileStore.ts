@@ -82,7 +82,7 @@ export const useStudentProfileStore = defineStore('studentProfile', {
       this.isLoading = true;
 
       try {
-        const studentProfile = await getStudentProfile();
+        const studentProfile = await getStudentProfile(userStore.userId);
 
         if (studentProfile && studentProfile.userProfile) {
           this.userProfile.firstName = studentProfile.userProfile.firstName || '';

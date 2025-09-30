@@ -2,6 +2,9 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 library.add(faArrowRight);
 </script>
@@ -27,6 +30,7 @@ library.add(faArrowRight);
       
       <div>
         <button
+          @click="router.push('/landing')"
           type="button"
           class="w-64 py-3.5 bg-gradient-to-r from-[#5f22d9] to-[#2c016d] text-white font-semibold rounded-full text-center transition-all hover:shadow-lg group flex items-center justify-center gap-2"
         >

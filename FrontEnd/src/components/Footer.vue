@@ -18,17 +18,17 @@ library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
             Connecting students and tutors worldwide for personalized, effective learning experiences.
           </p>
           <div class="space-y-2 text-sm">
-            <a href="mailto:support@tutorconnect.com" class="flex items-center space-x-2 hover:text-[#5f22d9] transition-colors">
+            <a href="mailto:tutormd.online@gmail.com" class="flex items-center space-x-2 hover:text-[#5f22d9] transition-colors">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
-              <span>support@tutorconnect.com</span>
+              <span>tutormd.online@gmail.com</span>
             </a>
             <a href="tel:1-800-TUTOR-99" class="flex items-center space-x-2 transition-colors hover:text-[#5f22d9]">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.774a11.01 11.01 0 005.885 5.885l.774-1.548a1 1 0 011.06-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-              <span>1-800-TUTOR-99</span>
+              <span>0-780-TUTOR-99</span>
             </a>
             <div class="flex items-center space-x-2">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
-              <span>San Francisco, CA</span>
+              <span>Chisinau, Moldova</span>
             </div>
           </div>
         </div>
