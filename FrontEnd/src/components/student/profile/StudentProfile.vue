@@ -1,78 +1,94 @@
 <script setup lang="ts">
-  import { ref, watch, reactive, onMounted } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
-  import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
-  import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
-  import defaultProfileImage from '../../../assets/DefaultImg.png';
-  import { useRouter } from 'vue-router';
+import { ref, watch, reactive, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useStudentProfileStore } from '../../../store/studentProfileStore.ts';
+import { updateStudentProfile, getStudentProfile } from '../../../services/studentService.ts';
+import ProfilePhotoUpload from '../../../components/tutor/Profile/ProfileImageUploader.vue';
+import defaultProfileImage from '../../../assets/DefaultImg.png';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '../../../store/userStore.ts';
   
 
-  const studentStore = useStudentProfileStore();
+const studentStore = useStudentProfileStore();
 
-  const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
+const { grade, class: studentClass, userProfile, photo } = storeToRefs(studentStore);
 
-  const isEditing = ref(false);
-  const showSuccess = ref(false);
+const isEditing = ref(false);
+const showSuccess = ref(false);
 
-  const router = useRouter();
+const router = useRouter();
 
-  const profile = reactive({
-    firstName: userProfile.value?.firstName || '',
-    lastName: userProfile.value?.lastName || '',
-    phone: userProfile.value?.phone || '',
-    bio: userProfile.value?.bio || '',
-    city: userProfile.value?.city || '',
-    country: userProfile.value?.country || '',
-    grade: grade.value || 0,
-    class: studentClass.value || 0,
-    profileImage: photo.value || defaultProfileImage,
-    username: userProfile.value?.username || '',
-  });
+const profile = reactive({
+  firstName: userProfile.value?.firstName || '',
+  lastName: userProfile.value?.lastName || '',
+  phone: userProfile.value?.phone || '',
+  bio: userProfile.value?.bio || '',
+  city: userProfile.value?.city || '',
+  country: userProfile.value?.country || '',
+  grade: grade.value || 0,
+  class: studentClass.value || 0,
+  profileImage: photo.value || defaultProfileImage,
+  username: userProfile.value?.username || '',
+});
 
-  let originalProfile: any = null;
+let originalProfile: any = null;
 
-  const initializeProfile = async () => {
-    if (!userProfile.value?.firstName || !userProfile.value?.birthdate) {
-      try {
-        const serverProfile = await getStudentProfile();
+const initializeProfile = async () => {
+  if (!userProfile.value?.firstName || !userProfile.value?.birthdate) {
+    try {
+      const userIdFromUrl = router.currentRoute.value.params.id ? Number(router.currentRoute.value.params.id) : Number(useUserStore().userId);
+      const serverProfile = await getStudentProfile(String(userIdFromUrl));
 
-        studentStore.updateUserProfile(serverProfile.userProfile);
-        studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
-        studentStore.setPhoto(serverProfile.photo.url || '');
+      studentStore.updateUserProfile(serverProfile.userProfile);
+      studentStore.updateGradeAndClass(serverProfile.grade, serverProfile.class);
+      studentStore.setPhoto(serverProfile.photo.url || '');
 
-        syncProfileWithStore();
-      } catch (error) {
-        console.error('Failed to load student profile from server:', error);
-      }
-    } else {
       syncProfileWithStore();
+    } catch (error) {
+      console.error('Failed to load student profile from server:', error);
     }
-  };
+  } else {
+    syncProfileWithStore();
+  }
+};
 
-  const syncProfileWithStore = () => {
-    profile.firstName = userProfile.value?.firstName || '';
-    profile.lastName = userProfile.value?.lastName || '';
-    profile.phone = userProfile.value?.phone || '';
-    profile.bio = userProfile.value?.bio || '';
-    profile.city = userProfile.value?.city || '';
-    profile.country = userProfile.value?.country || '';
-    profile.grade = grade.value || 0;
-    profile.class = studentClass.value || 0;
-    profile.username = userProfile.value?.username || '';
-    profile.profileImage = photo.value || defaultProfileImage;
-  };
+const syncProfileWithStore = () => {
+  profile.firstName = userProfile.value?.firstName || '';
+  profile.lastName = userProfile.value?.lastName || '';
+  profile.phone = userProfile.value?.phone || '';
+  profile.bio = userProfile.value?.bio || '';
+  profile.city = userProfile.value?.city || '';
+  profile.country = userProfile.value?.country || '';
+  profile.grade = grade.value || 0;
+  profile.class = studentClass.value || 0;
+  profile.username = userProfile.value?.username || '';
+  profile.profileImage = photo.value || defaultProfileImage;
+};
 
   onMounted(initializeProfile);
 
   const handleSave = async () => {
+  // Format the birthdate properly for the backend
+  let formattedBirthdate = userProfile.value.birthdate;
+  
+  // If the birthdate is not in the correct format, format it
+  if (formattedBirthdate && !formattedBirthdate.includes('T00:00:00')) {
+    // Ensure we have a valid date format before processing
+    const parsedDate = new Date(formattedBirthdate);
+    if (!isNaN(parsedDate.getTime())) {
+      const yyyy = parsedDate.getFullYear();
+      const mm = String(parsedDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(parsedDate.getDate()).padStart(2, '0');
+      formattedBirthdate = `${yyyy}-${mm}-${dd}T00:00:00`;
+    }
+  }
     const payload = {
       username: profile.username,
       phone: profile.phone,
       firstName: profile.firstName || '',
       lastName: profile.lastName || '',
       bio: profile.bio,
-      birthdate: userProfile.value.birthdate,
+      birthdate: formattedBirthdate,
       grade: profile.grade,
       class: profile.class,
       city: profile.city,
@@ -87,6 +103,7 @@
         lastName: profile.lastName || '',
         phone: profile.phone,
         bio: profile.bio,
+        birthdate: formattedBirthdate,
         city: profile.city,
         country: profile.country,
         username: profile.username,
