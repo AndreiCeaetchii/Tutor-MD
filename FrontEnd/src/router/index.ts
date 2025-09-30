@@ -6,7 +6,7 @@ import LandingPage from '../pages/LandingPage.vue';
 import TutorDashboard from '../pages/TutorDashboard.vue';
 import StudentDashboard from '../pages/StudentDashboard.vue';
 
-import StudentProfile from '../components/student/Profile/StudentProfile.vue';
+import StudentProfile from '../components/student/profile/StudentProfile.vue';
 import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
 import TutorChat from '../components/tutor/Chat/TutorChat.vue';
@@ -15,7 +15,7 @@ import TutorAvailability from '../components/tutor/Availability/TutorAvailabilit
 import ProfilePage from '../pages/ProfilePage.vue';
 
 import CreateProfile from '../components/tutor/Profile/CreateProfile.vue';
-import CreateStudentProfile from '../components/student/Profile/CreateStudentProfile.vue';
+import CreateStudentProfile from '../components/student/profile/CreateStudentProfile.vue';
 
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
