@@ -18,6 +18,7 @@
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
               <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Andrei Ionescu">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="Michael Mueller">
               <div>
                 <h4 class="font-semibold text-gray-900">Andrei Ionescu</h4>
                 <p class="text-sm text-gray-500">10th Grade, Cluj-Napoca</p>

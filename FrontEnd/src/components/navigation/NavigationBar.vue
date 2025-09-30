@@ -7,8 +7,8 @@
   const route = useRoute();
 
   const tutorTabs = [
-    { name: 'Availability', icon: 'calendar_month', path: '/tutor-dashboard/availability' },
     { name: 'Profile', icon: 'person', path: '/tutor-dashboard/profile' },
+    { name: 'Availability', icon: 'calendar_month', path: '/tutor-dashboard/availability' },
     { name: 'Bookings', icon: 'book', path: '/tutor-dashboard/bookings' },
     { name: 'Reviews', icon: 'star', path: '/tutor-dashboard/reviews' },
     { name: 'Messages', icon: 'chat', path: '/tutor-dashboard/messages' },

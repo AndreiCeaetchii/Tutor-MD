@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useBookingStore } from '../../../store/bookingStore';
-import { getTutorBookings, updateBookingStatus } from '../../../services/tutorBookings';
+import { getTutorBookings, updateBookingStatus, addBookingToGoogleCalendar } from '../../../services/tutorBookings';
 
 const bookingStore = useBookingStore();
 const statusFilter = ref('all');
@@ -191,6 +191,54 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
   const pad = (n: number) => n.toString().padStart(2, '0');
   return `${pad(startHour)}:${pad(startMinute)} - ${pad(endHour)}:${pad(endMinute)} ${duration ? `(${duration})` : ''}`;
 }
+
+declare const google: any;
+
+const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
+  loading.value = true;
+
+  return new Promise((resolve, reject) => {
+    const tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
+      scope: 'https://www.googleapis.com/auth/calendar.events',
+
+      callback: async (response: any) => {
+        if (!response || !response.access_token) {
+          loading.value = false;
+
+          notificationMessage.value = 'Adding to calendar was canceled or failed.';
+          notificationType.value = 'error';
+          showNotification.value = true;
+          return reject(new Error('Google authorization failed or was canceled.'));
+        }
+
+        const accessToken = response.access_token;
+
+        try {
+          await addBookingToGoogleCalendar(bookingId, accessToken);
+
+          notificationMessage.value = 'Booking added to Google Calendar successfully.';
+          notificationType.value = 'success';
+          showNotification.value = true;
+          resolve();
+
+        } catch (err) {
+          console.error('Error adding to Google Calendar:', err);
+
+          notificationMessage.value = 'Failed to add booking to Google Calendar.';
+          notificationType.value = 'error';
+          showNotification.value = true;
+          reject(err);
+        } finally {
+          loading.value = false;
+        }
+      },
+    });
+
+    tokenClient.requestAccessToken();
+  });
+};
+
 </script>
 
 <template>
@@ -263,15 +311,15 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
 
     <div v-if="!loading && filteredBookings.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-400">
       <div class="flex items-center justify-center w-24 h-24 mb-4 border-4 border-gray-200 rounded-full">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  </div>
-  <p class="text-lg font-medium text-gray-500">No bookings found</p>
-  <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
-  <p v-else class="mt-2 text-gray-400">Your booking history will appear here once you schedule sessions with students</p>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p class="text-lg font-medium text-gray-500">No bookings found</p>
+      <p v-if="statusFilter !== 'all'" class="mt-2 text-gray-400">Try changing the filter</p>
+      <p v-else class="mt-2 text-gray-400">Your booking history will appear here once you schedule sessions with students</p>
     </div>
-
+    
     <div v-else class="space-y-4">
       <div 
         v-for="booking in filteredBookings" 
@@ -320,18 +368,25 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
         <p class="py-2 mb-3 text-sm text-gray-700 border-gray-100 sm:mb-4 sm:text-base border-y">
           {{ booking.message }}
         </p>
-
+        
         <div class="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
           <div></div>
           <div class="flex flex-wrap justify-end w-full gap-2 sm:w-auto">
             <template v-if="booking.status === 'pending'">
-              <button 
-                @click="handleReject(booking.id)" 
-                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+              <button
+                @click="handleAddToGoogleCalendar(booking.id)"
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-blue-700 bg-blue-100 border border-blue-300 rounded-full hover:bg-blue-200"
                 :disabled="loading"
               >
-                <span class="mr-1 text-xs text-red-500 material-icons sm:text-sm">close</span>
-                Reject
+                <span class="mr-1 text-xs material-icons sm:text-sm">event</span>
+                Add to Calendar
+              </button>
+              <button
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
+                @click="$emit('openChat', booking.studentName)"
+              >
+                <span class="mr-1 text-sm material-icons">chat</span>
+                Chat
               </button>
               <button 
                 @click="handleAccept(booking.id)" 
@@ -341,8 +396,31 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
                 <span class="mr-1 text-xs material-icons sm:text-sm">check</span>
                 Accept
               </button>
+              <button 
+                @click="handleReject(booking.id)" 
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-700 border border-gray-300 rounded-full hover:bg-gray-100"
+                :disabled="loading"
+              >
+                <span class="mr-1 text-xs text-red-500 material-icons sm:text-sm">close</span>
+                Reject
+              </button>
             </template>
             <template v-if="booking.status === 'confirmed'">
+              <button
+                @click="handleAddToGoogleCalendar(booking.id)"
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-blue-700 bg-blue-100 border border-blue-300 rounded-full hover:bg-blue-200"
+                :disabled="loading"
+              >
+                <span class="mr-1 text-xs material-icons sm:text-sm">event</span>
+                Add to Calendar
+              </button>
+              <button
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
+                @click="$emit('openChat', booking.studentName)"
+              >
+                <span class="mr-1 text-sm material-icons">chat</span>
+                Chat
+              </button>
               <button 
                 @click="handleMarkComplete(booking.id)" 
                 class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm text-white bg-blue-600 rounded-full hover:bg-blue-700"
@@ -352,13 +430,15 @@ function formatTimeInterval(startTime?: string, endTime?: string, duration?: str
                 Mark Complete
               </button>
             </template>
-            <button
-              class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
-              @click="$emit('openChat', booking.studentName)"
-            >
-              <span class="mr-1 text-sm material-icons">chat</span>
-              Chat
-            </button>
+            <template v-if="booking.status === 'completed' || booking.status === 'cancelled'">
+              <button
+                class="flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold text-purple-700 bg-purple-100 border border-purple-300 rounded-full hover:bg-purple-200 transition"
+                @click="$emit('openChat', booking.studentName)"
+              >
+                <span class="mr-1 text-sm material-icons">chat</span>
+                Chat
+              </button>
+            </template>
           </div>
         </div>
       </div>

@@ -1,351 +1,238 @@
 <script setup lang="ts">
-  import { ref, watch, computed } from 'vue';
-  import DropdownSelect from './DropdownSelect.vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { faTimes } from '@fortawesome/free-solid-svg-icons';
-  import { createTutorProfile } from '../../../services/tutorService.ts';
-  import type {
-    Subject,
-    TutorProfileData,
-    CreateProfileDto,
-  } from '../../../services/tutorService.ts';
-  import { useRouter } from 'vue-router';
-  import AlertMessage from '../../../components/ui/AlertMessage.vue';
+import { ref, watch, computed } from 'vue';
+import DropdownSelect from './DropdownSelect.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { createTutorProfile } from '../../../services/tutorService.ts';
+import type {
+  Subject,
+  TutorProfileData,
+  CreateProfileDto,
+} from '../../../services/tutorService.ts';
+import { useRouter } from 'vue-router';
 
-  library.add(faTimes);
+library.add(faTimes);
 
-  const router = useRouter();
-  
-  const showAlert = ref(false);
-  const alertMessage = ref('');
-  const alertType = ref('success');
+const router = useRouter();
 
-  type SubjectForm = {
-    subjectName: string;
-    pricePerHour: number | string;
-    currency: string;
-  };
+const form = ref({
+  firstName: '',
+  lastName: '',
+  username: '',
+  phone: '',
+  country: '',
+  city: '',
+  experienceYears: null as number | null,
+  subjects: [] as { subjectName: string; pricePerHour: number | null; currency: string }[],
+  languages: [] as string[],
+  teachingPreferences: {
+    myHome: false,
+    studentHome: false,
+    online: false,
+  },
+  bio: '',
+});
 
-  const form = ref({
-    firstName: '',
-    lastName: '',
-    username: '',
-    phone: '',
-    birthdate: '',
-    country: '',
-    city: '',
-    experienceYears: '',
-    subjects: [] as SubjectForm[],
-    languages: [] as string[],
-    teachingPreferences: {
-      myHome: false,
-      studentHome: false,
-      online: false,
-    },
-    bio: '',
+const birthDay = ref<number | null>(null);
+const birthMonth = ref<number | null>(null);
+const birthYear = ref<number | null>(null);
+
+const currentYear = new Date().getFullYear();
+const minYear = 1930;
+const maxYear = currentYear - 18;
+
+const allLanguages = ['English', 'French', 'Spanish', 'German', 'Italian', 'Romanian'];
+const allSubjects = [
+  'Mathematics',
+  'English',
+  'Science',
+  'Physics',
+  'Chemistry',
+  'Biology',
+  'Geography',
+  'History',
+  'Foreign languages',
+  'German',
+  'French',
+  'Russian',
+  'Spanish',
+  'Italian',
+  'Computer science',
+  'Economics',
+  'Philosophy',
+  'Psychology',
+  'Sociology',
+  'Physical Education',
+  'Health Education',
+  'Drawing',
+  'Music',
+  'Astronomy',
+  'Literature',
+  'Creative Writing',
+  'Statistics',
+];
+
+const attemptedSubmit = ref(false);
+
+const enforceMax = (val: number | null, maxLimit: number, targetRef: any) => {
+  if (val === null) return;
+  if (val > maxLimit) {
+    targetRef.value = maxLimit;
+  }
+};
+
+watch(birthDay, (newVal) => enforceMax(newVal, 31, birthDay));
+watch(birthMonth, (newVal) => enforceMax(newVal, 12, birthMonth));
+watch(birthYear, (newVal) => enforceMax(newVal, maxYear, birthYear));
+
+const MAX_EXPERIENCE_YEARS = 50;
+watch(() => form.value.experienceYears, (newVal) => enforceMax(newVal, MAX_EXPERIENCE_YEARS, form.value.experienceYears));
+
+watch(() => form.value.subjects, (newSubjects) => {
+  newSubjects.forEach(subject => {
+    if (subject.pricePerHour !== null && subject.pricePerHour < 0) {
+      subject.pricePerHour = 0;
+    }
   });
+}, { deep: true });
 
-  const allLanguages = ['English', 'French', 'Spanish', 'German', 'Italian', 'Romanian'];
-  const allSubjects = [
-    'Mathematics',
-    'English',
-    'Science',
-    'Physics',
-    'Chemistry',
-    'Biology',
-    'Geography',
-    'History',
-    'Foreign languages',
-    'German',
-    'French',
-    'Russian',
-    'Spanish',
-    'Italian',
-    'Computer science',
-    'Economics',
-    'Philosophy',
-    'Psychology',
-    'Sociology',
-    'Physical Education',
-    'Health Education',
-    'Drawing',
-    'Music',
-    'Astronomy',
-    'Literature',
-    'Creative Writing',
-    'Statistics',
-  ];
+const availableLanguages = computed(() => {
+  return allLanguages.filter((lang) => !form.value.languages.includes(lang));
+});
 
-  const birthDay = ref<number | null>(null);
-  const birthMonth = ref<number | null>(null);
-  const birthYear = ref<number | null>(null);
+const availableSubjects = computed(() => {
+  const selectedSubjects = form.value.subjects.map((s) => s.subjectName);
+  return allSubjects.filter((subject) => !selectedSubjects.includes(subject));
+});
 
-  const currentYear = new Date().getFullYear();
-  const minYear = 1930;
-  const maxYear = currentYear - 18;
+const isCountryInvalid = computed(() => attemptedSubmit.value && !form.value.country);
+const isCityInvalid = computed(() => attemptedSubmit.value && !form.value.city);
+const isExperienceInvalid = computed(() => attemptedSubmit.value && (form.value.experienceYears === null || form.value.experienceYears < 0));
+const isSubjectsEmpty = computed(() => attemptedSubmit.value && form.value.subjects.length === 0);
+const areSubjectsPricesInvalid = computed(() => attemptedSubmit.value && form.value.subjects.some(s => s.pricePerHour === null || s.pricePerHour <= 0));
+const isLanguageInvalid = computed(() => attemptedSubmit.value && form.value.languages.length === 0);
+const isTeachingLocationInvalid = computed(() => attemptedSubmit.value && workingLocationId.value === 0);
 
-  const teachingLocationError = ref('');
-  const birthDateError = ref('');
-  const phoneError = ref('');
-  const phonePattern = /^\+[0-9]{1,4}[0-9]{6,14}$/;
+const addLanguage = (language: string) => {
+  if (language && !form.value.languages.includes(language)) {
+    form.value.languages.push(language);
+  }
+};
 
-  const validatePhone = () => {
-    phoneError.value = '';
-    
-    if (!form.value.phone) {
-      phoneError.value = 'Phone number is required';
-      return false;
-    }
-    
-    if (!phonePattern.test(form.value.phone)) {
-      phoneError.value = 'Please enter a valid phone number (e.g., +37360000000)';
-      return false;
-    }
-    
-    return true;
-  };
-  
-  const validateAge = () => {
-    birthDateError.value = '';
-    
-    if (birthYear.value && birthMonth.value && birthDay.value) {
-      const birthDate = new Date(birthYear.value, birthMonth.value - 1, birthDay.value);
-      const today = new Date();
-      const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-      
-      if (birthDate > minAgeDate) {
-        birthDateError.value = 'You must be at least 18 years old to register as a tutor';
-        return false;
-      }
-      
-      const isValidDate = birthDate.getFullYear() === birthYear.value &&
-                          birthDate.getMonth() === birthMonth.value - 1 &&
-                          birthDate.getDate() === birthDay.value;
-                          
-      if (!isValidDate) {
-        birthDateError.value = 'Please enter a valid date';
-        return false;
-      }
-    }
-    
-    return true;
-  };
+const removeLanguage = (language: string) => {
+  form.value.languages = form.value.languages.filter((lang) => lang !== language);
+};
 
-  watch([birthDay, birthMonth, birthYear], () => {
-    validateAge();
-  }, { deep: true });
+const cities = computed(() => {
+  if (form.value.country === 'Romania') {
+    return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
+  } else if (form.value.country === 'Moldova') {
+    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Strășeni', 'Orhei'];
+  } else if (form.value.country === 'Italy') {
+    return ['Rome', 'Milan', 'Florence', 'Naples', 'Turin'];
+  } else if (form.value.country === 'Germany') {
+    return ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne'];
+  } else if (form.value.country === 'England') {
+    return ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds'];
+  }
+  return [];
+});
 
-  const availableLanguages = computed(() => {
-    return allLanguages.filter((lang) => !form.value.languages.includes(lang));
+const addNewSubject = (subjectName: string) => {
+  form.value.subjects.push({
+    subjectName: subjectName,
+    pricePerHour: null,
+    currency: 'MDL',
   });
+};
 
-  const availableSubjects = computed(() => {
-    const selectedSubjects = form.value.subjects.map((s) => s.subjectName);
-    return allSubjects.filter((subject) => !selectedSubjects.includes(subject));
-  });
+const removeSubject = (index: number) => {
+  form.value.subjects.splice(index, 1);
+};
 
-  const addLanguage = (language: string) => {
-    if (language && !form.value.languages.includes(language)) {
-      form.value.languages.push(language);
-    }
+watch(
+  () => form.value.country,
+  () => {
+    form.value.city = '';
+  },
+);
+
+const workingLocationId = computed(() => {
+  const { myHome, studentHome, online } = form.value.teachingPreferences;
+
+  if (myHome && online && studentHome) return 7;
+  if (myHome && online) return 4;
+  if (myHome && studentHome) return 5;
+  if (online && studentHome) return 6;
+  if (myHome) return 1;
+  if (online) return 2;
+  if (studentHome) return 3;
+
+  return 0;
+});
+
+const handleSubmit = async () => {
+  attemptedSubmit.value = true;
+
+  const pad = (num: number | null) => (num !== null ? String(num).padStart(2, '0') : '');
+
+  const yyyy = birthYear.value;
+  const mm = pad(birthMonth.value);
+  const dd = pad(birthDay.value);
+
+  if (!yyyy || !mm || !dd) {
+    return;
+  }
+
+  if (
+    isCountryInvalid.value ||
+    isCityInvalid.value ||
+    isExperienceInvalid.value ||
+    isSubjectsEmpty.value ||
+    areSubjectsPricesInvalid.value ||
+    isLanguageInvalid.value ||
+    isTeachingLocationInvalid.value
+  ) {
+    return;
+  }
+
+  const finalBirthdate = `${yyyy}-${mm}-${dd}`;
+  const birthdateFormatted = finalBirthdate ? `${finalBirthdate}T00:00:00` : '';
+
+  const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
+    subjectName: subject.subjectName,
+    subjectSlug: subject.subjectName.toLowerCase().replace(/\s/g, '-').replace(/[^\w-]+/g, ''),
+    pricePerHour: parseFloat(subject.pricePerHour!.toString()),
+    currency: 'MDL',
+  }));
+
+  const profileDto: CreateProfileDto = {
+    phone: form.value.phone,
+    username: form.value.username,
+    firstName: form.value.firstName,
+    lastName: form.value.lastName,
+    bio: form.value.bio.substring(0, 400),
+    birthdate: birthdateFormatted,
+    country: form.value.country,
+    city: form.value.city,
   };
 
-  const removeLanguage = (language: string) => {
-    form.value.languages = form.value.languages.filter((lang) => lang !== language);
+  const payload: TutorProfileData = {
+    verificationStatus: 'Pending',
+    experienceYears: form.value.experienceYears!,
+    subjects: subjectsPayload,
+    createProfileDto: profileDto,
+    workingLocation: workingLocationId.value,
+    languages: form.value.languages,
   };
 
-  const cities = computed(() => {
-    if (form.value.country === 'Romania') {
-      return ['Bucharest', 'Cluj-Napoca', 'Iași'];
-    } else if (form.value.country === 'Moldova') {
-      return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Strășeni'];
-    } else if (form.value.country === 'Italy') {
-      return ['Rome', 'Milan', 'Florence'];
-    } else if (form.value.country === 'Germany') {
-      return ['Berlin', 'Munich', 'Hamburg'];
-    } else if (form.value.country === 'England') {
-      return ['London', 'Manchester', 'Birmingham'];
-    }
-    return [];
-  });
-
-  const addNewSubject = (subjectName: string) => {
-    form.value.subjects.push({
-      subjectName: subjectName,
-      pricePerHour: '',
-      currency: 'MDL',
-    });
-  };
-
-  const removeSubject = (index: number) => {
-    form.value.subjects.splice(index, 1);
-  };
-
-  watch(
-    () => form.value.country,
-    () => {
-      form.value.city = '';
-    },
-  );
-
-  const workingLocationId = computed(() => {
-    const { myHome, studentHome, online } = form.value.teachingPreferences;
-
-    if (myHome && online && studentHome) return 7;
-    if (myHome && online) return 4;
-    if (myHome && studentHome) return 5;
-    if (online && studentHome) return 6;
-    if (myHome) return 1;
-    if (online) return 2;
-    if (studentHome) return 3;
-
-    return 0;
-  });
-
-  const closeAlert = () => {
-    showAlert.value = false;
-  };
-
-  const validatePhoneInput = () => {
-    if (!form.value.phone) {
-      phoneError.value = 'Phone number is required';
-    } else if (!phonePattern.test(form.value.phone)) {
-      phoneError.value = 'Please enter a valid phone number (e.g., +37360000000)';
-    } else {
-      phoneError.value = '';
-    }
-  };
-  
-  const clearPhoneError = () => {
-    if (phoneError.value) phoneError.value = '';
-  };
-  
-  const validateBirthdateInputs = () => {
-    validateAge();
-  };
-  
-  const clearBirthdateError = () => {
-    if (birthDateError.value) birthDateError.value = '';
-  };
-  
-  const validateTeachingLocations = () => {
-    const { myHome, studentHome, online } = form.value.teachingPreferences;
-    if (myHome || studentHome || online) {
-      teachingLocationError.value = '';
-    } else {
-      teachingLocationError.value = 'Please select at least one teaching location';
-    }
-  };
-  
-  watch(
-    () => [form.value.teachingPreferences.myHome, form.value.teachingPreferences.studentHome, form.value.teachingPreferences.online], 
-    validateTeachingLocations
-  );
-
-  const bioCharacterCount = computed(() => {
-    return form.value.bio.length;
-  });
-  
-  const bioLimitReached = computed(() => {
-    return bioCharacterCount.value >= 200;
-  });
-  
-  const limitBioText = () => {
-    if (form.value.bio.length > 200) {
-      form.value.bio = form.value.bio.substring(0, 200);
-    }
-  };
-
-  const handleSubmit = async () => {
-    teachingLocationError.value = '';
-    birthDateError.value = '';
-    phoneError.value = '';
-    
-    const isPhoneValid = validatePhone();
-    const isAgeValid = validateAge();
-    
-    const { myHome, studentHome, online } = form.value.teachingPreferences;
-    const isTeachingLocationValid = myHome || studentHome || online;
-    
-    if (!isTeachingLocationValid) {
-      teachingLocationError.value = 'Please select at least one teaching location';
-      document.getElementById('teachingLocations')?.scrollIntoView({ behavior: 'smooth' });
-    }
-    
-    if (form.value.subjects.length === 0) {
-      alertMessage.value = 'Please add at least one subject';
-      alertType.value = 'error';
-      showAlert.value = true;
-      document.querySelector('.subjects-section')?.scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    
-    if (!isPhoneValid || !isAgeValid || !isTeachingLocationValid) {
-      if (!isAgeValid) {
-        document.getElementById('birthdate-section')?.scrollIntoView({ behavior: 'smooth' });
-      }
-      return;
-    }
-    
-    const pad = (num: number | null) => (num !== null ? String(num).padStart(2, '0') : '');
-
-    const yyyy = birthYear.value;
-    const mm = pad(birthMonth.value);
-    const dd = pad(birthDay.value);
-
-    if (!yyyy || !mm || !dd) {
-      console.error('Birthdate is incomplete.');
-      return;
-    }
-
-    const finalBirthdate = `${yyyy}-${mm}-${dd}`;
-    const birthdateFormatted = finalBirthdate ? `${finalBirthdate}T00:00:00` : '';
-
-    const subjectsPayload: Subject[] = form.value.subjects.map((subject) => ({
-      subjectName: subject.subjectName,
-      subjectSlug: 'default-slug',
-      pricePerHour: parseFloat(subject.pricePerHour.toString()),
-      currency: 'MDL',
-    }));
-
-    const profileDto: CreateProfileDto = {
-      phone: form.value.phone,
-      username: form.value.username,
-      firstName: form.value.firstName,
-      lastName: form.value.lastName,
-      bio: form.value.bio,
-      birthdate: birthdateFormatted,
-      country: form.value.country,
-      city: form.value.city,
-    };
-
-    const payload: TutorProfileData = {
-      verificationStatus: 'Pending',
-      experienceYears: Number(form.value.experienceYears),
-      subjects: subjectsPayload,
-      createProfileDto: profileDto,
-      workingLocation: workingLocationId.value,
-    };
-
-    try {
-      await createTutorProfile(payload);
-      
-      alertMessage.value = 'Your tutor profile has been successfully created!';
-      alertType.value = 'success';
-      showAlert.value = true;
-      
-      setTimeout(() => {
-        router.push('/tutor-dashboard');
-      }, 2000);
-    } catch (error) {
-      console.error('Error creating tutor profile:', error);
-      
-      alertMessage.value = 'An error occurred while creating your profile. Please try again.';
-      alertType.value = 'error';
-      showAlert.value = true;
-    }
-  };
+  try {
+    await createTutorProfile(payload);
+    router.push('/tutor-dashboard');
+  } catch (error) {
+  }
+};
 </script>
 
 <template>
@@ -385,9 +272,7 @@
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
-              <label for="firstName" class="mb-2 text-sm font-semibold text-gray-700"
-                >First name <span class="text-red-500">*</span></label
-              >
+              <label for="firstName" class="mb-2 text-sm font-semibold text-gray-700">First name</label>
               <input
                 id="firstName"
                 v-model="form.firstName"
@@ -398,9 +283,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="lastName" class="mb-2 text-sm font-semibold text-gray-700"
-                >Last name <span class="text-red-500">*</span></label
-              >
+              <label for="lastName" class="mb-2 text-sm font-semibold text-gray-700">Last name</label>
               <input
                 id="lastName"
                 v-model="form.lastName"
@@ -411,9 +294,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="username" class="mb-2 text-sm font-semibold text-gray-700"
-                >Username <span class="text-red-500">*</span></label
-              >
+              <label for="username" class="mb-2 text-sm font-semibold text-gray-700">Username</label>
               <input
                 id="username"
                 v-model="form.username"
@@ -424,9 +305,7 @@
               />
             </div>
             <div class="flex flex-col">
-              <label for="phone" class="mb-2 text-sm font-semibold text-gray-700"
-                >Phone <span class="text-red-500">*</span></label
-              >
+              <label for="phone" class="mb-2 text-sm font-semibold text-gray-700">Phone</label>
               <input
                 id="phone"
                 v-model="form.phone"
@@ -442,10 +321,8 @@
                 {{ phoneError }}
               </p>
             </div>
-            <div class="flex flex-col md:col-span-2" id="birthdate-section">
-              <label class="mb-2 text-sm font-semibold text-gray-700"
-              >Birthdate <span class="text-red-500">*</span></label
-              >
+            <div class="flex flex-col md:col-span-2">
+              <label class="mb-2 text-sm font-semibold text-gray-700">Birthdate</label>
               <div class="grid grid-cols-3 gap-4">
                 <input
                   id="birthDay"
@@ -456,11 +333,8 @@
                   max="31"
                   required
                   class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
-                  :class="{'border-red-300': birthDateError}"
                   maxlength="2"
                   oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                  @blur="validateBirthdateInputs"
-                  @input="clearBirthdateError"
                 />
                 <input
                   id="birthMonth"
@@ -471,11 +345,8 @@
                   max="12"
                   required
                   class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
-                  :class="{'border-red-300': birthDateError}"
                   maxlength="2"
                   oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                  @blur="validateBirthdateInputs"
-                  @input="clearBirthdateError"
                 />
                 <input
                   id="birthYear"
@@ -486,17 +357,11 @@
                   :max="maxYear"
                   required
                   class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
-                  :class="{'border-red-300': birthDateError}"
                   maxlength="4"
                   oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
-                  @blur="validateBirthdateInputs"
-                  @input="clearBirthdateError"
                 />
               </div>
-              <p v-if="birthDateError" class="mt-2 text-sm font-medium text-red-500">
-                {{ birthDateError }}
-              </p>
-              <p class="mt-1 text-xs text-gray-500" v-else>You must be at least 18 years old to register as a tutor</p>
+              <p v-if="attemptedSubmit && (!birthDay || !birthMonth || !birthYear)" class="mt-1 text-xs text-red-500">Please provide a complete and valid birthdate.</p>
             </div>
           </div>
         </section>
@@ -518,14 +383,14 @@
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="flex flex-col">
-              <label for="country" class="mb-2 text-sm font-semibold text-gray-700"
-                >Country <span class="text-red-500">*</span></label
-              >
+              <label for="country" class="mb-2 text-sm font-semibold text-gray-700">Country</label>
               <DropdownSelect
                 :options="['Romania', 'Moldova', 'Italy', 'Germany', 'England']"
                 placeholder="Select country from list"
                 @update:modelValue="form.country = $event"
+                :class="{'border-red-500': isCountryInvalid}"
               />
+              <p v-if="isCountryInvalid" class="mt-1 text-xs text-red-500">Please select a country.</p>
               <div v-if="form.country" class="mt-4">
                 <span
                   class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
@@ -536,14 +401,14 @@
             </div>
 
             <div class="flex flex-col">
-              <label for="city" class="mb-2 text-sm font-semibold text-gray-700"
-                >City <span class="text-red-500">*</span></label
-              >
+              <label for="city" class="mb-2 text-sm font-semibold text-gray-700">City</label>
               <DropdownSelect
                 :options="cities"
                 placeholder="Select city from list"
                 @update:modelValue="form.city = $event"
+                :class="{'border-red-500': isCityInvalid}"
               />
+              <p v-if="isCityInvalid" class="mt-1 text-xs text-red-500">Please select a city.</p>
               <div v-if="form.city" class="mt-4">
                 <span
                   class="px-5 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200 text-[#5f22d9] rounded-full flex items-center gap-3 shadow-sm font-medium transition-all duration-300"
@@ -571,19 +436,17 @@
             </h2>
           </div>
           <div class="flex flex-col">
-            <label for="experienceYears" class="mb-2 text-sm font-semibold text-gray-700"
-              >Years of Experience <span class="text-red-500">*</span></label
-            >
+            <label for="experienceYears" class="mb-2 text-sm font-semibold text-gray-700">Years of Experience</label>
             <input
               id="experienceYears"
               v-model.number="form.experienceYears"
               type="number"
               min="0"
-              max="50"
-              placeholder="e.g., 5"
+              :max="MAX_EXPERIENCE_YEARS"
               required
               class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
             />
+            <p v-if="isExperienceInvalid" class="mt-1 text-xs text-red-500">Please provide a valid number of years of experience (Max {{ MAX_EXPERIENCE_YEARS }}).</p>
           </div>
         </section>
 
@@ -619,18 +482,17 @@
                   </div>
                 </div>
                 <div class="flex flex-col">
-                  <label :for="`price-${index}`" class="mb-2 text-sm font-semibold text-gray-700"
-                    >Price per Hour (MDL) <span class="text-red-500">*</span></label
-                  >
+                  <label :for="`price-${index}`" class="mb-2 text-sm font-semibold text-gray-700">Price per Hour (MDL)</label>
                   <input
                     :id="`price-${index}`"
                     v-model.number="subject.pricePerHour"
                     type="number"
                     step="0.01"
-                    min="0"
+                    min="1"
                     required
                     placeholder="200"
                     class="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md"
+                    :class="{'border-red-500': attemptedSubmit && (subject.pricePerHour === null || subject.pricePerHour <= 0)}"
                   />
                 </div>
                 <div class="flex justify-end">
@@ -645,12 +507,16 @@
               </div>
             </div>
 
-            <div class="flex justify-center">
+            <p v-if="isSubjectsEmpty" class="mt-1 text-xs font-semibold text-red-500">Please add at least one subject to create your profile.</p>
+            <p v-else-if="areSubjectsPricesInvalid" class="mt-1 text-xs text-red-500">Please provide a price greater than 0 for all selected subjects.</p>
+
+            <div v-if="availableSubjects.length > 0">
               <DropdownSelect
                 :options="availableSubjects"
                 placeholder="+ Add Subject"
                 class="w-full"
                 @update:modelValue="addNewSubject"
+                :class="{'border-red-500': isSubjectsEmpty}"
               />
             </div>
           </div>
@@ -688,8 +554,10 @@
               :options="availableLanguages"
               placeholder="+ Add Language"
               @update:modelValue="addLanguage"
+              :class="{'border-red-500': isLanguageInvalid}"
             />
           </div>
+          <p v-if="isLanguageInvalid" class="mt-1 text-xs text-red-500">Please select at least one language.</p>
         </section>
 
         <section
@@ -750,10 +618,7 @@
               <label for="online" class="font-medium text-gray-700">Online</label>
             </div>
           </div>
-          
-          <p v-if="teachingLocationError" class="mt-2 text-sm font-medium text-red-500">
-            {{ teachingLocationError }}
-          </p>
+          <p v-if="isTeachingLocationInvalid" class="mt-1 text-xs text-red-500">Please select at least one teaching location.</p>
         </section>
 
         <section
@@ -774,18 +639,23 @@
           <textarea
             v-model="form.bio"
             rows="6"
-            maxlength="200"
+            maxlength="400"
+            required
             class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-[#5f22d9] outline-none bg-white shadow-sm hover:shadow-md resize-none"
             placeholder="Tell us about yourself, your teaching experience, and what makes you passionate about education..."
             @input="limitBioText"
             :class="{'border-red-300': bioLimitReached}"
           ></textarea>
-          <div class="mt-2 text-sm text-right" :class="{
-            'text-gray-500': bioCharacterCount < 150,
-            'text-orange-500': bioCharacterCount >= 150 && bioCharacterCount < 200,
-            'text-red-500': bioCharacterCount >= 200
-          }">
-            {{ bioCharacterCount }}/200 characters
+          <div class="mt-2 text-sm text-right">
+            <p
+              v-if="form.bio && form.bio.length >= 400"
+              class="font-semibold text-red-500"
+            >
+              Maximum limit of 400 characters reached.
+            </p>
+            <p class="text-gray-500">
+              {{ form.bio ? form.bio.length : 0 }} / 400 characters
+            </p>
           </div>
         </section>
 
