@@ -3,31 +3,21 @@ import { ref, onMounted } from "vue";
 import Hero1 from "../components/landing/Hero1.vue";
 import Hero3 from "../components/landing/Hero3.vue";
 import Footer from "../components/Footer.vue";
-import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 import InstructorCard from "../components/landing/InstructorCard.vue";
 import CardCarousel from "../components/landing/CardCarousel.vue";
 
-// stare pentru loader
 const loading = ref(true);
 
 onMounted(() => {
-  // Simulăm timpul de încărcare (ex: fetch API, assets, etc.)
   setTimeout(() => {
     loading.value = false;
-  }, 1500); // 1.5 secunde
+  }, 1500);
 });
 </script>
 
 <template>
 
   <div>
-    <!-- Loader pe tot ecranul -->
-<!--    <div v-if="loading" class="fixed inset-0 flex items-center justify-center bg-gray-50">-->
-<!--      <DotLottieVue autoplay loop class="w-72 h-72" src="https://lottie.host/72ca364b-846a-4290-aa54-2846d475d657/T8ZWCsBzkS.lottie"/>-->
-<!--    </div>-->
-
-    <!-- Conținutul real -->
-
     <div>
       <Hero1 />
       <!-- Section 2-->
@@ -52,18 +42,19 @@ onMounted(() => {
 
             <div class="mt-12">
               <CardCarousel>
-                <instructorCard />
-                <instructorCard />
-                <instructorCard />
-                <instructorCard />
-                <instructorCard />
+                <InstructorCard :instructorIndex="0" />
+                <InstructorCard :instructorIndex="1" />
+                <InstructorCard :instructorIndex="2" />
+                <InstructorCard :instructorIndex="3" />
+                <InstructorCard :instructorIndex="4" />
               </CardCarousel>
             </div>
 
             <div class="mt-1">
               <button
+                  @click="$router.push('/signup')"
                   class="inline-flex items-center rounded-full border border-transparent bg-[#5f22d9] px-6 py-3 font-semibold text-white shadow-sm transition-colors hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                Explore all tutors
+                Sign up as Tutor
                 <svg
                     class="w-5 h-5 ml-2 -mr-1"
                     xmlns="http://www.w3.org/2000/svg"

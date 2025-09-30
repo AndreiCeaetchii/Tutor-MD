@@ -92,9 +92,9 @@ export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
   }
 };
 
-export const getStudentProfile = async () => {
+export const getStudentProfile = async (studentId: string) => {
   try {
-    const response = await studentAxios.get(`/students/student-profile`, {
+    const response = await studentAxios.get(`/students/student-profile/${studentId}`, {
       headers: {
         'Content-Type': 'application/json',
       },

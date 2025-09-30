@@ -128,19 +128,21 @@ public static class ApplicationSetup
         {
             options.AddPolicy("AllowFrontend", policy =>
             {
-                if (allowedOrigins.Length > 0)
-                {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://tutormd.online",
-                            "https://tutormd.online")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                }
-                else
+                // if (allowedOrigins.Length > 0)
+                // {
+                //     policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://tutormd.online",
+                //             "https://tutormd.online")
+                //         .AllowAnyHeader()
+                //         .AllowAnyMethod()
+                //         .AllowCredentials();
+                // }
+                // else
                 {
                     policy.AllowAnyOrigin()
                           .AllowAnyHeader()
-                          .AllowAnyMethod();
+                          .AllowAnyMethod()
+                            .AllowCredentials();
+
                 }
             });
         });
