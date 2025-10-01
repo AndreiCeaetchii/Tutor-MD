@@ -256,7 +256,7 @@ public class TutorService : ITutorService
         foreach (var profile in profiles)
         {
             int? role = await _userRoleService.GetRoleIdAsync(profile.UserId);
-            if (role == 3)
+            if (role == 2)
                 filteredProfiles.Add(profile);
         }
 
