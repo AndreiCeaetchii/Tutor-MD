@@ -56,6 +56,7 @@
     try {
       const userIdFromUrl = route.params.id ? Number(route.params.id) : Number(userStore.userId);
       const serverData = await getTutorProfile(userIdFromUrl);
+      console.log('Fetched profile data:', serverData);
       if (!serverData || !serverData.userProfile || !serverData.userProfile.username) {
         await router.push('/create-profile');
         return;
@@ -73,8 +74,8 @@
         city: serverData.userProfile.city || '',
         location: `${serverData.userProfile.city || ''}, ${serverData.userProfile.country || ''}`,
         profileImage: serverData.photo?.url || profileStore.profileImage || defaultProfileImage,
-        rating: 0,
-        reviews: 0,
+        rating: serverData.rating || 0,
+        reviews: serverData.reviewCount || 0,
         students: 0,
         languages: [],
         subjects: serverData.tutorSubjects.map((s: any) => ({
