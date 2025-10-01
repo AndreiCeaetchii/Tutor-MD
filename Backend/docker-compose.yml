@@ -18,6 +18,15 @@ services:
       - POSTGRES_USER=admin # The PostgreSQL user (useful to connect to the database)
       - POSTGRES_PASSWORD=admin # The PostgreSQL password (useful to connect to the database)
       - POSTGRES_DB=Tutor # The PostgreSQL default database (automatically created at first launch)
+
+  redis-server:
+    image: redis:latest
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    networks:
+      - localdev
+
   tutor-api:
     build:
       context: .
