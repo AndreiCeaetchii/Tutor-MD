@@ -50,7 +50,7 @@
   const profileButton = ref<HTMLElement | null>(null);
   const profileMenu = ref<HTMLElement | null>(null);
 
-  const hasMfa = computed(() => store.hasMfa);
+  const hasMfa = computed(() => store.mfaEnabled);
 
   function toggleMenu() {
     isMenuOpen.value = !isMenuOpen.value;

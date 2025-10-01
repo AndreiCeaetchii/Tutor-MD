@@ -85,7 +85,7 @@ export function useAuth() {
       );
       const data = response.data;
       const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id.toString(), userRole, formData.email, data.hasMfa);
+      store.setUser(data.token, data.id.toString(), userRole, formData.email, data.twoFactorEnabled);
 
       await fetchCsrfToken();
 
@@ -141,7 +141,8 @@ export function useAuth() {
 
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id, userRole, formData.email, data.hasMfa);
+      console.log(data);
+      store.setUser(data.token, data.id, userRole, formData.email, data.twoFactorEnabled);
 
       await fetchCsrfToken();
 
@@ -189,7 +190,7 @@ export function useAuth() {
       const data = response.data;
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id, userRole, email, true);
+      store.setUser(data.token, data.id, userRole, email, data.twoFactorEnabled || true);
 
       await fetchCsrfToken();
 
@@ -275,7 +276,7 @@ export function useAuth() {
 
               const decoded = decodeJwt(data.token);
               const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
-              store.setUser(data.token, data.id, userRole, email, data.hasMfa);
+              store.setUser(data.token, data.id, userRole, email, data.twoFactorEnabled);
 
               await fetchCsrfToken();
 
