@@ -45,4 +45,6 @@ public class CreateProfileDto
     
     [DataType(DataType.DateTime, ErrorMessage = "Invalid datetime format")]
     public DateTime CreatedAt { get; set; }
+
+    public bool TwoFactorEnabled { get; set; }
 }

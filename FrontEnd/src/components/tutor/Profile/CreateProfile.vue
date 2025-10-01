@@ -331,7 +331,7 @@ const workingLocationId = computed(() => {
   if (online) return 2;
   if (studentHome) return 3;
 
-  return 0;
+  return 1;
 });
 
 const bioCharacterCount = computed(() => {
@@ -411,7 +411,6 @@ const handleSubmit = async () => {
     subjects: subjectsPayload,
     createProfileDto: profileDto,
     workingLocation: workingLocationId.value,
-    // languages: form.value.languages,
   };
 
   try {

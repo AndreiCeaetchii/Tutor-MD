@@ -50,7 +50,6 @@
   const profileButton = ref<HTMLElement | null>(null);
   const profileMenu = ref<HTMLElement | null>(null);
 
-  // Get MFA status directly from the store
   const hasMfa = computed(() => store.hasMfa);
 
   function toggleMenu() {
@@ -80,7 +79,6 @@
 
   const userRole = computed(() => store.userRole);
 
-  // Navigation based on user role
   function navigateBasedOnRole(path: string) {
     const role = userRole.value;
     if (role === 'tutor') {
@@ -96,23 +94,28 @@
   }
 
   const userName = computed(() => {
-    if (userRole.value === 'student') {
-      if (studentProfileStore.userProfile?.username) {
-        return studentProfileStore.userProfile.username;
-      }
-      
-      if (store.email) {
-        const emailPart = store.email.split('@')[0];
-        const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
-        studentProfileStore.updateUsername(cleanEmailPart);
-        return cleanEmailPart;
-      }
-      
-      return 'user';
-    } else {
-      return profileStore.userName || '';
+  if (userRole.value === 'student') {
+    if (studentProfileStore.userProfile?.username) {
+      return studentProfileStore.userProfile.username;
     }
-  });
+    
+    if (store.email) {
+      const emailPart = store.email.split('@')[0];
+      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+      studentProfileStore.updateUsername(cleanEmailPart);
+      return cleanEmailPart;
+    }
+    
+    return 'user';
+  } else if (userRole.value === 'admin') {
+    if (store.email) {
+      return `Admin`;
+    }
+    return 'Administrator';
+  } else {
+    return profileStore.userName || '';
+  }
+});
 
   const email = computed(() => store.email);
 
@@ -179,7 +182,6 @@
                   <p class="mt-1 text-xs text-gray-500 truncate">{{ email }}</p>
                 </div>
                 <div class="py-1">
-                  <!-- 2FA Security with check mark -->
                   <button
                     @click="navigateToMfaSetup"
                     class="block w-full text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
