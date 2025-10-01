@@ -1,7 +1,10 @@
 <template>
   <div class="max-w-6xl p-6 mx-auto bg-white shadow-lg rounded-2xl">
     <template v-if="profileStore.isEditing">
-      <ProfileHeaderEdit :editedProfile="editedProfile" @save-profile="saveChanges" />
+      <ProfileHeaderEdit 
+        :editedProfile="editedProfile" 
+        @save-profile="saveChanges"
+        @cancel-edit="cancelEditing" />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
     </template>
     <template v-else>
@@ -118,6 +121,7 @@
           birthdate: profileStore.birthdate,
           country: editedProfile.value.country,
           city: editedProfile.value.city,
+          workingLocation: `${editedProfile.value.city || ''}, ${editedProfile.value.country || ''}`,
           experienceYears: editedProfile.value.experience,
           profileImage: editedProfile.value.profileImage,
         },
@@ -130,6 +134,7 @@
         })),
       };
       await editTutorProfile(profileDataToUpdate.userProfile);
+      console.log('Profile updated:', profileDataToUpdate.userProfile);
       for (const subject of editedProfile.value.subjects) {
         if (subject.isNew) {
           await addSubject({
@@ -159,5 +164,9 @@
     } catch (error) {
       console.error('Error saving profile changes:', error);
     }
+  };
+  
+  const cancelEditing = () => {
+    profileStore.toggleEditing();
   };
 </script>
