@@ -13,8 +13,8 @@ export interface MfaSetupResponse {
 }
 
 const API_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ||
-  (window as any)?.VITE_API_BASE_URL ||
+  (import.meta as any).env?.VITE_API_BASE_URL_USER ||
+  (window as any)?.VITE_API_BASE_URL_USER ||
   'http://localhost:8080/api/users';
 const userAxios = axios.create({
   baseURL: API_URL,
