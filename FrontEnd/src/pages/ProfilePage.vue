@@ -73,8 +73,8 @@
         city: serverData.userProfile.city || '',
         location: `${serverData.userProfile.city || ''}, ${serverData.userProfile.country || ''}`,
         profileImage: serverData.photo?.url || profileStore.profileImage || defaultProfileImage,
-        rating: 0,
-        reviews: 0,
+        rating: serverData.rating || 0,
+        reviews: serverData.reviewCount || 0,
         students: 0,
         languages: [],
         subjects: serverData.tutorSubjects.map((s: any) => ({
