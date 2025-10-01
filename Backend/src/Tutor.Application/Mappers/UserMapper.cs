@@ -13,7 +13,7 @@ public static class UserMapper
 
     public static UserResponseDto ToResponseDto(this User user, string token)
     {
-        return new UserResponseDto { Email = user.Email, Token = token, Username = user.Username, Id = user.Id, RefreshToken = user.RefreshToken,  RefreshTokenExpiryTime = user.RefreshTokenExpiryTime };
+        return new UserResponseDto { Email = user.Email, Token = token, Username = user.Username, Id = user.Id, RefreshToken = user.RefreshToken,  RefreshTokenExpiryTime = user.RefreshTokenExpiryTime, TwoFactorEnabled = user.TwoFactorEnabled };
     }
    
 }

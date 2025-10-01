@@ -8,7 +8,7 @@ interface UserState {
   userId: string | null;
   role: UserRole | null;
   email: string | null;
-  hasMfa: boolean;
+  mfaEnabled: boolean;
   csrfToken: string | null;
 }
 
@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', {
     userId: null,
     role: null,
     email: null,
-    hasMfa: false,
+    mfaEnabled: false,
     csrfToken: null
   }),
   getters: {
@@ -33,7 +33,7 @@ export const useUserStore = defineStore('user', {
       this.userId = id;
       this.role = role;
       this.email = email;
-      this.hasMfa = hasMfa;
+      this.mfaEnabled = hasMfa;
     },
 
     setCsrfToken(token: string) {
@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', {
     },
 
     updateUserMfaStatus(status: boolean) {
-    this.hasMfa = status;
+    this.mfaEnabled = status;
   },
   },
   persist: true,

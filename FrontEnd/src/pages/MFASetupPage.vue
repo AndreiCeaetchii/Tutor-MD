@@ -8,7 +8,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const userRole = computed(() => userStore.userRole);
-const isMfaEnabled = computed(() => userStore.hasMfa);
+const isMfaEnabled = computed(() => userStore.mfaEnabled);
 const mfaStatus = ref('');
 
 const loading = ref(false);
