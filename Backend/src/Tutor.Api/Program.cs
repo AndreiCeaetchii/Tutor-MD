@@ -97,7 +97,7 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.None;
 
     //Instead of Always we use SameAsRequest to allow local testing over http
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; 
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
     options.Cookie.IsEssential = true; 
 });
 
