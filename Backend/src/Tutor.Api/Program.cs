@@ -43,6 +43,13 @@ builder.Services.AddHangfire(config =>
     config.UseMemoryStorage());
 builder.Services.AddHangfireServer();
 //Cache
+var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+
+// Log the Redis connection string
+logger.LogInformation("Redis connection string: {RedisConnection}", builder.Configuration.GetConnectionString("Redis"));
+
+// Configure Redis cache
+
 builder.Services.AddStackExchangeRedisCache(options =>
 {
     options.Configuration = builder.Configuration.GetConnectionString("Redis");
