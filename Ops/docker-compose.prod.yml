@@ -35,7 +35,7 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,https://localhost:5173}
       - CORS_POLICY_NAME=${CORS_POLICY_NAME:-AllowFrontend}
-      - Redis__Connection=redis:6379
+      - ConnectionStrings__Redis=redis:6379,abortConnect=false,connectTimeout=30000
     ports:
       - "8080:8080"
     networks:
