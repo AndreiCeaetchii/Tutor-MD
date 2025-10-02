@@ -12,8 +12,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB:-Tutor}
     volumes:
       - db_data:/var/lib/postgresql/data
-    ports:
-      - "127.0.0.1:5432:5432"
     networks:
       - app
 
@@ -22,22 +20,22 @@ services:
     container_name: tutor-redis
     volumes:
       - redis_data:/data
-    ports:
-      - "127.0.0.1:7000:7000"
     networks:
       - app
 
   backend:
-    image: ${IMAGE_BACKEND}   
+    image: ${IMAGE_BACKEND}
     container_name: tutor-api
     depends_on:
       - db
+      - redis
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB:-Tutor};Username=${POSTGRES_USER:-admin};Password=${POSTGRES_PASSWORD:-admin}
       - ASPNETCORE_URLS=http://+:8080
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,https://localhost:5173}
       - CORS_POLICY_NAME=${CORS_POLICY_NAME:-AllowFrontend}
+      - Redis__Connection=redis:6379
     ports:
       - "8080:8080"
     networks:
@@ -56,5 +54,3 @@ services:
 volumes:
   db_data:
   redis_data:
-
-
