@@ -66,7 +66,45 @@ const cities = computed(() => {
   if (form.value.createProfileDto.country === 'Romania') {
     return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
   } else if (form.value.createProfileDto.country === 'Moldova') {
-    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Orhei'];
+    return [
+      'Anenii Noi',
+      'Basarabeasca',
+      'Briceni',
+      'Cahul',
+      'Cantemir',
+      'Călărași',
+      'Căușeni',
+      'Chișinău',
+      'Cimișlia',
+      'Criuleni',
+      'Dondușeni',
+      'Drochia',
+      'Dubăsari',
+      'Edineț',
+      'Fălești',
+      'Florești',
+      'Glodeni',
+      'Hîncești',
+      'Ialoveni',
+      'Leova',
+      'Nisporeni',
+      'Ocnița',
+      'Orhei',
+      'Rezina',
+      'Rîșcani',
+      'Sîngerei',
+      'Soroca',
+      'Strășeni',
+      'Șoldănești',
+      'Ștefan Vodă',
+      'Taraclia',
+      'Telenești',
+      'Ungheni',
+      'Bălți',
+      'Comrat',
+      'Tighina',
+      'Tiraspol',
+    ];
   }
   return [];
 });
@@ -165,18 +203,15 @@ const enforceMax = (val: number | null, maxLimit: number, targetRef: any) => {
   }
 };
 
-// Birthdate Limits
 watch(birthDay, (newVal) => enforceMax(newVal, 31, birthDay));
 watch(birthMonth, (newVal) => enforceMax(newVal, 12, birthMonth));
 
-// Academic Limits
 const MAX_GPA = 10;
 const MAX_CLASS = 12;
 
 watch(() => form.value.grade, (newVal) => enforceMax(newVal, MAX_GPA, form.value.grade));
 watch(() => form.value.class, (newVal) => enforceMax(newVal, MAX_CLASS, form.value.class));
 
-// Bio character limit
 const bioCharacterCount = computed(() => {
   return form.value.createProfileDto.bio.length;
 });

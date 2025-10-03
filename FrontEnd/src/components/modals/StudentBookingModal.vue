@@ -85,7 +85,7 @@ const handleLocationSelect = (location: string) => {
 
 const handleSubmit = () => {
   if (!selectedSubject.value) {
-    alert('Please select a subject');
+
     return;
   }
   

@@ -2,8 +2,21 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faFacebookF, faTwitter, faInstagram, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import { useRouter } from 'vue-router'; // Importul exista deja
+
+const router = useRouter();
 
 library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
+
+const navigateTo = (path: string) => {
+  router.push(path);
+};
+
+const navigateToSubject = (subject: string) => {
+
+  router.push(`/subjects/${subject}`);
+};
+
 </script>
 
 <template>
@@ -11,9 +24,9 @@ library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
     <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 gap-8 md:grid-cols-6 lg:gap-12">
         <div class="col-span-1 md:col-span-2">
-                    <div class="flex items-center mb-4 space-x-2">
-                      <img class="h-8" src="../assets/tutor2.png" alt="TutorConnect Logo">
-                    </div>
+          <div class="flex items-center mb-4 space-x-2">
+            <img class="h-8" src="../assets/tutor2.png" alt="TutorConnect Logo">
+          </div>
           <p class="mb-4 text-sm leading-relaxed">
             Connecting students and tutors worldwide for personalized, effective learning experiences.
           </p>
@@ -36,37 +49,40 @@ library.add(faFacebookF, faTwitter, faInstagram, faLinkedinIn);
         <div>
           <h5 class="mb-3 font-semibold">Platform</h5>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">How it Works</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Find Tutors</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Become a Tutor</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Pricing</a></li>
+            <li><router-link to="/how-it-works" class="transition-colors hover:text-[#5f22d9]">How it Works</router-link></li>
+            <li><router-link to="/find-tutors" class="transition-colors hover:text-[#5f22d9]">Find Tutors</router-link></li>
+            <li><router-link to="/become-a-tutor" class="transition-colors hover:text-[#5f22d9]">Become a Tutor</router-link></li>
+            <li><router-link to="/pricing" class="transition-colors hover:text-[#5f22d9]">Pricing</router-link></li>
           </ul>
         </div>
+
         <div>
           <h5 class="mb-3 font-semibold ">Popular Subjects</h5>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Mathematics</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Science</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Languages</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Programming</a></li>
+            <li><a href="#" @click.prevent="navigateToSubject('mathematics')" class="transition-colors hover:text-[#5f22d9]">Mathematics</a></li>
+            <li><a href="#" @click.prevent="navigateToSubject('science')" class="transition-colors hover:text-[#5f22d9]">Science</a></li>
+            <li><a href="#" @click.prevent="navigateToSubject('languages')" class="transition-colors hover:text-[#5f22d9]">Languages</a></li>
+            <li><a href="#" @click.prevent="navigateToSubject('programming')" class="transition-colors hover:text-[#5f22d9]">Programming</a></li>
           </ul>
         </div>
+
         <div>
           <h5 class="mb-3 font-semibold ">Support</h5>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Help Center</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Contact Us</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Safety</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Community Guidelines</a></li>
+            <li><router-link to="/help-center" class="transition-colors hover:text-[#5f22d9]">Help Center</router-link></li>
+            <li><router-link to="/contact-us" class="transition-colors hover:text-[#5f22d9]">Contact Us</router-link></li>
+            <li><router-link to="/safety" class="transition-colors hover:text-[#5f22d9]">Safety</router-link></li>
+            <li><router-link to="/community-guidelines" class="transition-colors hover:text-[#5f22d9]">Community Guidelines</router-link></li>
           </ul>
         </div>
+
         <div>
           <h5 class="mb-3 font-semibold ">Company</h5>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">About Us</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Careers</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Press</a></li>
-            <li><a href="#" class="transition-colors hover:text-[#5f22d9]">Blog</a></li>
+            <li><router-link to="/about-us" class="transition-colors hover:text-[#5f22d9]">About Us</router-link></li>
+            <li><router-link to="/careers" class="transition-colors hover:text-[#5f22d9]">Careers</router-link></li>
+            <li><router-link to="/press" class="transition-colors hover:text-[#5f22d9]">Press</router-link></li>
+            <li><router-link to="/blog" class="transition-colors hover:text-[#5f22d9]">Blog</router-link></li>
           </ul>
         </div>
       </div>

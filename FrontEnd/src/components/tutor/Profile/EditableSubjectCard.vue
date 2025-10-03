@@ -66,7 +66,7 @@
     },
   });
 
-  const availableCurrencies = ['ron', 'eur', 'usd', 'mdl'];
+  const availableCurrencies = ['RON', 'EUR', 'USD', 'MDL'];
 
   const emit = defineEmits(['remove', 'update:currency', 'update:price']);
 

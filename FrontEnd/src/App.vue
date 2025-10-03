@@ -9,7 +9,6 @@ const userStore = useUserStore();
 onMounted(async () => {
   if (userStore.isAuthenticated) {
     await fetchCsrfToken();
-    console.log('CSRF token initialized on application startup');
   }
 });
 </script>

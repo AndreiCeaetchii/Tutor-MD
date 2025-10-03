@@ -34,6 +34,17 @@ import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
 import MFASetupPage from '../pages/MFASetupPage.vue';
 
+import HowItWorksPage from '../components/footer/HowItWorksPage.vue';
+import HelpCenterPage from '../components/footer/HelpCenterPage.vue';
+import AboutUsPage from '../components/footer/AboutUsPage.vue';
+import BecomeATutorPage from '../components/footer/BecomeATutorPage.vue';
+import PricingPage from '../components/footer/PricingPage.vue';
+import SafetyPage from '../components/footer/SafetyPage.vue';
+import CommunityGuidelinesPage from '../components/footer/CommunityGuidelinesPage.vue';
+import ContactUsPage from '../components/footer/ContactUsPage.vue';
+import CareersPage from '../components/footer/CareersPage.vue';
+import PressPage from '../components/footer/PressPage.vue';
+import BlogPage from '../components/footer/BlogPage.vue';
 
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
@@ -115,7 +126,21 @@ const routes = [
   meta: {
     requiresAuth: true
   }
-}
+},
+
+  { path: '/how-it-works', component: HowItWorksPage },
+  { path: '/become-a-tutor', component: BecomeATutorPage },
+  { path: '/pricing', component: PricingPage },
+
+  { path: '/help-center', component: HelpCenterPage },
+  { path: '/contact-us', component: ContactUsPage },
+  { path: '/safety', component: SafetyPage },
+  { path: '/community-guidelines', component: CommunityGuidelinesPage },
+
+  { path: '/about-us', component: AboutUsPage },
+  { path: '/careers', component: CareersPage },
+  { path: '/press', component: PressPage },
+  { path: '/blog', component: BlogPage },
 ];
 
 const router = createRouter({

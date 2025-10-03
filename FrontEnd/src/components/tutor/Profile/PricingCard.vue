@@ -21,29 +21,111 @@
 </template>
 
 <script setup lang="ts">
-  import { defineProps, computed } from 'vue';
-  import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { library } from '@fortawesome/fontawesome-svg-core';
-  import { faCalculator, faAtom, faLaptopCode, faBook } from '@fortawesome/free-solid-svg-icons';
+import { defineProps, computed } from 'vue'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import {
+  faCalculator,
+  faBook,
+  faAtom,
+  faFlask,
+  faLeaf,
+  faGlobe,
+  faLandmark,
+  faLanguage,
+  faLaptopCode,
+  faCoins,
+  faBrain,
+  faPersonRunning,
+  faHeartPulse,
+  faPaintBrush,
+  faMusic,
+  faStar,
+  faPenFancy,
+  faChartLine,
+  faSchool,
+  faBookOpenReader
+} from '@fortawesome/free-solid-svg-icons'
 
-  library.add(faCalculator, faAtom, faLaptopCode, faBook);
+library.add(
+  faCalculator,
+  faBook,
+  faAtom,
+  faFlask,
+  faLeaf,
+  faGlobe,
+  faLandmark,
+  faLanguage,
+  faLaptopCode,
+  faCoins,
+  faBrain,
+  faPersonRunning,
+  faHeartPulse,
+  faPaintBrush,
+  faMusic,
+  faStar,
+  faPenFancy,
+  faChartLine,
+  faSchool,
+  faBookOpenReader
+)
 
-  const props = defineProps({
-    subject: String,
-    price: String,
-    availability: String,
-  });
+const props = defineProps({
+  subject: String,
+  price: String,
+  availability: String
+})
 
-  const iconName = computed(() => {
-    switch (props.subject.toLowerCase()) {
-      case 'matematică':
-        return 'calculator';
-      case 'fizică':
-        return 'atom';
-      case 'informatică':
-        return 'laptop-code';
-      default:
-        return 'book';
-    }
-  });
+const iconName = computed(() => {
+  const subject = props.subject?.toLowerCase() || ''
+
+  switch (subject) {
+    case 'Mathematics':
+    case 'statistics':
+      return 'calculator'
+    case 'english':
+    case 'literature':
+    case 'creative writing':
+      return 'book-open-reader'
+    case 'science':
+      return 'atom'
+    case 'physics':
+      return 'atom'
+    case 'chemistry':
+      return 'flask'
+    case 'biology':
+      return 'leaf'
+    case 'geography':
+      return 'globe'
+    case 'history':
+      return 'landmark'
+    case 'foreign languages':
+    case 'german':
+    case 'french':
+    case 'russian':
+    case 'spanish':
+    case 'italian':
+      return 'language'
+    case 'computer science':
+      return 'laptop-code'
+    case 'economics':
+      return 'coins'
+    case 'philosophy':
+    case 'psychology':
+    case 'sociology':
+      return 'brain'
+    case 'physical education':
+      return 'person-running'
+    case 'health education':
+      return 'heart-pulse'
+    case 'drawing':
+      return 'paint-brush'
+    case 'music':
+      return 'music'
+    case 'astronomy':
+      return 'star'
+    default:
+      return 'book'
+  }
+})
 </script>
