@@ -13,8 +13,8 @@ export interface MfaSetupResponse {
 }
 
 const API_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL_USER ||
-  (window as any)?.VITE_API_BASE_URL_USER ||
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  (window as any)?.VITE_API_BASE_URL ||
   'http://localhost:8080/api/users';
 const userAxios = axios.create({
   baseURL: API_URL,
@@ -64,7 +64,7 @@ export const deleteProfilePhoto = async () => {
 
 export const enableMfa = async () => {
   try {
-    const response = await userAxios.put<MfaSetupResponse>(`/enable-mfa`, {});
+    const response = await userAxios.put<MfaSetupResponse>(`/users/enable-mfa`, {});
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to enable MFA. Please try again.');
@@ -102,7 +102,7 @@ export const verifyMfaSetup = async (code: string) => {
 
 export const disableMfa = async () => {
   try {
-    const response = await userAxios.put(`/disable-mfa`, {});
+    const response = await userAxios.put(`/users/disable-mfa`, {});
     return response.data;
   } catch (error: any) {
     console.error('Disable MFA error:', error);
