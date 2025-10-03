@@ -76,7 +76,7 @@ export const verifyMfaSetup = async (code: string) => {
     const formattedCode = code.trim().padStart(6, '0').substring(0, 6);
 
     const response = await userAxios.put(
-      `/verify-enable-mfa`,
+      `/users/verify-enable-mfa`,
       {
         code: formattedCode,
       },
