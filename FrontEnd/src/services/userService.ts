@@ -42,7 +42,7 @@ export const uploadProfilePhoto = async (photoFile: File) => {
     const formData = new FormData();
     formData.append('file', photoFile);
 
-    const response = await userAxios.post<UploadPhotoResponse>(`/add-photo`, formData);
+    const response = await userAxios.post<UploadPhotoResponse>(`/users/add-photo`, formData);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -53,7 +53,7 @@ export const uploadProfilePhoto = async (photoFile: File) => {
 
 export const deleteProfilePhoto = async () => {
   try {
-    const response = await userAxios.delete(`/delete-photo`);
+    const response = await userAxios.delete(`/users/delete-photo`);
     return response.data;
   } catch (error: any) {
     throw new Error(
