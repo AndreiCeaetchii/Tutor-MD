@@ -24,6 +24,7 @@ export interface ProfileState {
   age: number;
   country?: string;
   city?: string;
+  workingLocation?: null | number;
   location: string;
   profileImage: string;
   rating: number;
@@ -56,7 +57,8 @@ export const useProfileStore = defineStore('profile', {
     languages: [],
     subjects: [],
     isEditing: false,
-    isLoading: false
+    isLoading: false,
+    workingLocation: 0,
   }),
 
   getters: {
@@ -104,6 +106,7 @@ export const useProfileStore = defineStore('profile', {
       this.languages = [];
       this.subjects = [];
       this.isEditing = false;
+      this.workingLocation = null;
 
       this.$reset();
     },

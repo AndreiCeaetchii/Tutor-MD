@@ -79,6 +79,7 @@
         profileImage: serverData.photo?.url || profileStore.profileImage || defaultProfileImage,
         rating: serverData.rating || 0,
         reviews: serverData.reviewCount || 0,
+        workingLocation: serverData.workingLocation || '',
         students: 0,
         languages: [],
         subjects: serverData.tutorSubjects.map((s: any) => ({
@@ -122,7 +123,7 @@
           birthdate: profileStore.birthdate,
           country: editedProfile.value.country,
           city: editedProfile.value.city,
-          workingLocation: `${editedProfile.value.city || ''}, ${editedProfile.value.country || ''}`,
+          workingLocation: editedProfile.value.workingLocation,
           experienceYears: editedProfile.value.experience,
           profileImage: editedProfile.value.profileImage,
         },
