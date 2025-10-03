@@ -199,7 +199,7 @@ const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
 
   return new Promise((resolve, reject) => {
     const tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
+      client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/calendar.events',
 
       callback: async (response: any) => {
@@ -243,65 +243,67 @@ const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
 
 <template>
   <div class="container px-4 py-6 mx-auto tutor-bookings">
-    <div class="flex items-center justify-between mb-6">
-      <div class="flex border-b border-gray-200">
-        <button 
-          @click="statusFilter = 'all'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'all' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          All
-        </button>
-        <button 
-          @click="statusFilter = 'pending'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'pending' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Pending
-        </button>
-        <button 
-          @click="statusFilter = 'confirmed'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'confirmed' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Confirmed
-        </button>
-        <button 
-          @click="statusFilter = 'completed'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'completed' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Completed
-        </button>
-        <button 
-          @click="statusFilter = 'cancelled'" 
-          :class="[
-            'py-2 px-3 border-b-2', 
-            statusFilter === 'cancelled' 
-              ? 'border-purple-500 text-purple-600' 
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-          ]"
-        >
-          Cancelled
-        </button>
-      </div>
+    <div class="mb-6 -mx-4 sm:mx-0">
+  <div class="overflow-x-auto hide-scrollbar">
+    <div class="flex px-4 border-b border-gray-200 min-w-max sm:px-0">
+      <button 
+        @click="statusFilter = 'all'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'all' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        All
+      </button>
+      <button 
+        @click="statusFilter = 'pending'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'pending' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Pending
+      </button>
+      <button 
+        @click="statusFilter = 'confirmed'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'confirmed' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Confirmed
+      </button>
+      <button 
+        @click="statusFilter = 'completed'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'completed' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Completed
+      </button>
+      <button 
+        @click="statusFilter = 'cancelled'" 
+        :class="[
+          'py-1 px-2 sm:py-2 sm:px-3 border-b-2 text-xs sm:text-sm whitespace-nowrap', 
+          statusFilter === 'cancelled' 
+            ? 'border-purple-500 text-purple-600 font-medium' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+        ]"
+      >
+        Cancelled
+      </button>
     </div>
+  </div>
+</div>
     
     <div v-if="loading" class="flex justify-center mb-6">
       <div class="w-8 h-8 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
@@ -453,5 +455,14 @@ const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
 
 .material-icons {
   font-size: 18px;
+}
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 </style>

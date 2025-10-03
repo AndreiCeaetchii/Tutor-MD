@@ -32,8 +32,7 @@ const joinAsInstructor = () => {
           </span>
         </h1>
         <p class="max-w-lg mx-auto mt-6 text-gray-600 lg:mx-0">
-          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-          aliqua. Ad minim veniam.
+          Connect with our community of tutors and take control of your academic journey.
         </p>
         <div
           class="flex flex-col items-center justify-center mt-8 space-y-4 sm:flex-row sm:items-start lg:justify-start sm:space-y-0 sm:space-x-4"
@@ -59,7 +58,7 @@ const joinAsInstructor = () => {
         </div>
         <p class="mt-4 text-sm text-gray-500">
           A world of knowledge awaits.
-          <a href="#" class="text-[#5f22d9] underline hover:no-underline">Join our community</a>.
+          <a href="/signup" class="text-[#5f22d9] underline hover:no-underline">Join our community</a>.
         </p>
       </div>
 

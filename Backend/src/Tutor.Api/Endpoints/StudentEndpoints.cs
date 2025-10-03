@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
+using Tutor.Api.Filters;
 using Tutor.Application.Features.Booking.AddToCalendar;
 using Tutor.Application.Features.Booking.CreateBooking;
 using Tutor.Application.Features.Booking.Dto;
@@ -51,14 +52,15 @@ public static class StudentEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
+            .AddEndpointFilter<ValidationFilter>() 
             .WithName("CreateStudentProfile")
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
             .Produces<StudentDto>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
-        group.MapGet("/student-profile",
-                async (IMediator mediator, HttpContext httpContext) =>
+        group.MapGet("/student-profile/{studentId}",
+                async (IMediator mediator, HttpContext httpContext, int studentId) =>
                 {
                     var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userIdClaim))
@@ -66,13 +68,19 @@ public static class StudentEndpoints
 
                     if (!int.TryParse(userIdClaim, out var userId))
                         return Results.BadRequest("Invalid UserId in token");
-                    var command = new GetStudentCommand(userId);
+                    var role = httpContext.User.FindFirst(ClaimTypes.Role)?.Value;
+                    if (studentId == userId || role == "Admin")
+                    {
+                        var command = new GetStudentCommand(userId);
 
-                    var result = await mediator.Send(command);
+                        var result = await mediator.Send(command);
 
-                    return result.IsSuccess
-                        ? Results.Ok(result.Value)
-                        : Results.BadRequest(result.Errors);
+                        return result.IsSuccess
+                            ? Results.Ok(result.Value)
+                            : Results.BadRequest(result.Errors);
+                    }
+                    return Results.BadRequest("TOu cannot access this student");
+                    
                 })
             .WithName("GetStudentProfile")
             .Produces<StudentDto>(StatusCodes.Status200OK)
@@ -80,6 +88,7 @@ public static class StudentEndpoints
             .RequireAuthorization("ActiveUserOnly")
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
+        
         group.MapGet("/all-students",
                 async (IMediator mediator) =>
                 {
@@ -116,6 +125,7 @@ public static class StudentEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
+            .AddEndpointFilter<ValidationFilter>() 
             .WithName("UpdateStudentProfile")
             .Produces<StudentDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy")
@@ -139,7 +149,9 @@ public static class StudentEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("CreateBooking")
+                })
+            .AddEndpointFilter<ValidationFilter>() 
+            .WithName("CreateBooking")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
@@ -252,7 +264,9 @@ public static class StudentEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("CreateReview")
+                })
+            .AddEndpointFilter<ValidationFilter>() 
+            .WithName("CreateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
@@ -276,7 +290,9 @@ public static class StudentEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("UpdateReview")
+                })
+            .AddEndpointFilter<ValidationFilter>() 
+            .WithName("UpdateReview")
             .Produces<ReviewDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy")
             .RequireAuthorization("ActiveUserOnly")

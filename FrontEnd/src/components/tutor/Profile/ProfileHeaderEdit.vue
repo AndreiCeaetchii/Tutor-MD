@@ -76,12 +76,19 @@
           </div>
         </div>
 
-        <div class="mt-6 lg:mt-0 lg:self-start">
+        <div class="flex flex-col mt-6 space-y-4 lg:mt-0 lg:ml-4 lg:self-start">
           <button
             type="submit"
             class="bg-white text-[#5f22d9] font-semibold py-2 px-6 rounded-full shadow hover:bg-gray-100 transition-colors"
           >
             Save Changes
+          </button>
+          <button 
+            type="button"
+            @click="$emit('cancel-edit')" 
+            class="border border-white text-white font-semibold py-2 px-6 rounded-full shadow hover:bg-[#4a3de1] transition-colors"
+          >
+            Cancel
           </button>
         </div>
       </div>
@@ -116,5 +123,5 @@
     },
   });
 
-  const emits = defineEmits(['save-profile']);
+  const emits = defineEmits(['save-profile', 'cancel-edit']);
 </script>

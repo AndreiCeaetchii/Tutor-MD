@@ -13,11 +13,9 @@ export interface MfaSetupResponse {
 }
 
 const API_URL =
-  (import.meta as any).env?.VITE_API_BASE_URL ||
-  (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api/users'
-;
-
+  (import.meta as any).env?.VITE_API_BASE_URL_USER ||
+  (window as any)?.VITE_API_BASE_URL_USER ||
+  'http://localhost:8080/api/users';
 const userAxios = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -69,9 +67,7 @@ export const enableMfa = async () => {
     const response = await userAxios.put<MfaSetupResponse>(`/enable-mfa`, {});
     return response.data;
   } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message || 'Failed to enable MFA. Please try again.',
-    );
+    throw new Error(error.response?.data?.message || 'Failed to enable MFA. Please try again.');
   }
 };
 
@@ -79,13 +75,17 @@ export const verifyMfaSetup = async (code: string) => {
   try {
     const formattedCode = code.trim().padStart(6, '0').substring(0, 6);
 
-    const response = await userAxios.put(`/verify-enable-mfa`, { 
-      code: formattedCode 
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
+    const response = await userAxios.put(
+      `/verify-enable-mfa`,
+      {
+        code: formattedCode,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
 
     return response.data;
   } catch (error: any) {
@@ -106,8 +106,6 @@ export const disableMfa = async () => {
     return response.data;
   } catch (error: any) {
     console.error('Disable MFA error:', error);
-    throw new Error(
-      error.response?.data?.message || 'Failed to disable MFA. Please try again.',
-    );
+    throw new Error(error.response?.data?.message || 'Failed to disable MFA. Please try again.');
   }
 };

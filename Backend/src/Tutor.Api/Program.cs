@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ using System;
 using System.Threading;
 using Tutor.Api.Common;
 using Tutor.Api.Filters.Guards;
+using Tutor.Application.Interfaces;
 using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
 using Tutor.Infrastructure.Seeder;
@@ -40,6 +42,12 @@ builder.Services.AddPersistenceSetup(builder.Configuration);
 builder.Services.AddHangfire(config =>
     config.UseMemoryStorage());
 builder.Services.AddHangfireServer();
+//Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "TutorApp:"; // Optional: prefix for keys
+});
 
 // Application layer setup
 builder.Services.AddApplicationSetup(builder.Configuration);
@@ -87,7 +95,9 @@ builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
     options.Cookie.SameSite = SameSiteMode.None;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+
+    //Instead of Always we use SameAsRequest to allow local testing over http
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; 
     options.Cookie.IsEssential = true; 
 });
 
@@ -108,9 +118,12 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
     await context.Database.MigrateAsync();
     await SubjectSeeder.SeedAsync(context);
     await RoleSeeder.SeedAsync(context);
+    await AdminSeeder.SeedAsync(context,passwordHasher);
     var scheduler = scope.ServiceProvider.GetRequiredService<JobSchedulerService>();
     await scheduler.StartAsync(CancellationToken.None);
 }
@@ -141,12 +154,12 @@ app.Use(async (context, next) =>
          HttpMethods.IsPut(context.Request.Method) ||
          HttpMethods.IsDelete(context.Request.Method))
         && !(path.Contains("/login") || path.Contains("/register")
-                                     || path.Contains("/login-auth") || path.Contains("/register-auth")))
+                                     || path.Contains("/login-auth") || path.Contains("/register-auth")|| path.Contains("/password")))
     {
         if (!context.Request.Headers.ContainsKey("X-CSRF-TOKEN"))
         {
             context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            await context.Response.WriteAsJsonAsync(new { error = "Forbidden", detail = "Missing CSRF cookie." });
+            await context.Response.WriteAsJsonAsync(new { error = "Forbidden", detail = "Missing CSRF token." });
             return;
         }
 

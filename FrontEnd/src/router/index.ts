@@ -34,7 +34,6 @@ import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
 import MFASetupPage from '../pages/MFASetupPage.vue';
 
-
 import HowItWorksPage from '../components/footer/HowItWorksPage.vue';
 import HelpCenterPage from '../components/footer/HelpCenterPage.vue';
 import AboutUsPage from '../components/footer/AboutUsPage.vue';

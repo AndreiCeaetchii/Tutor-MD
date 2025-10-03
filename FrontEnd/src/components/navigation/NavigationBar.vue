@@ -53,6 +53,15 @@
     overflow-x: auto;
   }
 
+  .hide-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   button,
   .router-link-active {
     white-space: nowrap;

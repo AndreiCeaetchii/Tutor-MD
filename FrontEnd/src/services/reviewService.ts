@@ -4,7 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api';
+  'http://localhost:8080/api';
 
 const reviewAxios = axios.create({
   baseURL: API_URL,
@@ -49,21 +49,8 @@ export interface CreateReviewDto {
 
 export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResponse> => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.get<TutorReviewsResponse>(
-      `${API_URL}/students/reviews/${tutorId}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      },
+    const response = await reviewAxios.get<TutorReviewsResponse>(
+      `/students/reviews/${tutorId}`
     );
 
     return response.data;
@@ -82,20 +69,7 @@ export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResp
 
 export const createReview = async (reviewData: CreateReviewDto) => {
   try {
-    const userStore = useUserStore();
-    const token = userStore.accessToken;
-
-    if (!token) {
-      throw new Error('Access token not available. Please log in.');
-    }
-
-    const response = await axios.post(`${API_URL}/students/reviews/create`, reviewData, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      withCredentials: true,
-    });
+    const response = await reviewAxios.post(`/students/reviews/create`, reviewData);
 
     return response.data;
   } catch (error) {

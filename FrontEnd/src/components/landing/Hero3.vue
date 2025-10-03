@@ -7,8 +7,8 @@
     <div class="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-12">
         <h2 class="text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-          See how our visitors & members<br>
-          made their <span class="text-blue-500">#Success Stories</span>
+          See how our students<br>
+          created their <span class="text-blue-500">#Success Stories</span>
         </h2>
       </div>
 
@@ -17,10 +17,116 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Andrei Ionescu">
               <img class="object-cover w-12 h-12 rounded-full" src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="Michael Mueller">
               <div>
-                <h4 class="font-semibold text-gray-900">Michael Mueller</h4>
-                <p class="text-sm text-gray-500">5th Standard, Dubai UAE</p>
+                <h4 class="font-semibold text-gray-900">Andrei Ionescu</h4>
+                <p class="text-sm text-gray-500">10th Grade, Cluj-Napoca</p>
+                <div class="flex items-center space-x-0.5 mt-1">
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                </div>
+              </div>
+            </div>
+            <p class="mb-4 text-lg font-semibold text-gray-800">
+              My math grades improved from C to A- in just two months!
+            </p>
+            <p class="text-sm text-gray-600">
+              "Before using TutorMd, I struggled with advanced calculus. My tutor made complex concepts easy to understand with practical examples from Romanian engineering achievements. Now I'm confident in my abilities and planning to study engineering."
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
+          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
+            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
+            <div class="flex items-center mb-4 space-x-4">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" alt="Elena Dumitrescu">
+              <div>
+                <h4 class="font-semibold text-gray-900">Elena Dumitrescu</h4>
+                <p class="text-sm text-gray-500">8th Grade, Timisoara</p>
+                <div class="flex items-center space-x-0.5 mt-1">
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                </div>
+              </div>
+            </div>
+            <p class="mb-4 text-lg font-semibold text-gray-800">
+              The flexible online tutoring saved my academic year
+            </p>
+            <p class="text-sm text-gray-600">
+              "When I moved from Bucharest to Timisoara mid-school year, I was falling behind in English literature. My TutorMd tutor helped me catch up with the new curriculum while accommodating my schedule. The personalized lessons were exactly what I needed."
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
+          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
+            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
+            <div class="flex items-center mb-4 space-x-4">
+              <!-- Changed Mihai's photo to a different one -->
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Mihai Popa">
+              <div>
+                <h4 class="font-semibold text-gray-900">Mihai Popa</h4>
+                <p class="text-sm text-gray-500">University Student, Iasi</p>
+                <div class="flex items-center space-x-0.5 mt-1">
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                </div>
+              </div>
+            </div>
+            <p class="mb-4 text-lg font-semibold text-gray-800">
+              Passed my computer science entrance exam with flying colors
+            </p>
+            <p class="text-sm text-gray-600">
+              "The specialized tutoring for university entrance exams was exactly what I needed. My tutor was a graduate from my target university and shared insider tips on the admission process. Now I'm studying computer science at my dream university!"
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
+          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
+            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
+            <div class="flex items-center mb-4 space-x-4">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1629467057571-42d22d8f0cbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=698&q=80" alt="Ana Rusu">
+              <div>
+                <h4 class="font-semibold text-gray-900">Ana Rusu</h4>
+                <p class="text-sm text-gray-500">11th Grade, Chisinau, Moldova</p>
+                <div class="flex items-center space-x-0.5 mt-1">
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
+                </div>
+              </div>
+            </div>
+            <p class="mb-4 text-lg font-semibold text-gray-800">
+              Improved my English language skills dramatically
+            </p>
+            <p class="text-sm text-gray-600">
+              "As a student from Moldova preparing for international studies, I needed to perfect my English. My tutor customized lessons around my interests in technology and helped me prepare for the TOEFL exam. I scored 112 out of 120 points!"
+            </p>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
+          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
+            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
+            <div class="flex items-center mb-4 space-x-4">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Vasile Munteanu">
+              <div>
+                <h4 class="font-semibold text-gray-900">Vasile Munteanu</h4>
+                <p class="text-sm text-gray-500">Parent, Brasov</p>
                 <div class="flex items-center space-x-0.5 mt-1">
                   <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
                   <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
@@ -31,10 +137,10 @@
               </div>
             </div>
             <p class="mb-4 text-lg font-semibold text-gray-800">
-              I highly recommend this platform, amazing experience with fast delivery
+              The perfect solution for my daughter's chemistry struggles
             </p>
             <p class="text-sm text-gray-600">
-              "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more."
+              "My daughter was struggling with chemistry and losing confidence. Her TutorMd tutor not only helped her understand the subject but also rekindled her interest in science. The progress reports kept me informed of her improvement throughout the semester."
             </p>
           </div>
         </div>
@@ -43,10 +149,10 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Bobbie Schwartz">
+              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80" alt="Ion Cebanu">
               <div>
-                <h4 class="font-semibold text-gray-900">Bobbie Schwartz</h4>
-                <p class="text-sm text-gray-500">2nd Standard, Manchester UK</p>
+                <h4 class="font-semibold text-gray-900">Ion Cebanu</h4>
+                <p class="text-sm text-gray-500">High School Teacher, Balti, Moldova</p>
                 <div class="flex items-center space-x-0.5 mt-1">
                   <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
                   <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
@@ -57,114 +163,10 @@
               </div>
             </div>
             <p class="mb-4 text-lg font-semibold text-gray-800">
-              I really can imagin how professional they are. Just amazing experience
+              I recommend TutorMd to all my students who need extra help
             </p>
             <p class="text-sm text-gray-600">
-              "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look."
-            </p>
-          </div>
-        </div>
-
-        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
-          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
-            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
-            <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Cecil Sims">
-              <div>
-                <h4 class="font-semibold text-gray-900">Cecil Sims</h4>
-                <p class="text-sm text-gray-500">7th Standard, Rome Italy</p>
-                <div class="flex items-center space-x-0.5 mt-1">
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                </div>
-              </div>
-            </div>
-            <p class="mb-4 text-lg font-semibold text-gray-800">
-              On first project I feel its a mess then later it turn into an great details for me
-            </p>
-            <p class="text-sm text-gray-600">
-              "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old."
-            </p>
-          </div>
-        </div>
-
-        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
-          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
-            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
-            <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Cecil Sims">
-              <div>
-                <h4 class="font-semibold text-gray-900">Cecil Sims</h4>
-                <p class="text-sm text-gray-500">7th Standard, Rome Italy</p>
-                <div class="flex items-center space-x-0.5 mt-1">
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                </div>
-              </div>
-            </div>
-            <p class="mb-4 text-lg font-semibold text-gray-800">
-              On first project I feel its a mess then later it turn into an great details for me
-            </p>
-            <p class="text-sm text-gray-600">
-              "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old."
-            </p>
-          </div>
-        </div>
-
-        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
-          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
-            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
-            <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Bobbie Schwartz">
-              <div>
-                <h4 class="font-semibold text-gray-900">Bobbie Schwartz</h4>
-                <p class="text-sm text-gray-500">2nd Standard, Manchester UK</p>
-                <div class="flex items-center space-x-0.5 mt-1">
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                </div>
-              </div>
-            </div>
-            <p class="mb-4 text-lg font-semibold text-gray-800">
-              I really can imagin how professional they are. Just amazing experience
-            </p>
-            <p class="text-sm text-gray-600">
-              "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look."
-            </p>
-          </div>
-        </div>
-
-        <div class="flex-shrink-0 w-full p-4 md:w-1/2 lg:w-1/3">
-          <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
-            <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
-            <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Bobbie Schwartz">
-              <div>
-                <h4 class="font-semibold text-gray-900">Bobbie Schwartz</h4>
-                <p class="text-sm text-gray-500">2nd Standard, Manchester UK</p>
-                <div class="flex items-center space-x-0.5 mt-1">
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                  <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
-                </div>
-              </div>
-            </div>
-            <p class="mb-4 text-lg font-semibold text-gray-800">
-              I really can imagin how professional they are. Just amazing experience
-            </p>
-            <p class="text-sm text-gray-600">
-              "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look."
+              "As a high school teacher, I've seen remarkable progress in students who use TutorMd for supplementary education. The platform complements classroom learning perfectly, and I appreciate how they incorporate our regional curriculum standards."
             </p>
           </div>
         </div>

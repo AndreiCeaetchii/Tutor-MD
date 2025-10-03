@@ -4,9 +4,7 @@ import { useUserStore } from '../store/userStore';
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
   (window as any)?.VITE_API_BASE_URL ||
-  'https://localhost:8085/api'
-;
-
+  'http://localhost:8080/api';
 const studentAxios = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -94,9 +92,9 @@ export const updateStudentProfile = async (profileData: UpdateProfileDto) => {
   }
 };
 
-export const getStudentProfile = async () => {
+export const getStudentProfile = async (studentId: string) => {
   try {
-    const response = await studentAxios.get(`/students/student-profile`, {
+    const response = await studentAxios.get(`/students/student-profile/${studentId}`, {
       headers: {
         'Content-Type': 'application/json',
       },

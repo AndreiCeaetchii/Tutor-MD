@@ -15,5 +15,7 @@ public interface IUserService
     Task<Result> ActivateUserAsync(int userId);
     Task<Result> DeactivateUserAsync(int userId);
     Task<Result> CreateAdminAsync(int userId);
+    Task<Result> RequestPasswordResetAsync(string email);
+    Task<Result> ResetPasswordAsync(string token, string newPassword);
     Task Update(User user);
 }

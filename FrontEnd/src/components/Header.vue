@@ -50,8 +50,7 @@
   const profileButton = ref<HTMLElement | null>(null);
   const profileMenu = ref<HTMLElement | null>(null);
 
-  // Get MFA status directly from the store
-  const hasMfa = computed(() => store.hasMfa);
+  const hasMfa = computed(() => store.mfaEnabled);
 
   function toggleMenu() {
     isMenuOpen.value = !isMenuOpen.value;
@@ -80,7 +79,6 @@
 
   const userRole = computed(() => store.userRole);
 
-  // Navigation based on user role
   function navigateBasedOnRole(path: string) {
     const role = userRole.value;
     if (role === 'tutor') {
@@ -96,23 +94,28 @@
   }
 
   const userName = computed(() => {
-    if (userRole.value === 'student') {
-      if (studentProfileStore.userProfile?.username) {
-        return studentProfileStore.userProfile.username;
-      }
-      
-      if (store.email) {
-        const emailPart = store.email.split('@')[0];
-        const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
-        studentProfileStore.updateUsername(cleanEmailPart);
-        return cleanEmailPart;
-      }
-      
-      return 'user';
-    } else {
-      return profileStore.userName || '';
+  if (userRole.value === 'student') {
+    if (studentProfileStore.userProfile?.username) {
+      return studentProfileStore.userProfile.username;
     }
-  });
+    
+    if (store.email) {
+      const emailPart = store.email.split('@')[0];
+      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+      studentProfileStore.updateUsername(cleanEmailPart);
+      return cleanEmailPart;
+    }
+    
+    return 'user';
+  } else if (userRole.value === 'admin') {
+    if (store.email) {
+      return `Admin`;
+    }
+    return 'Administrator';
+  } else {
+    return profileStore.userName || '';
+  }
+});
 
   const email = computed(() => store.email);
 
@@ -179,7 +182,6 @@
                   <p class="mt-1 text-xs text-gray-500 truncate">{{ email }}</p>
                 </div>
                 <div class="py-1">
-                  <!-- 2FA Security with check mark -->
                   <button
                     @click="navigateToMfaSetup"
                     class="block w-full text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
@@ -278,13 +280,13 @@
           <div v-else class="flex space-x-2">
             <router-link
               to="/login"
-              class="px-4 py-1 text-sm text-purple-600 border border-purple-600 rounded-full hover:text-purple-800"
+              class="px-4 py-1 text-sm text-[#5f22d9] border border-[#5d15ec] rounded-full hover:text-purple-800"
             >
               Login
             </router-link>
             <router-link
               to="/signup"
-              class="bg-[#5f22d9] hover:bg-purple-700 text-white px-4 py-1 rounded-full text-sm"
+              class="bg-[#5f22d9] hover:bg-[#5d15ec] text-white px-4 py-1 rounded-full text-sm"
             >
               Sign Up
             </router-link>
@@ -293,6 +295,7 @@
 
         <div class="md:hidden">
           <button
+            v-if="store.isAuthenticated"
             @click="toggleMenu"
             aria-label="Toggle menu"
             class="p-2 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
@@ -303,10 +306,9 @@
         </div>
       </div>
 
-      <div v-if="isMenuOpen" class="md:hidden">
+      <div v-if="isMenuOpen && store.isAuthenticated" class="md:hidden">
         <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100 sm:px-3">
           <div class="py-2 space-y-1">
-            <!-- Mobile menu links - also update icons here -->
             <button
               @click="navigateBasedOnRole(userRole === 'student' ? '/account' : '/profile')"
               class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
@@ -382,7 +384,7 @@
               </div>
             </div>
 
-            <div v-else class="flex items-center justify-center space-x-4 px-3">
+            <div v-else class="flex space-x-2">
               <router-link
                 to="/login"
                 class="px-4 py-1 text-sm text-purple-600 border border-purple-600 rounded-full hover:text-purple-800"

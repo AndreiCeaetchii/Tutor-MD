@@ -8,7 +8,7 @@ interface UserState {
   userId: string | null;
   role: UserRole | null;
   email: string | null;
-  hasMfa: boolean;
+  mfaEnabled: boolean;
   csrfToken: string | null;
 }
 
@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', {
     userId: null,
     role: null,
     email: null,
-    hasMfa: false,
+    mfaEnabled: false,
     csrfToken: null
   }),
   getters: {
@@ -27,12 +27,13 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.accessToken,
   },
   actions: {
-    setUser(token: string, id: string, role: UserRole, email: string) {
+    setUser(token: string, id: string, role: UserRole, email: string, hasMfa: boolean = false) {
 
       this.accessToken = token;
       this.userId = id;
       this.role = role;
       this.email = email;
+      this.mfaEnabled = hasMfa;
     },
 
     setCsrfToken(token: string) {
@@ -44,7 +45,6 @@ export const useUserStore = defineStore('user', {
       this.userId = null;
       this.role = null;
       this.email = null;
-      this.hasMfa = false;
       const notificationStore = useNotificationStore();
       notificationStore.notifications = [];
       notificationStore.locallyReadIds = [];
@@ -61,7 +61,7 @@ export const useUserStore = defineStore('user', {
     },
 
     updateUserMfaStatus(status: boolean) {
-    this.hasMfa = status;
+    this.mfaEnabled = status;
   },
   },
   persist: true,

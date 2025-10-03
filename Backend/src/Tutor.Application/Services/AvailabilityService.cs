@@ -113,8 +113,6 @@ public class AvailabilityService : IAvailabilityService
         var today = DateOnly.FromDateTime(DateTime.Now);
 
         var tutorAvailabilities = await _availabilityRepository.FindAsync(u => u.TutorUserId == tutorUserId && u.Date>= today);
-        if (tutorAvailabilities.Count == 0)
-            return Result<List<AvailabilityDto>>.Error("Tutor does not have any availability");
         return Result<List<AvailabilityDto>>.Success(
             _mapper.Map<List<AvailabilityDto>>(tutorAvailabilities)
         );

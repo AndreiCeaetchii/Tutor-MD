@@ -193,14 +193,14 @@ const { bookingIdForReview, tutorName, subjectName, tutorPhoto, lessonDate, have
             </div>
           </div>
         </div>
-        <div v-if="isLoading" class="text-center text-gray-500">Se încarcă recenziile...</div>
+        <div v-if="isLoading" class="text-center text-gray-500">Loading reviews...</div>
         <div v-else-if="error" class="text-center text-red-500">
           {{ error }}
         </div>
         <div v-else-if="reviews.length > 0" class="space-y-6">
           <ReviewCard v-for="review in reviews" :key="review.id" :review="review" />
         </div>
-        <div v-else class="text-center text-gray-500">There are no reviews for this tutor.</div>
+        <div v-else class="text-center text-gray-500">No reviews found</div>
       </div>
     </div>
   </div>
