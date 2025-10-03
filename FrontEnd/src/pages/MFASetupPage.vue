@@ -32,7 +32,7 @@ async function startMfaSetup() {
     showQrCode.value = true;
   } catch (error: any) {
     console.error('Failed to start MFA setup:', error);
-    alert(error.message);
+
   } finally {
     loading.value = false;
   }
@@ -73,7 +73,6 @@ async function disableMfaAuth() {
     recoveryCodes.value = [];
   } catch (error: any) {
     console.error('Failed to disable MFA:', error);
-    alert(error.message || 'Failed to disable MFA. Please try again.');
   } finally {
     loading.value = false;
   }

@@ -1,7 +1,10 @@
 <template>
   <div class="max-w-6xl p-6 mx-auto bg-white shadow-lg rounded-2xl">
     <template v-if="profileStore.isEditing">
-      <ProfileHeaderEdit :editedProfile="editedProfile" @save-profile="saveChanges" />
+      <ProfileHeaderEdit 
+        :editedProfile="editedProfile" 
+        @save-profile="saveChanges"
+        @cancel-edit="cancelEditing" />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
     </template>
     <template v-else>
@@ -81,7 +84,7 @@
         subjects: serverData.tutorSubjects.map((s: any) => ({
           name: s.subjectName || '',
           price: s.price || 0,
-          currency: s.currency || 'mdl',
+          currency: s.currency || 'MDL',
           subjectId: s.subjectId,
           isNew: false,
           isModified: false,
@@ -119,6 +122,7 @@
           birthdate: profileStore.birthdate,
           country: editedProfile.value.country,
           city: editedProfile.value.city,
+          workingLocation: `${editedProfile.value.city || ''}, ${editedProfile.value.country || ''}`,
           experienceYears: editedProfile.value.experience,
           profileImage: editedProfile.value.profileImage,
         },
@@ -131,13 +135,14 @@
         })),
       };
       await editTutorProfile(profileDataToUpdate.userProfile);
+      console.log('Profile updated:', profileDataToUpdate.userProfile);
       for (const subject of editedProfile.value.subjects) {
         if (subject.isNew) {
           await addSubject({
             subjectName: subject.name,
             subjectSlug: subject.name.toLowerCase().replace(/\s+/g, '-'),
             pricePerHour: subject.price,
-            currency: subject.currency.toLowerCase(),
+            currency: subject.currency,
           });
           subject.isNew = false;
         } else if (subject.isModified) {
@@ -160,5 +165,9 @@
     } catch (error) {
       console.error('Error saving profile changes:', error);
     }
+  };
+  
+  const cancelEditing = () => {
+    profileStore.toggleEditing();
   };
 </script>

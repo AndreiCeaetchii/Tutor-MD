@@ -280,7 +280,45 @@ const cities = computed(() => {
   if (form.value.country === 'Romania') {
     return ['Bucharest', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov'];
   } else if (form.value.country === 'Moldova') {
-    return ['Chișinău', 'Bălți', 'Tiraspol', 'Cahul', 'Ungheni', 'Strășeni', 'Orhei'];
+    return [
+      'Anenii Noi',
+      'Basarabeasca',
+      'Briceni',
+      'Cahul',
+      'Cantemir',
+      'Călărași',
+      'Căușeni',
+      'Chișinău',
+      'Cimișlia',
+      'Criuleni',
+      'Dondușeni',
+      'Drochia',
+      'Dubăsari',
+      'Edineț',
+      'Fălești',
+      'Florești',
+      'Glodeni',
+      'Hîncești',
+      'Ialoveni',
+      'Leova',
+      'Nisporeni',
+      'Ocnița',
+      'Orhei',
+      'Rezina',
+      'Rîșcani',
+      'Sîngerei',
+      'Soroca',
+      'Strășeni',
+      'Șoldănești',
+      'Ștefan Vodă',
+      'Taraclia',
+      'Telenești',
+      'Ungheni',
+      'Bălți',
+      'Comrat',
+      'Tighina',
+      'Tiraspol',
+    ];
   } else if (form.value.country === 'Italy') {
     return ['Rome', 'Milan', 'Florence', 'Naples', 'Turin'];
   } else if (form.value.country === 'Germany') {

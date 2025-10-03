@@ -85,7 +85,7 @@ const handleAddToGoogleCalendar = (bookingId: number): Promise<void> => {
 
   return new Promise((resolve, reject) => {
     const tokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID,
+      client_id: '425538151525-bhujljp8s9kn9vffkd0rf1cad6gd1epb.apps.googleusercontent.com',
       scope: 'https://www.googleapis.com/auth/calendar.events',
 
       callback: async (response: any) => {

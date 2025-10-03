@@ -28,7 +28,6 @@
   const fetchBookings = async () => {
     try {
       const bookings = await getStudentBookings();
-      console.log('Fetched bookings:', bookings);
       if (!bookings.length) {
         return
       }
@@ -39,7 +38,6 @@
           subjectName.value = booking.subjectName;
           tutorPhoto.value = booking.tutorPhoto;
           lessonDate.value = booking.date;
-          console.log('booking id gasit', booking.id);
           break;
         }
       }
@@ -60,7 +58,6 @@
         (review) => review.studentUserId === Number(userIdFromStore)
       );
       HaveToWriteReview.value = BookingIdForReview.value !== 0 && !existingReview;
-      console.log('HaveToWriteReview:', HaveToWriteReview.value);
 
     } catch (err: any) {
       console.error('Failed to fetch reviews:', err);
