@@ -85,7 +85,13 @@ export function useAuth() {
       );
       const data = response.data;
       const userRole = data?.role?.toLowerCase() || formData.role?.toLowerCase() || 'student';
-      store.setUser(data.token, data.id.toString(), userRole, formData.email, data.twoFactorEnabled);
+      store.setUser(
+        data.token,
+        data.id.toString(),
+        userRole,
+        formData.email,
+        data.twoFactorEnabled,
+      );
 
       await fetchCsrfToken();
 
@@ -147,7 +153,6 @@ export function useAuth() {
       requiresMfa.value = false;
       return { success: true, role: userRole };
     } catch (err: any) {
-
       if (
         err.response?.data?.requiresMfa === true ||
         err.response?.data?.message === 'MFA_REQUIRED' ||
@@ -211,7 +216,6 @@ export function useAuth() {
     role?: string,
     mfaCode?: string,
   ): Promise<{ success: boolean; role?: string; requiresMfa?: boolean }> => {
-
     const getRoleId = (role: string): number => {
       switch (role?.toLowerCase()) {
         case 'admin':
@@ -222,6 +226,46 @@ export function useAuth() {
           return 3;
       }
     };
+
+    if (mfaCode) {
+      const savedAccessToken = sessionStorage.getItem('mfa_google_token');
+      const savedEmail = sessionStorage.getItem('mfa_email');
+
+      if (!savedAccessToken || !savedEmail) {
+        errorMessage.value = 'Session expired. Please login again.';
+        return { success: false };
+      }
+
+      const endpoint = isSignup ? GOOGLE_REGISTER_URL : GOOGLE_LOGIN_URL;
+      const requestData: any = {
+        email: savedEmail,
+        accessToken: savedAccessToken,
+        provider: 'google',
+        MfaCode: mfaCode,
+      };
+
+      if (isSignup && role) requestData.roleId = getRoleId(role);
+
+      try {
+        const res = await axios.post(endpoint, requestData, { withCredentials: true });
+        const data = res.data;
+
+        const decoded = decodeJwt(data.token);
+        const userRole = decoded?.role?.toLowerCase() || role?.toLowerCase() || 'student';
+        store.setUser(data.token, data.id, userRole, savedEmail, data.twoFactorEnabled);
+
+        await fetchCsrfToken();
+
+        requiresMfa.value = false;
+        sessionStorage.removeItem('mfa_email');
+        sessionStorage.removeItem('mfa_google_token');
+
+        return { success: true, role: userRole };
+      } catch (err: any) {
+        errorMessage.value = handleAuthError(err, 'mfa');
+        return { success: false };
+      }
+    }
 
     return new Promise((resolve) => {
       const tokenClient = google.accounts.oauth2.initTokenClient({
@@ -246,10 +290,6 @@ export function useAuth() {
               provider: 'google',
             };
 
-            if (mfaCode) {
-              requestData.MfaCode = mfaCode;
-            }
-
             if (isSignup && role) requestData.roleId = getRoleId(role);
 
             try {
@@ -265,6 +305,7 @@ export function useAuth() {
               ) {
                 requiresMfa.value = true;
                 sessionStorage.setItem('mfa_email', email);
+                sessionStorage.setItem('mfa_google_token', response.access_token);
                 return resolve({ success: false, requiresMfa: true });
               }
 
@@ -276,7 +317,6 @@ export function useAuth() {
 
               resolve({ success: true, role: userRole });
             } catch (err: any) {
-
               if (
                 err.response?.data?.requiresMfa === true ||
                 err.response?.data?.message === 'MFA_REQUIRED' ||
@@ -287,6 +327,7 @@ export function useAuth() {
               ) {
                 requiresMfa.value = true;
                 sessionStorage.setItem('mfa_email', email);
+                sessionStorage.setItem('mfa_google_token', response.access_token);
                 return resolve({ success: false, requiresMfa: true });
               }
 

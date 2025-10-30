@@ -9,7 +9,7 @@
   interface LoginFormData {
     email: string;
     password: string;
-    mfaCode?: string; // Adaugă codul MFA opțional
+    mfaCode?: string;
   }
 
   const { login, loginWithGoogle, errorMessage, requiresMfa } = useAuth();
@@ -22,10 +22,10 @@
   });
 
   const touchedFields = ref<Set<string>>(new Set());
+  const isGoogleMfa = ref(false);
 
-  // Definirea validărilor
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
   const emailError = computed(() => {
     if (!touchedFields.value.has('email') || emailRegex.test(formData.value.email)) return '';
     return 'Please enter a valid email address';
@@ -35,11 +35,14 @@
     if (!touchedFields.value.has('password') || formData.value.password) return '';
     return 'Password is required';
   });
-  
-  // Fixed error message translation to English
+
   const mfaCodeError = computed(() => {
-    if (!requiresMfa.value || !touchedFields.value.has('mfaCode') || 
-        (formData.value.mfaCode && formData.value.mfaCode.length === 6)) return '';
+    if (
+      !requiresMfa.value ||
+      !touchedFields.value.has('mfaCode') ||
+      (formData.value.mfaCode && formData.value.mfaCode.length === 6)
+    )
+      return '';
     return 'Please enter a valid 6-digit code';
   });
 
@@ -70,6 +73,32 @@
   };
 
   const handleSubmit = async (data: LoginFormData) => {
+    if (isGoogleMfa.value && requiresMfa.value) {
+      touchedFields.value.add('mfaCode');
+      if (!formData.value.mfaCode || formData.value.mfaCode.length !== 6) {
+        return;
+      }
+
+      const result = await loginWithGoogle(false, undefined, formData.value.mfaCode);
+
+      if (result.requiresMfa) {
+        requiresMfa.value = true;
+        return;
+      }
+
+      if (!result.success) return;
+
+      showSuccess();
+
+      const userStore = useUserStore();
+      const userRole = userStore.userRole;
+
+      setTimeout(() => {
+        navigateBasedOnRole(userRole ?? '');
+      }, 1000);
+      return;
+    }
+
     touchedFields.value.add('email');
     touchedFields.value.add('password');
 
@@ -97,12 +126,13 @@
     }
 
     const result = await login(loginData);
-    
+
     if (result.requiresMfa) {
       requiresMfa.value = true;
+      isGoogleMfa.value = false;
       return;
     }
-    
+
     if (!result.success) return;
 
     showSuccess();
@@ -135,19 +165,35 @@
       if (!formData.value.mfaCode || formData.value.mfaCode.length !== 6) {
         return;
       }
+
+      const result = await loginWithGoogle(false, undefined, formData.value.mfaCode);
+
+      if (result.requiresMfa) {
+        requiresMfa.value = true;
+        return;
+      }
+
+      if (!result.success) return;
+
+      showSuccess();
+
+      const userStore = useUserStore();
+      const userRole = userStore.userRole;
+
+      setTimeout(() => {
+        navigateBasedOnRole(userRole ?? '');
+      }, 1000);
+      return;
     }
 
-    const result = await loginWithGoogle(
-      false, 
-      undefined, 
-      requiresMfa.value ? formData.value.mfaCode : undefined
-    );
+    const result = await loginWithGoogle(false);
 
     if (result.requiresMfa) {
       requiresMfa.value = true;
+      isGoogleMfa.value = true;
       return;
     }
-    
+
     if (!result.success) return;
 
     showSuccess();
@@ -156,15 +202,7 @@
     const userRole = userStore.userRole;
 
     setTimeout(() => {
-      if (userRole === 'tutor') {
-        router.push('/tutor-dashboard');
-      } else if (userRole === 'student') {
-        router.push('/student-dashboard');
-      } else if (userRole === 'admin') {
-        router.push('/admin-dashboard');
-      } else {
-        router.push('/landing');
-      }
+      navigateBasedOnRole(userRole ?? '');
     }, 1000);
   };
 </script>
@@ -187,6 +225,7 @@
     footerLinkText="Sign up"
     footerLinkPath="/signup"
     :isLogin="true"
+    :hideEmailPassword="requiresMfa && isGoogleMfa"
     @submit="handleSubmit"
     @socialLogin="handleSocialLogin"
     @fieldBlur="handleFieldBlur"
@@ -213,7 +252,7 @@
             :class="[
               fieldErrors?.mfaCode
                 ? 'border-red-500 focus:ring-red-200 focus:border-red-500'
-                : 'border-gray-300 focus:ring-purple-100 focus:border-[#5f22d9]'
+                : 'border-gray-300 focus:ring-purple-100 focus:border-[#5f22d9]',
             ]"
             @blur="handleFieldBlur('mfaCode')"
             @input="(e) => handleFieldInput('mfaCode', (e.target as HTMLInputElement).value)"
@@ -226,8 +265,19 @@
           {{ fieldErrors.mfaCode }}
         </p>
         <div class="flex items-start mt-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 mr-1 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-gray-500 mr-1 flex-shrink-0 mt-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           <p class="text-sm text-gray-600">
             Open your authentication app and enter the code displayed for your account.

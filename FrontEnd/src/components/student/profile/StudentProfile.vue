@@ -68,12 +68,9 @@ const syncProfileWithStore = () => {
   onMounted(initializeProfile);
 
   const handleSave = async () => {
-  // Format the birthdate properly for the backend
   let formattedBirthdate = userProfile.value.birthdate;
   
-  // If the birthdate is not in the correct format, format it
   if (formattedBirthdate && !formattedBirthdate.includes('T00:00:00')) {
-    // Ensure we have a valid date format before processing
     const parsedDate = new Date(formattedBirthdate);
     if (!isNaN(parsedDate.getTime())) {
       const yyyy = parsedDate.getFullYear();
