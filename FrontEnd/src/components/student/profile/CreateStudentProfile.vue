@@ -53,13 +53,11 @@ const currentYear = new Date().getFullYear();
 const minYear = 1930;
 const maxYear = currentYear - 5;
 
-// Direct validation refs
 const phoneError = ref('');
 const birthDateError = ref('');
 const countryError = ref('');
 const cityError = ref('');
 
-// Phone validation pattern
 const phonePattern = /^\+[0-9]{1,4}[0-9]{6,14}$/;
 
 const cities = computed(() => {
@@ -178,7 +176,6 @@ const validateLocation = () => {
   return isValid;
 };
 
-// Event handlers
 const validatePhoneInput = () => {
   validatePhone();
 };
@@ -195,7 +192,6 @@ const clearBirthdateError = () => {
   if (birthDateError.value) birthDateError.value = '';
 };
 
-// Limit enforcement
 const enforceMax = (val: number | null, maxLimit: number, targetRef: any) => {
   if (val === null) return;
   if (val > maxLimit) {
