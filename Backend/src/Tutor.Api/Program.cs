@@ -97,6 +97,9 @@ builder.Services.AddMediatRSetup();
 // Exception handler
 builder.Services.AddExceptionHandler<ExceptionHandler>();
 
+// Rate limiting
+builder.Services.AddRateLimitingSetup(builder.Configuration);
+
 //Anti forgery
 builder.Services.AddAntiforgery(options =>
 {
@@ -141,17 +144,21 @@ app.UseResponseCompression();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
+    // Use HTTPS in development
+    app.UseHttpsRedirection();
 }
-
-app.UseHsts();
-app.UseResponseCompression();
-app.UseHttpsRedirection();
+else
+{
+    // In production/Docker, we're behind a reverse proxy that handles HTTPS
+    // So we don't need HSTS or HTTPS redirection
+}
 app.UseCors("AllowFrontend");
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.Use(async (context, next) =>
 {
     var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
