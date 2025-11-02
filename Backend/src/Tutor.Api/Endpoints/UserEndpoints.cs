@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -70,6 +71,7 @@ public static class UserEndpoints
                     }
                 })
             .AddEndpointFilter<ValidationFilter>()
+            .RequireRateLimiting("auth")
             .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterUser");
@@ -100,7 +102,9 @@ public static class UserEndpoints
                 {
                     return Results.BadRequest(result.Errors);
                 }
-            }).Produces<UserResponseDto>(StatusCodes.Status200OK)
+            })
+            .RequireRateLimiting("auth")
+            .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginUser");
         group.MapPut("/refresh", async (IMediator mediator, HttpContext context) =>
@@ -177,7 +181,9 @@ public static class UserEndpoints
                     {
                         return Results.BadRequest(result.Errors);
                     }
-                }).Produces<UserResponseDto>(StatusCodes.Status200OK)
+                })
+            .RequireRateLimiting("auth")
+            .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("RegisterAuthUser");
 
@@ -208,7 +214,9 @@ public static class UserEndpoints
                     {
                         return Results.BadRequest(result.Errors);
                     }
-                }).Produces<UserResponseDto>(StatusCodes.Status200OK)
+                })
+            .RequireRateLimiting("auth")
+            .Produces<UserResponseDto>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithName("LoginAuthUser");
         group.MapPut("/password",
@@ -219,7 +227,9 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("RequestResetPassword")
+                })
+            .RequireRateLimiting("password-reset")
+            .WithName("RequestResetPassword")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
         group.MapPut("/password-reset",
@@ -230,7 +240,9 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("ResetPassword")
+                })
+            .RequireRateLimiting("password-reset")
+            .WithName("ResetPassword")
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized);
 
@@ -249,7 +261,9 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).Produces<EnableMFAResponse>(StatusCodes.Status200OK)
+                })
+            .RequireRateLimiting("sensitive")
+            .Produces<EnableMFAResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
@@ -270,7 +284,9 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).Produces<bool>(StatusCodes.Status200OK)
+                })
+            .RequireRateLimiting("sensitive")
+            .Produces<bool>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
@@ -291,7 +307,9 @@ public static class UserEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).Produces<bool>(StatusCodes.Status200OK)
+                })
+            .RequireRateLimiting("sensitive")
+            .Produces<bool>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")

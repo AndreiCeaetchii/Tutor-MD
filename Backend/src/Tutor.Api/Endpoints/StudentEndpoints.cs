@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using System.Security.Claims;
 using Tutor.Api.Filters;
@@ -150,7 +151,8 @@ public static class StudentEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
-            .AddEndpointFilter<ValidationFilter>() 
+            .AddEndpointFilter<ValidationFilter>()
+            .RequireRateLimiting("sensitive")
             .WithName("CreateBooking")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("StudentPolicy")
@@ -174,7 +176,9 @@ public static class StudentEndpoints
                     return result.IsSuccess
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
-                }).WithName("UpdateBookingStatus")
+                })
+            .RequireRateLimiting("sensitive")
+            .WithName("UpdateBookingStatus")
             .Produces<BookingDto>(StatusCodes.Status200OK)
             .RequireAuthorization("TutorOrStudentPolicy")
             .RequireAuthorization("ActiveUserOnly")
