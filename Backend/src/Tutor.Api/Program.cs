@@ -1,11 +1,9 @@
-using Ardalis.Result;
 using DotNetEnv;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +15,7 @@ using System;
 using System.Threading;
 using Tutor.Api.Common;
 using Tutor.Api.Filters.Guards;
+using Tutor.Api.Middlewares;
 using Tutor.Application.Interfaces;
 using Tutor.Application.Services.Background;
 using Tutor.Infrastructure;
@@ -140,6 +139,9 @@ using (var scope = app.Services.CreateScope())
 
 // Configure the HTTP request pipeline.
 app.UseResponseCompression();
+
+// Add security headers middleware (CSP, X-Frame-Options, etc.)
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
