@@ -145,7 +145,7 @@ export function useAuth() {
 
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      console.log(data);
+      // console.log(data);
       store.setUser(data.token, data.id, userRole, formData.email, data.twoFactorEnabled);
 
       await fetchCsrfToken();

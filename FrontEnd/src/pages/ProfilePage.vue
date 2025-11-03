@@ -59,7 +59,7 @@
     try {
       const userIdFromUrl = route.params.id ? Number(route.params.id) : Number(userStore.userId);
       const serverData = await getTutorProfile(userIdFromUrl);
-      console.log('Fetched profile data:', serverData);
+      // console.log('Fetched profile data:', serverData);
       if (!serverData || !serverData.userProfile || !serverData.userProfile.username) {
         await router.push('/create-profile');
         return;
@@ -136,7 +136,7 @@
         })),
       };
       await editTutorProfile(profileDataToUpdate.userProfile);
-      console.log('Profile updated:', profileDataToUpdate.userProfile);
+      // console.log('Profile updated:', profileDataToUpdate.userProfile);
       for (const subject of editedProfile.value.subjects) {
         if (subject.isNew) {
           await addSubject({
