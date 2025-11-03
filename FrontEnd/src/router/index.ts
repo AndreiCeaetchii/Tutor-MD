@@ -141,6 +141,12 @@ const routes = [
   { path: '/careers', component: CareersPage },
   { path: '/press', component: PressPage },
   { path: '/blog', component: BlogPage },
+
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../pages/NotFoundPage.vue'),
+  },
 ];
 
 const router = createRouter({

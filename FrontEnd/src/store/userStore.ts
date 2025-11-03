@@ -28,12 +28,15 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     setUser(token: string, id: string, role: UserRole, email: string, hasMfa: boolean = false) {
-
       this.accessToken = token;
       this.userId = id;
       this.role = role;
       this.email = email;
       this.mfaEnabled = hasMfa;
+    },
+    
+    updateAccessToken(token: string) {
+      this.accessToken = token;
     },
 
     setCsrfToken(token: string) {
@@ -53,7 +56,6 @@ export const useUserStore = defineStore('user', {
       notificationStore.lastFetchTime = 0;
 
       this.csrfToken = null;
-
     },
 
     updateRole(newRole: UserRole) {
@@ -61,8 +63,8 @@ export const useUserStore = defineStore('user', {
     },
 
     updateUserMfaStatus(status: boolean) {
-    this.mfaEnabled = status;
-  },
+      this.mfaEnabled = status;
+    },
   },
   persist: true,
 });

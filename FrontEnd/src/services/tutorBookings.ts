@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
+import { setupTokenRefreshInterceptor } from './tokenService';
 
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
@@ -26,6 +27,8 @@ bookingAxios.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+setupTokenRefreshInterceptor(bookingAxios);
 
 export interface TutorBooking {
   id: number;
@@ -84,16 +87,17 @@ export const updateBookingStatus = async (
 
 export const addBookingToGoogleCalendar = async (
   bookingId: number,
-  googleAccessToken: string
+  googleAccessToken: string,
 ): Promise<any> => {
   try {
-    const response = await bookingAxios.put(`/students/booking/add-calendar/${bookingId}`,
+    const response = await bookingAxios.put(
+      `/students/booking/add-calendar/${bookingId}`,
       JSON.stringify(googleAccessToken),
       {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     return response.data;
   } catch (error: any) {
