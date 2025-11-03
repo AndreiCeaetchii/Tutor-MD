@@ -52,6 +52,10 @@ public class SecurityHeadersMiddleware
         context.Response.Headers["Permissions-Policy"] =
             "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
 
+        // HTTP Strict Transport Security - Force HTTPS for 2 years with preload
+        context.Response.Headers["Strict-Transport-Security"] =
+            "max-age=63072000; includeSubDomains; preload";
+
         await _next(context);
     }
 }
