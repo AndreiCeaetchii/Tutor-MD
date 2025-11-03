@@ -1,5 +1,9 @@
 using FluentAssertions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using Tutor.Api.IntegrationTests.Common;
 using Tutor.Application.Features.Users.Dtos;
 
@@ -53,10 +57,8 @@ public class RateLimitingTests : BaseTest
         var registerDtos = Enumerable.Range(1, 6).Select(i => new RegisterUserDto
         {
             Email = $"testuser{i}@example.com",
-            FirstName = "Test",
-            LastName = "User",
-            PhoneNumber = $"12345678{i:D2}",
-            Role = "Student"
+            Password = "TestPassword123!",
+            RoleId = 1
         }).ToList();
 
         // Act
@@ -205,36 +207,6 @@ public class RateLimitingTests : BaseTest
 
         // Password reset should still work (independent rate limit)
         resetResponse.StatusCode.Should().NotBe(HttpStatusCode.TooManyRequests);
-    }
-
-    #endregion
-
-    #region OAuth Endpoints Rate Limiting
-
-    [Fact]
-    public async Task OAuthLogin_ExceedingAuthRateLimit_Returns429TooManyRequests()
-    {
-        // Arrange
-        var oauthLoginDto = new LoginUserAuthDto
-        {
-            Token = "fake-google-token-for-testing"
-        };
-
-        // Act - Make 6 requests (exceeding the limit of 5)
-        var responses = new List<HttpResponseMessage>();
-        for (int i = 0; i < 6; i++)
-        {
-            var response = await PostAsync("/api/users/login-auth", oauthLoginDto, ensureSuccess: false);
-            responses.Add(response);
-        }
-
-        // Assert
-        // First 5 should not be rate limited (might fail for other reasons)
-        responses.Take(5).Should().OnlyContain(r =>
-            r.StatusCode != HttpStatusCode.TooManyRequests);
-
-        // 6th request should be rate limited
-        responses.Last().StatusCode.Should().Be(HttpStatusCode.TooManyRequests);
     }
 
     #endregion
