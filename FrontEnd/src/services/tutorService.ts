@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
 import { useProfileStore } from '../store/profileStore';
-import { setupTokenRefreshInterceptor } from '../store/tokenService';
+import { setupTokenRefreshInterceptor } from './tokenService';
 
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||

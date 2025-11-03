@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
-import { setupTokenRefreshInterceptor } from '../store/tokenService';
+import { setupTokenRefreshInterceptor } from './tokenService';
 
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
@@ -52,9 +52,7 @@ export interface CreateReviewDto {
 
 export const getTutorReviews = async (tutorId: number): Promise<TutorReviewsResponse> => {
   try {
-    const response = await reviewAxios.get<TutorReviewsResponse>(
-      `/students/reviews/${tutorId}`
-    );
+    const response = await reviewAxios.get<TutorReviewsResponse>(`/students/reviews/${tutorId}`);
 
     return response.data;
   } catch (error) {

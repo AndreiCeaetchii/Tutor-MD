@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
-import { setupTokenRefreshInterceptor } from '../store/tokenService';
+import { setupTokenRefreshInterceptor } from './tokenService';
 
 export interface UploadPhotoResponse {
   message: string;
