@@ -14,13 +14,4 @@ export default defineConfig({
     },
     allowedHosts: ['.ngrok-free.app', 'localhost', '.ngrok.io'],
   },
-  build: {
-    minify: 'terser',
-    terserOptions: ( {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
-    } as any ),
-  },
 });
