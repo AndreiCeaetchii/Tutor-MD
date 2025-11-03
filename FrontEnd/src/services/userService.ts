@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
+import { setupTokenRefreshInterceptor } from '../store/tokenService';
 
 export interface UploadPhotoResponse {
   message: string;
@@ -36,6 +37,8 @@ userAxios.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+setupTokenRefreshInterceptor(userAxios);
 
 export const uploadProfilePhoto = async (photoFile: File) => {
   try {

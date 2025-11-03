@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useUserStore } from '../store/userStore';
+import { setupTokenRefreshInterceptor } from '../store/tokenService';
 
 const API_URL =
   (import.meta as any).env?.VITE_API_BASE_URL ||
@@ -25,6 +26,8 @@ studentAxios.interceptors.request.use(async (config) => {
 
   return config;
 });
+
+setupTokenRefreshInterceptor(studentAxios);
 
 export interface CreateProfileDto {
   phone: string;

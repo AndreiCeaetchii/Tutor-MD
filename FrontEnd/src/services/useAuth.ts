@@ -46,6 +46,7 @@ export function useAuth() {
   const LOGIN_URL = `${API_URL}/users/login`;
   const GOOGLE_LOGIN_URL = `${API_URL}/users/login-auth`;
   const GOOGLE_REGISTER_URL = `${API_URL}/users/register-auth`;
+  const LOGOUT_URL = `${API_URL}/users/logout`;
 
   const handleAuthError = (
     err: any,
@@ -145,7 +146,6 @@ export function useAuth() {
 
       const decoded = decodeJwt(data.token);
       const userRole = decoded?.role?.toLowerCase() || 'student';
-      // console.log(data);
       store.setUser(data.token, data.id, userRole, formData.email, data.twoFactorEnabled);
 
       await fetchCsrfToken();
@@ -204,11 +204,26 @@ export function useAuth() {
     }
   };
 
-  const logout = () => {
-    store.clearUser();
-    accessToken.value = null;
-    currentUser.value = null;
-    router.push('/login');
+  const logout = async () => {
+    try {
+      await axios.post(
+        LOGOUT_URL,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${store.accessToken}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      store.clearUser();
+      accessToken.value = null;
+      currentUser.value = null;
+      router.push('/login');
+    }
   };
 
   const loginWithGoogle = async (
