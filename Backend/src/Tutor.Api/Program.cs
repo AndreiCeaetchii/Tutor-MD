@@ -106,8 +106,16 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
 
     //Instead of Always we use SameAsRequest to allow local testing over http
-    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest; 
-    options.Cookie.IsEssential = true; 
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.IsEssential = true;
+});
+
+// Configure HSTS
+builder.Services.AddHsts(options =>
+{
+    options.MaxAge = TimeSpan.FromDays(365);
+    options.IncludeSubDomains = true;
+    options.Preload = true;
 });
 
 builder.Logging.ClearProviders();
@@ -146,13 +154,17 @@ app.UseMiddleware<SecurityHeadersMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    // Use HTTPS in development
-    app.UseHttpsRedirection();
 }
-else
+
+// Apply HSTS in all environments (development and production)
+// Even behind a reverse proxy, the app should send HSTS header
+app.UseHsts();
+
+// Only redirect to HTTPS in development
+// In production, the reverse proxy handles HTTPS redirection
+if (app.Environment.IsDevelopment())
 {
-    // In production/Docker, we're behind a reverse proxy that handles HTTPS
-    // So we don't need HSTS or HTTPS redirection
+    app.UseHttpsRedirection();
 }
 app.UseCors("AllowFrontend");
 
