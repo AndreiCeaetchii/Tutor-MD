@@ -3,6 +3,16 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark } from '@fortawesome/free-solid-svg-icons';
 library.add(faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark);
 
+import boy1Image from '../../assets/people/boy1.jpg';
+import boy2Image from '../../assets/people/boy2.jpg';
+import boy3Image from '../../assets/people/boy3.jpg';
+import boy4Image from '../../assets/people/boy4.jpg';
+
+import girl1Image from '../../assets/people/girl1.jpg';
+import girl2Image from '../../assets/people/girl2.jpg';
+import girl3Image from '../../assets/people/girl3.jpg';
+import girl4Image from '../../assets/people/girl4.jpg';
+
 const instructorProfiles = [
   {
     name: 'Alexandru Popescu',
@@ -10,8 +20,8 @@ const instructorProfiles = [
     hourlyRate: '45.00',
     rating: 4.9,
     reviews: 237,
-    profileImage: 'https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
-    imageUrl: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80'
+    profileImage: boy3Image,
+    imageUrl: boy3Image
   },
   {
     name: 'Petru Ionescu',
@@ -19,8 +29,8 @@ const instructorProfiles = [
     hourlyRate: '43.50',
     rating: 4.8,
     reviews: 189,
-    profileImage: 'https://images.unsplash.com/photo-1534030347209-467a5b0ad3e6?ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
-    imageUrl: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1171&q=80'
+    profileImage: boy2Image,
+    imageUrl: boy2Image
   },
   {
     name: 'Vasile Rusu',
@@ -28,8 +38,8 @@ const instructorProfiles = [
     hourlyRate: '36.00',
     rating: 4.8,
     reviews: 98,
-    profileImage: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
-    imageUrl: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80'
+    profileImage: boy1Image,
+    imageUrl: boy1Image
   },
   {
     name: 'Bogdan Stancu',
@@ -37,8 +47,8 @@ const instructorProfiles = [
     hourlyRate: '42.00',
     rating: 4.7,
     reviews: 156,
-    profileImage: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
-    imageUrl: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80'
+    profileImage: boy4Image,
+    imageUrl: boy4Image
   },
   {
     name: 'Diana Enache',
@@ -46,8 +56,8 @@ const instructorProfiles = [
     hourlyRate: '40.00',
     rating: 4.6,
     reviews: 129,
-    profileImage: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=687&q=80',
-    imageUrl: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80'
+    profileImage: girl1Image,
+    imageUrl: girl1Image
   },
 ];
 

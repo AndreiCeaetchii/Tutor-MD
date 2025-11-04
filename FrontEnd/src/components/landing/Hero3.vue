@@ -17,8 +17,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Andrei Ionescu">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg" alt="Michael Mueller">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/boy5.jpg" alt="Andrei Ionescu">
               <div>
                 <h4 class="font-semibold text-gray-900">Andrei Ionescu</h4>
                 <p class="text-sm text-gray-500">10th Grade, Cluj-Napoca</p>
@@ -32,7 +31,7 @@
               </div>
             </div>
             <p class="mb-4 text-lg font-semibold text-gray-800">
-              My math grades improved from C to A- in just two months!
+              My math grades improved from C to A in just two months!
             </p>
             <p class="text-sm text-gray-600">
               "Before using TutorMd, I struggled with advanced calculus. My tutor made complex concepts easy to understand with practical examples from Romanian engineering achievements. Now I'm confident in my abilities and planning to study engineering."
@@ -44,7 +43,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=688&q=80" alt="Elena Dumitrescu">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/girl2.jpg" alt="Elena Dumitrescu">
               <div>
                 <h4 class="font-semibold text-gray-900">Elena Dumitrescu</h4>
                 <p class="text-sm text-gray-500">8th Grade, Timisoara</p>
@@ -70,10 +69,9 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <!-- Changed Mihai's photo to a different one -->
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80" alt="Mihai Popa">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/girl3.jpg" alt="Daniela Popa">
               <div>
-                <h4 class="font-semibold text-gray-900">Mihai Popa</h4>
+                <h4 class="font-semibold text-gray-900">Daniela Popa</h4>
                 <p class="text-sm text-gray-500">University Student, Iasi</p>
                 <div class="flex items-center space-x-0.5 mt-1">
                   <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20"><path d="M10 15l-5.878 3.09 1.123-6.545L.489 7.91l6.572-.955L10 1l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/></svg>
@@ -97,7 +95,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1629467057571-42d22d8f0cbd?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=698&q=80" alt="Ana Rusu">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/girl4.jpg" alt="Ana Rusu">
               <div>
                 <h4 class="font-semibold text-gray-900">Ana Rusu</h4>
                 <p class="text-sm text-gray-500">11th Grade, Chisinau, Moldova</p>
@@ -123,7 +121,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80" alt="Vasile Munteanu">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/boy6.jpg" alt="Vasile Munteanu">
               <div>
                 <h4 class="font-semibold text-gray-900">Vasile Munteanu</h4>
                 <p class="text-sm text-gray-500">Parent, Brasov</p>
@@ -149,7 +147,7 @@
           <div class="relative h-full p-8 bg-white border border-gray-200 shadow-lg rounded-2xl">
             <div class="absolute font-bold text-gray-200 top-4 right-4 text-9xl opacity-5">"</div>
             <div class="flex items-center mb-4 space-x-4">
-              <img class="object-cover w-12 h-12 rounded-full" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=880&q=80" alt="Ion Cebanu">
+              <img class="object-cover w-12 h-12 rounded-full" src="../../assets/people/boy7.jpg" alt="Ion Cebanu">
               <div>
                 <h4 class="font-semibold text-gray-900">Ion Cebanu</h4>
                 <p class="text-sm text-gray-500">High School Teacher, Balti, Moldova</p>
