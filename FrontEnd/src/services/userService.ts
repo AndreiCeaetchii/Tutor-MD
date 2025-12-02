@@ -112,3 +112,43 @@ export const disableMfa = async () => {
     throw new Error(error.response?.data?.message || 'Failed to disable MFA. Please try again.');
   }
 };
+
+export const requestPasswordReset = async (email: string) => {
+  try {
+    const response = await userAxios.put(`/users/password`, { Email: email });
+    return response.data;
+  } catch (error: any) {
+    console.error('Request password reset error:', error);
+    throw new Error(
+      error.response?.data?.message || 'Failed to request password reset. Please try again.',
+    );
+  }
+};
+
+export const resetPassword = async (token: string, newPassword: string) => {
+  try {
+    const response = await userAxios.put(`/users/password-reset`, {
+      Token: token,
+      NewPassword: newPassword,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Reset password error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to reset password. Please try again.');
+  }
+};
+
+export const changePassword = async (currentPassword: string, newPassword: string) => {
+  try {
+    const response = await userAxios.put(`/users/change-password`, {
+      CurrentPassword: currentPassword,
+      NewPassword: newPassword,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Change password error:', error);
+    throw new Error(
+      error.response?.data?.message || 'Failed to change password. Please try again.',
+    );
+  }
+};

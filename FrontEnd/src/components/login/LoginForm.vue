@@ -232,7 +232,7 @@
     @fieldInput="handleFieldInput"
     :fieldErrors="fieldErrors"
     :errorMessage="errorMessage ?? undefined"
-    :forgotPasswordPath="'/landing'"
+    :forgotPasswordPath="'/forgot-password'"
   >
     <template #fields-after v-if="requiresMfa">
       <div class="mb-4 sm:mb-5">

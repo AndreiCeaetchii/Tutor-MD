@@ -7,6 +7,9 @@ using Tutor.Application.Features.Users.Dtos;
 using Tutor.Application.Interfaces;
 using Tutor.Domain.Entities;
 using Tutor.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace Tutor.Application.Services;
 
@@ -18,13 +21,19 @@ public class UserService : IUserService
     private readonly IGenericRepository2<UserRole> _userRoleRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IGenericRepository2<Password> _passwordRepository;
+    private readonly ILogger<UserService> _logger;
+    private readonly IHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
 
     public UserService(IGenericRepository<User, int> userRepository,
         IGenericRepository<GoogleAuth, int> googleAuthRepository,
         IEmailService emailService,
         IGenericRepository2<UserRole> userRoleRepository,
         IGenericRepository2<Password> passwordRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        ILogger<UserService> logger,
+        IHostEnvironment environment,
+        IConfiguration configuration)
     {
         _userRepository = userRepository;
         _googleAuthRepository = googleAuthRepository;
@@ -32,6 +41,9 @@ public class UserService : IUserService
         _emailService = emailService;
         _passwordHasher = passwordHasher;
         _passwordRepository = passwordRepository;
+        _logger = logger;
+        _environment = environment;
+        _configuration = configuration;
     }
 
     public async Task<User?> GetUserByOAuthIdAsync(string provider, string providerId)
@@ -181,7 +193,9 @@ public class UserService : IUserService
 
         await _userRepository.Update(user);
 
-        var resetLink = $"http://localhost:5173/reset-password?token={token}";
+        // Get frontend URL from configuration
+        var frontendUrl = _configuration["FrontendUrl"] ?? "http://localhost:5173";
+        var resetLink = $"{frontendUrl}/reset-password?token={token}";
         var htmlMessage = $@"
 <!DOCTYPE html>
 <html>
@@ -190,7 +204,7 @@ public class UserService : IUserService
     <title>Reset Your Tutor Platform Password</title>
 </head>
 <body style='font-family: Arial, sans-serif; line-height: 1.6;'>
-    <p>Hi {user.FirstName},</p>
+    <p>Hi {user.FirstName ?? "there"},</p>
 
     <p>We received a request to reset your password for your Tutor Platform account. Click the button below to create a new password:</p>
 
@@ -198,15 +212,51 @@ public class UserService : IUserService
         <a href='{resetLink}' style='background-color: #5F3AEB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Password</a>
     </p>
 
-    <p>This link will expire in 24 hours for your security. If you did not request a password reset, you can safely ignore this email.</p>
+    <p>This link will expire in 1 hour for your security. If you did not request a password reset, you can safely ignore this email.</p>
 
     <p>Thank you,<br/>Tutor Team</p>
 </body>
 </html>
 ";
-        var result = await _emailService.SendEmailAsync(user.Email, "Password Reset", htmlMessage);
-        if (result == false)
-            return Result.Error("Something went wrong");
+
+        _logger.LogInformation("Password reset requested for user with email: {Email}", email);
+        
+        if (_environment.IsDevelopment())
+        {
+            _logger.LogInformation("========================================");
+            _logger.LogInformation("PASSWORD RESET LINK FOR {Email}:", user.Email);
+            _logger.LogInformation("{ResetLink}", resetLink);
+            _logger.LogInformation("========================================");
+        }
+        
+        try
+        {
+            var emailResult = await _emailService.SendEmailAsync(user.Email, "Password Reset", htmlMessage);
+            
+            if (!emailResult)
+            {
+                _logger.LogWarning("Failed to send password reset email to {Email}", user.Email);
+                
+                if (!_environment.IsDevelopment())
+                {
+                    return Result.Error("Failed to send reset email. Please try again later or contact support.");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Password reset email sent successfully to {Email}", user.Email);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception occurred while sending password reset email to {Email}", user.Email);
+            
+            if (!_environment.IsDevelopment())
+            {
+                return Result.Error("An error occurred while sending the reset email. Please try again later.");
+            }
+        }
+        
         return Result.Success();
     }
 
@@ -225,6 +275,29 @@ public class UserService : IUserService
         await _passwordRepository.Update(password);
         await _userRepository.Update(user);
 
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("User not found");
+
+        var password = await _passwordRepository.FindAsyncDefault(u => u.UserId == userId);
+        if (password == null)
+            return Result.Error("Password not found");
+
+        if (!_passwordHasher.VerifyPassword(currentPassword, password.PasswordHash))
+            return Result.Error("Current password is incorrect");
+
+        if (currentPassword == newPassword)
+            return Result.Error("New password must be different from current password");
+            
+        var newPasswordHash = _passwordHasher.HashPassword(newPassword);
+        password.PasswordHash = newPasswordHash;
+        await _passwordRepository.Update(password);
 
         return Result.Success();
     }

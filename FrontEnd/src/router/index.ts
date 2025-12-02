@@ -33,6 +33,9 @@ import AdminAnalytics from '../components/admin/AdminAnalytics.vue';
 import AdminOverview from '../components/admin/AdminOverview.vue';
 import AdminNotifications from '../components/admin/AdminNotifications.vue';
 import MFASetupPage from '../pages/MFASetupPage.vue';
+import PasswordResetPage from '../pages/PasswordResetPage.vue';
+import ResetPasswordConfirmPage from '../pages/ResetPasswordConfirmPage.vue';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage.vue';
 
 import HowItWorksPage from '../components/footer/HowItWorksPage.vue';
 import HelpCenterPage from '../components/footer/HelpCenterPage.vue';
@@ -73,6 +76,7 @@ const routes = [
       { path: 'favourite-tutors', component: FavouriteTutors },
       { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
+      { path: 'password-reset', component: PasswordResetPage },
     ],
   },
 
@@ -87,6 +91,7 @@ const routes = [
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },
       { path: 'messages', component: TutorChat },
+      { path: 'password-reset', component: PasswordResetPage },
     ],
   },
 
@@ -100,6 +105,7 @@ const routes = [
       { path: 'users', component: AdminUsers },
       { path: 'notifications', component: AdminNotifications },
       { path: 'analytics', component: AdminAnalytics },
+      { path: 'password-reset', component: PasswordResetPage },
     ],
   },
 
@@ -120,13 +126,23 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-  path: '/mfa-setup',
-  name: 'MFASetup',
-  component: MFASetupPage,
-  meta: {
-    requiresAuth: true
-  }
-},
+    path: '/mfa-setup',
+    name: 'MFASetup',
+    component: MFASetupPage,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPasswordConfirm',
+    component: ResetPasswordConfirmPage,
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasswordPage,
+  },
 
   { path: '/how-it-works', component: HowItWorksPage },
   { path: '/become-a-tutor', component: BecomeATutorPage },
@@ -156,7 +172,7 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     }
-    return { top: 0 }
+    return { top: 0 };
   },
 });
 
@@ -175,13 +191,13 @@ router.beforeEach(async (to, _, next) => {
   if (hasToken) {
     if (userRole === 'tutor' && !profileStore.firstName) {
       await profileStore.loadProfile();
-    }
-    else if (userRole === 'student' && !studentProfileStore.userProfile.firstName) {
+    } else if (userRole === 'student' && !studentProfileStore.userProfile.firstName) {
       await studentProfileStore.loadProfile();
     }
   }
   const isTutorProfileCreated = profileStore.firstName && profileStore.lastName;
-  const isStudentProfileCreated = studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName;
+  const isStudentProfileCreated =
+    studentProfileStore.userProfile.firstName && studentProfileStore.userProfile.lastName;
 
   if (hasToken && userRole) {
     const isTutorCreationRoute = to.path === '/create-profile';
