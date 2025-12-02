@@ -181,7 +181,8 @@ public class UserService : IUserService
 
         await _userRepository.Update(user);
 
-        var resetLink = $"http://localhost:5173/reset-password?token={token}";
+        // var resetLink = $"http://localhost:5173/reset-password?token={token}";
+        var resetLink = $"https://tutormd.online/reset-password?token={token}";
         var htmlMessage = $@"
 <!DOCTYPE html>
 <html>
@@ -190,7 +191,7 @@ public class UserService : IUserService
     <title>Reset Your Tutor Platform Password</title>
 </head>
 <body style='font-family: Arial, sans-serif; line-height: 1.6;'>
-    <p>Hi {user.FirstName},</p>
+    <p>Hi {user.FirstName ?? "there"},</p>
 
     <p>We received a request to reset your password for your Tutor Platform account. Click the button below to create a new password:</p>
 
@@ -198,15 +199,30 @@ public class UserService : IUserService
         <a href='{resetLink}' style='background-color: #5F3AEB; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Password</a>
     </p>
 
-    <p>This link will expire in 24 hours for your security. If you did not request a password reset, you can safely ignore this email.</p>
+    <p>This link will expire in 1 hour for your security. If you did not request a password reset, you can safely ignore this email.</p>
 
     <p>Thank you,<br/>Tutor Team</p>
 </body>
 </html>
 ";
-        var result = await _emailService.SendEmailAsync(user.Email, "Password Reset", htmlMessage);
-        if (result == false)
-            return Result.Error("Something went wrong");
+        Console.WriteLine($"========================================");
+        Console.WriteLine($"PASSWORD RESET LINK FOR {user.Email}:");
+        Console.WriteLine(resetLink);
+        Console.WriteLine($"========================================");
+        
+        try
+        {
+            var result = await _emailService.SendEmailAsync(user.Email, "Password Reset", htmlMessage);
+            if (!result)
+            {
+                Console.WriteLine($"Failed to send email to {user.Email}, but continuing...");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Email sending exception: {ex.Message}");
+        }
+        
         return Result.Success();
     }
 
