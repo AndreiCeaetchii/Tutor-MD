@@ -31,6 +31,7 @@ using Tutor.Application.Features.Users.RegisterOAuthUser;
 using Tutor.Application.Features.Users.RegisterUser;
 using Tutor.Application.Features.Users.ResetPassword;
 using Tutor.Application.Features.Users.VerifyMFA;
+using Tutor.Application.Features.Users.ChangePassword;
 
 namespace Tutor.Api.Endpoints;
 
@@ -244,6 +245,21 @@ public static class UserEndpoints
             .RequireRateLimiting("password-reset")
             .WithName("ResetPassword")
             .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized);
+
+        group.MapPut("/change-password",
+                async (IMediator mediator, [FromBody] ChangePasswordDto changePasswordDto) =>
+                {
+                    var command = new ChangePasswordCommand(changePasswordDto);
+                    var result = await mediator.Send(command);
+                    return result.IsSuccess
+                        ? Results.Ok(result.Value)
+                        : Results.BadRequest(result.Errors);
+                })
+            .RequireAuthorization()
+            .WithName("ChangePassword")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status401Unauthorized);
 
         group.MapPut("/enable-mfa",
