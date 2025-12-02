@@ -37,6 +37,8 @@
     minLength: (password: string) => password.length >= 8,
     hasUppercase: (password: string) => /[A-Z]/.test(password),
     hasLowercase: (password: string) => /[a-z]/.test(password),
+    hasNumber: (password: string) => /[0-9]/.test(password),
+    hasSymbol: (password: string) => /[!@#$%^&*(),.?"':{}|<>_\-\\/\[\]=+~`;]/.test(password),
   };
 
   const errors = computed(() => {
@@ -47,6 +49,9 @@
       result.push('at least one uppercase letter');
     if (!passwordRules.hasLowercase(formData.value.password))
       result.push('at least one lowercase letter');
+    if (!passwordRules.hasNumber(formData.value.password)) result.push('at least one number');
+    if (!passwordRules.hasSymbol(formData.value.password))
+      result.push('at least one symbol (e.g. !@#$%)');
     return result;
   });
 
@@ -64,13 +69,17 @@
   });
 
   const handleFieldBlur = (field: string) => {
-    touchedFields.value.add(field);
+    if (field !== 'password') {
+      touchedFields.value.add(field);
+    }
   };
 
   const handleFieldInput = (field: string, value: string) => {
     if (field === 'email') formData.value.email = value;
-    else if (field === 'password') formData.value.password = value;
-    else if (field === 'role') formData.value.role = value;
+    else if (field === 'password') {
+      formData.value.password = value;
+      touchedFields.value.delete('password');
+    } else if (field === 'role') formData.value.role = value;
   };
 
   const showSuccessNotification = ref(false);

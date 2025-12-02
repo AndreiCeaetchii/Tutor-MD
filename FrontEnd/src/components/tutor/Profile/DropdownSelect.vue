@@ -9,13 +9,13 @@
     </button>
     <div
       v-if="showDropdown"
-      class="absolute z-50 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+      class="absolute z-50 w-full mt-2 overflow-y-auto bg-white border border-gray-300 rounded-lg shadow-lg max-h-48"
     >
       <div
         v-for="option in options"
         :key="option"
         @click="selectOption(option)"
-        class="p-2 cursor-pointer text-sm text-gray-800 hover:bg-purple-100 hover:text-purple-700 transition-colors"
+        class="p-2 text-sm text-gray-800 transition-colors cursor-pointer hover:bg-purple-100 hover:text-purple-700"
       >
         {{ option }}
       </div>
@@ -28,7 +28,7 @@
 
   const props = defineProps({
     options: {
-      type: Array,
+      type: Array as () => string[],
       required: true,
     },
     placeholder: {

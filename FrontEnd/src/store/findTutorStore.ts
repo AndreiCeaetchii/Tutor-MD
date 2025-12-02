@@ -3,7 +3,6 @@ import debounce from 'lodash/debounce';
 import { getTutors } from '../services/tutorService';
 import { useFavouriteTutorStore } from './favouriteTutorStore';
 
-
 interface Tutor {
   id: number;
   name: string;
@@ -82,11 +81,35 @@ export const useFindTutorStore = defineStore('tutor', {
         if (state.location && !tutor.location.toLowerCase().includes(state.location.toLowerCase()))
           return false;
 
-        if (
-          state.serviceTypes.length > 0 &&
-          !state.serviceTypes.some((service) => tutor.services.includes(service))
-        )
-          return false;
+        if (state.serviceTypes.length > 0) {
+          const locationId = tutor.workingLocation;
+          const hasMyHome = state.serviceTypes.includes('My home');
+          const hasTutorHome = state.serviceTypes.includes("Tutor's home");
+          const hasOnline = state.serviceTypes.includes('Online');
+
+          const myHomeMatch =
+            !hasMyHome ||
+            locationId === 1 ||
+            locationId === 4 ||
+            locationId === 5 ||
+            locationId === 7;
+          const tutorHomeMatch =
+            !hasTutorHome ||
+            locationId === 3 ||
+            locationId === 5 ||
+            locationId === 6 ||
+            locationId === 7;
+          const onlineMatch =
+            !hasOnline ||
+            locationId === 2 ||
+            locationId === 4 ||
+            locationId === 6 ||
+            locationId === 7;
+
+          if (!myHomeMatch || !tutorHomeMatch || !onlineMatch) {
+            return false;
+          }
+        }
 
         if (state.workingLocation !== null && tutor.workingLocation !== state.workingLocation) {
           return false;
@@ -160,7 +183,7 @@ export const useFindTutorStore = defineStore('tutor', {
       try {
         const serverTutors = await getTutors();
         const favouriteStore = useFavouriteTutorStore();
-        
+
         this.tutors = serverTutors.map((item: any) => ({
           id: item.userId,
           name: `${item.userProfile.firstName} ${item.userProfile.lastName}`,
@@ -183,10 +206,10 @@ export const useFindTutorStore = defineStore('tutor', {
       }
     },
     updateSavedStatus(tutorId: number, isSaved: boolean) {
-      const tutorIndex = this.tutors.findIndex(t => t.id === tutorId);
+      const tutorIndex = this.tutors.findIndex((t) => t.id === tutorId);
       if (tutorIndex !== -1) {
         this.tutors[tutorIndex].saved = isSaved;
       }
-    }
+    },
   },
 });
