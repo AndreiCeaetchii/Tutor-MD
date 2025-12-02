@@ -246,22 +246,22 @@ public class UserService : IUserService
     }
 
     public async Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
-{
-    var user = await _userRepository.GetById(userId);
-    if (user == null)
-        return Result.Error("User not found");
+    {
+        var user = await _userRepository.GetById(userId);
+        if (user == null)
+            return Result.Error("User not found");
 
-    var password = await _passwordRepository.FindAsyncDefault(u => u.UserId == userId);
-    if (password == null)
-        return Result.Error("Password not found");
+        var password = await _passwordRepository.FindAsyncDefault(u => u.UserId == userId);
+        if (password == null)
+            return Result.Error("Password not found");
 
-    if (!_passwordHasher.VerifyPassword(currentPassword, password.PasswordHash))
-        return Result.Error("Current password is incorrect");
+        if (!_passwordHasher.VerifyPassword(currentPassword, password.PasswordHash))
+            return Result.Error("Current password is incorrect");
 
-    var newPasswordHash = _passwordHasher.HashPassword(newPassword);
-    password.PasswordHash = newPasswordHash;
-    await _passwordRepository.Update(password);
+        var newPasswordHash = _passwordHasher.HashPassword(newPassword);
+        password.PasswordHash = newPasswordHash;
+        await _passwordRepository.Update(password);
 
-    return Result.Success();
-}
+        return Result.Success();
+    }
 }
