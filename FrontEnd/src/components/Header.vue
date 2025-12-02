@@ -14,6 +14,7 @@
     faRightFromBracket,
     faShieldHalved,
     faCheckCircle,
+    faKey,
   } from '@fortawesome/free-solid-svg-icons';
   import { useUserStore } from '../store/userStore.ts';
   import { useProfileStore } from '../store/profileStore.ts';
@@ -22,14 +23,15 @@
   import NotificationsDropdown from '../components/notifications/NotificationsDropdown.vue';
 
   library.add(
-    faUser, 
-    faCog, 
+    faUser,
+    faCog,
     faCalendarDays,
     faMessage,
     faUserGear,
-    faRightFromBracket, 
+    faRightFromBracket,
     faShieldHalved,
-    faCheckCircle
+    faCheckCircle,
+    faKey,
   );
 
   interface HeaderProps {
@@ -94,28 +96,28 @@
   }
 
   const userName = computed(() => {
-  if (userRole.value === 'student') {
-    if (studentProfileStore.userProfile?.username) {
-      return studentProfileStore.userProfile.username;
+    if (userRole.value === 'student') {
+      if (studentProfileStore.userProfile?.username) {
+        return studentProfileStore.userProfile.username;
+      }
+
+      if (store.email) {
+        const emailPart = store.email.split('@')[0];
+        const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
+        studentProfileStore.updateUsername(cleanEmailPart);
+        return cleanEmailPart;
+      }
+
+      return 'user';
+    } else if (userRole.value === 'admin') {
+      if (store.email) {
+        return `Admin`;
+      }
+      return 'Administrator';
+    } else {
+      return profileStore.userName || '';
     }
-    
-    if (store.email) {
-      const emailPart = store.email.split('@')[0];
-      const cleanEmailPart = emailPart.replace(/[^a-zA-Z0-9_]/g, '_');
-      studentProfileStore.updateUsername(cleanEmailPart);
-      return cleanEmailPart;
-    }
-    
-    return 'user';
-  } else if (userRole.value === 'admin') {
-    if (store.email) {
-      return `Admin`;
-    }
-    return 'Administrator';
-  } else {
-    return profileStore.userName || '';
-  }
-});
+  });
 
   const email = computed(() => store.email);
 
@@ -152,7 +154,10 @@
           </div>
         </div>
         <div class="items-center hidden space-x-4 md:flex">
-          <NotificationsDropdown v-if="store.isAuthenticated" @close-other-menus="closeProfileMenu" />
+          <NotificationsDropdown
+            v-if="store.isAuthenticated"
+            @close-other-menus="closeProfileMenu"
+          />
 
           <div v-if="store.isAuthenticated" class="relative">
             <button
@@ -188,14 +193,14 @@
                   >
                     <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
                       <div class="relative w-4 h-4 mr-3">
-                        <font-awesome-icon 
-                          :icon="['fas', 'shield-halved']" 
-                          class="w-4 h-4 text-gray-500 transition-colors duration-200 group-hover:text-violet-600" 
+                        <font-awesome-icon
+                          :icon="['fas', 'shield-halved']"
+                          class="w-4 h-4 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                         />
-                        <font-awesome-icon 
+                        <font-awesome-icon
                           v-if="hasMfa"
-                          :icon="['fas', 'check-circle']" 
-                          class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500" 
+                          :icon="['fas', 'check-circle']"
+                          class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500"
                         />
                       </div>
                       {{ hasMfa ? 'Manage 2FA Security' : 'Enable 2FA Security' }}
@@ -230,7 +235,21 @@
                       Profile Settings
                     </div>
                   </button>
-                  
+
+                  <!-- Reset Password Link -->
+                  <button
+                    @click="navigateBasedOnRole('/password-reset')"
+                    class="block w-full text-sm text-left text-gray-700 transition-colors duration-200 hover:text-violet-600 group"
+                  >
+                    <div class="flex items-center px-4 py-2.5 mx-2 rounded-lg hover:bg-violet-50">
+                      <font-awesome-icon
+                        :icon="['fas', 'key']"
+                        class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
+                      />
+                      Reset Password
+                    </div>
+                  </button>
+
                   <!-- Bookings Link with better icon -->
                   <button
                     @click="navigateBasedOnRole('/bookings')"
@@ -244,7 +263,7 @@
                       Bookings
                     </div>
                   </button>
-                  
+
                   <!-- Messages Link with better icon -->
                   <button
                     @click="navigateBasedOnRole('/messages')"
@@ -316,32 +335,46 @@
               <font-awesome-icon :icon="['fas', 'user-gear']" class="w-5 h-5 mr-3 text-gray-500" />
               Profile
             </button>
-            
+
             <!-- 2FA link with check mark for mobile -->
             <button
               @click="navigateToMfaSetup"
               class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
               <div class="relative">
-                <font-awesome-icon :icon="['fas', 'shield-halved']" class="w-5 h-5 mr-3 text-gray-500" />
-                <font-awesome-icon 
+                <font-awesome-icon
+                  :icon="['fas', 'shield-halved']"
+                  class="w-5 h-5 mr-3 text-gray-500"
+                />
+                <font-awesome-icon
                   v-if="hasMfa"
-                  :icon="['fas', 'check-circle']" 
-                  class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500" 
+                  :icon="['fas', 'check-circle']"
+                  class="absolute -top-1 -right-1.5 w-3 h-3 text-green-500"
                 />
               </div>
               Security Settings
             </button>
-            
+
             <button
               v-if="userRole === 'tutor'"
               @click="navigateBasedOnRole('/availability')"
               class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
-              <font-awesome-icon :icon="['fas', 'calendar-days']" class="w-5 h-5 mr-3 text-gray-500" />
+              <font-awesome-icon
+                :icon="['fas', 'calendar-days']"
+                class="w-5 h-5 mr-3 text-gray-500"
+              />
               Availability
             </button>
-            
+
+            <button
+              @click="navigateBasedOnRole('/password-reset')"
+              class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
+            >
+              <font-awesome-icon :icon="['fas', 'key']" class="w-5 h-5 mr-3 text-gray-500" />
+              Reset Password
+            </button>
+
             <button
               @click="navigateBasedOnRole('/bookings')"
               class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
@@ -352,15 +385,12 @@
               />
               Bookings
             </button>
-            
+
             <button
               @click="navigateBasedOnRole('/messages')"
               class="flex items-center w-full px-3 py-2 text-left text-gray-700 rounded-md hover:bg-gray-100 hover:text-purple-600"
             >
-              <font-awesome-icon
-                :icon="['fas', 'message']"
-                class="w-5 h-5 mr-3 text-gray-500"
-              />
+              <font-awesome-icon :icon="['fas', 'message']" class="w-5 h-5 mr-3 text-gray-500" />
               Messages
             </button>
           </div>
@@ -398,7 +428,6 @@
                 Sign Up
               </router-link>
             </div>
-
           </div>
         </div>
       </div>
