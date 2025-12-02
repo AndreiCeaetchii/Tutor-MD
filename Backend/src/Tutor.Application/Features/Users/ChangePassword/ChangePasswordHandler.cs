@@ -26,8 +26,11 @@ public class ChangePasswordHandler : IRequestHandler<ChangePasswordCommand, Resu
         if (string.IsNullOrEmpty(userId))
             return Result.Error("User not authenticated");
 
+        if (!int.TryParse(userId, out int parsedUserId))
+            return Result.Error("Invalid user ID format");
+        
         return await _userService.ChangePasswordAsync(
-            int.Parse(userId), 
+            parsedUserId,  
             request.ChangePasswordDto.CurrentPassword, 
             request.ChangePasswordDto.NewPassword
         );

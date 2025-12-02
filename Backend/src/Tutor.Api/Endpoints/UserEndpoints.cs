@@ -256,6 +256,7 @@ public static class UserEndpoints
                         ? Results.Ok(result.Value)
                         : Results.BadRequest(result.Errors);
                 })
+            .RequireRateLimiting("sensitive")
             .RequireAuthorization()
             .WithName("ChangePassword")
             .Produces(StatusCodes.Status200OK)
