@@ -246,7 +246,7 @@
                         :icon="['fas', 'key']"
                         class="w-4 h-4 mr-3 text-gray-500 transition-colors duration-200 group-hover:text-violet-600"
                       />
-                      Reset Password
+                      Change Password
                     </div>
                   </button>
 

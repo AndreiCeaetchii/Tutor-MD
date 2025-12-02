@@ -11,7 +11,7 @@
   const errorMessage = ref('');
   const touched = ref(false);
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const emailError = computed(() => {
     if (!touched.value || emailRegex.test(email.value)) return '';
@@ -83,7 +83,7 @@
             >. Please check your inbox and follow the instructions to reset your password.
           </p>
 
-          <div class="w-full p-4 mb-4 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
+          <div class="w-full p-4 mb-4 border-l-4 border-blue-500 rounded-r-lg bg-blue-50">
             <div class="flex items-start">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -100,8 +100,8 @@
                 />
               </svg>
               <div class="text-sm text-blue-700">
-                <p class="font-semibold mb-1">Didn't receive the email?</p>
-                <ul class="list-disc list-inside space-y-1">
+                <p class="mb-1 font-semibold">Didn't receive the email?</p>
+                <ul class="space-y-1 list-disc list-inside">
                   <li>Check your spam or junk folder</li>
                   <li>Make sure you entered the correct email address</li>
                   <li>Wait a few minutes and try again</li>

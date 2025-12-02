@@ -137,17 +137,11 @@ const routes = [
     path: '/reset-password',
     name: 'ResetPasswordConfirm',
     component: ResetPasswordConfirmPage,
-    meta: {
-      requiresGuest: true,
-    },
   },
   {
     path: '/forgot-password',
     name: 'ForgotPassword',
     component: ForgotPasswordPage,
-    meta: {
-      requiresGuest: true,
-    },
   },
 
   { path: '/how-it-works', component: HowItWorksPage },

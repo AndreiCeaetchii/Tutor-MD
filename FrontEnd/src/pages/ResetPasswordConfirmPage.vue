@@ -41,12 +41,8 @@
       return false;
     }
 
-    const hasUpperCase = /[A-Z]/.test(newPassword.value);
-    const hasLowerCase = /[a-z]/.test(newPassword.value);
-    const hasNumbers = /\d/.test(newPassword.value);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword.value);
-
-    if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+    const requirements = passwordRequirements.value;
+    if (!requirements.hasUpperCase || !requirements.hasLowerCase || !requirements.hasNumbers || !requirements.hasSpecialChar) {
       errorMessage.value =
         'Password must contain uppercase, lowercase, number, and special character';
       return false;
