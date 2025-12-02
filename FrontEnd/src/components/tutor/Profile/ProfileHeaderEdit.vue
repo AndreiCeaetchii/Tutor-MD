@@ -15,9 +15,9 @@
           <div class="mt-2 text-center text-white">
             <div class="flex items-center justify-center space-x-1 text-lg text-yellow-400">
               <font-awesome-icon :icon="['fas', 'star']" />
-              <span class="font-bold text-white">{{ profileStore.rating }}</span>
+              <span class="font-bold text-white">{{ actualAverageRating.toFixed(1) }}</span>
             </div>
-            <span class="text-sm text-gray-200">({{ profileStore.reviews }} reviews)</span>
+            <span class="text-sm text-gray-200">({{ totalReviews }} reviews)</span>
           </div>
         </div>
 
@@ -83,9 +83,9 @@
           >
             Save Changes
           </button>
-          <button 
+          <button
             type="button"
-            @click="$emit('cancel-edit')" 
+            @click="$emit('cancel-edit')"
             class="border border-white text-white font-semibold py-2 px-6 rounded-full shadow hover:bg-[#4a3de1] transition-colors"
           >
             Cancel
@@ -98,29 +98,39 @@
 
 <script setup lang="ts">
   import { defineProps, defineEmits } from 'vue';
-  import { useProfileStore } from '../../../store/profileStore.ts';
   import { faStar, faTrophy, faMapMarkerAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import ProfileImageUploader from './ProfileImageUploader.vue';
+  import { computed } from 'vue';
 
   library.add(faStar, faTrophy, faMapMarkerAlt, faPencilAlt);
 
-  const profileStore = useProfileStore();
+  interface ReviewItem {
+    id: number;
+    rating: number;
+  }
 
-  defineProps({
+  const props = defineProps<{
     editedProfile: {
-      type: Object,
-      required: true,
-      default: () => ({
-        firstName: '',
-        lastName: '',
-        experience: 0,
-        city: '',
-        country: '',
-        profileImage: null,
-      }),
-    },
+      firstName?: string;
+      lastName?: string;
+      experience?: number;
+      city?: string;
+      country?: string;
+      profileImage?: any;
+    };
+    reviews: ReviewItem[];
+  }>();
+
+  const totalReviews = computed(() => {
+    return props.reviews?.length || 0;
+  });
+
+  const actualAverageRating = computed(() => {
+    if (totalReviews.value === 0) return 0;
+    const sum = props.reviews.reduce((acc, r) => acc + r.rating, 0);
+    return parseFloat((sum / totalReviews.value).toFixed(1));
   });
 
   const emits = defineEmits(['save-profile', 'cancel-edit']);
