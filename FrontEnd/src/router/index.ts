@@ -35,6 +35,7 @@ import AdminNotifications from '../components/admin/AdminNotifications.vue';
 import MFASetupPage from '../pages/MFASetupPage.vue';
 import PasswordResetPage from '../pages/PasswordResetPage.vue';
 import ResetPasswordConfirmPage from '../pages/ResetPasswordConfirmPage.vue';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage.vue';
 
 import HowItWorksPage from '../components/footer/HowItWorksPage.vue';
 import HelpCenterPage from '../components/footer/HelpCenterPage.vue';
@@ -136,6 +137,14 @@ const routes = [
     path: '/reset-password',
     name: 'ResetPasswordConfirm',
     component: ResetPasswordConfirmPage,
+    meta: {
+      requiresGuest: true,
+    },
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasswordPage,
     meta: {
       requiresGuest: true,
     },
