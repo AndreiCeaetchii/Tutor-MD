@@ -9,7 +9,7 @@ interface Tutor {
   location: string;
   hourlyRate: string;
   rating: number;
-  reviews: number;
+  reviews: any[];
   profileImage: string;
   description: string;
   services: string[];
@@ -184,20 +184,23 @@ export const useFindTutorStore = defineStore('tutor', {
         const serverTutors = await getTutors();
         const favouriteStore = useFavouriteTutorStore();
 
-        this.tutors = serverTutors.map((item: any) => ({
-          id: item.userId,
-          name: `${item.userProfile.firstName} ${item.userProfile.lastName}`,
-          location: `${item.userProfile.city}, ${item.userProfile.country}`,
-          hourlyRate: item.tutorSubjects?.[0]?.price?.toString() ?? '0',
-          rating: item.rating ?? 0,
-          reviews: item.reviews ?? 0,
-          profileImage: item.photo?.url ?? '',
-          description: item.userProfile.bio ?? '',
-          services: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
-          workingLocation: item.workingLocation ?? 0,
-          saved: favouriteStore.isFavourite(item.userId),
-          categories: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
-        }));
+        this.tutors = serverTutors.map((item: any) => {
+          const reviewCount = item.reviewCount ?? item.reviews ?? 0;
+          return {
+            id: item.userId,
+            name: `${item.userProfile.firstName} ${item.userProfile.lastName}`,
+            location: `${item.userProfile.city}, ${item.userProfile.country}`,
+            hourlyRate: item.tutorSubjects?.[0]?.price?.toString() ?? '0',
+            rating: item.rating ?? 0,
+            reviews: Array(reviewCount).fill({ id: 0, rating: item.rating ?? 0 }),
+            profileImage: item.photo?.url ?? '',
+            description: item.userProfile.bio ?? '',
+            services: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
+            workingLocation: item.workingLocation ?? 0,
+            saved: favouriteStore.isFavourite(item.userId),
+            categories: item.tutorSubjects?.map((s: any) => s.subjectName) ?? [],
+          };
+        });
       } catch (err: any) {
         this.error = err.message || 'An error occurred while fetching tutors.';
         console.error('fetchTutors error:', err);

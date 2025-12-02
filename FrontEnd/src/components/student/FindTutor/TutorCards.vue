@@ -23,7 +23,7 @@
     location: { type: String, default: 'Phoenix, MN' },
     hourlyRate: { type: String, default: '712.93' },
     rating: { type: Number, default: 5.0 },
-    reviews: { type: Number, default: 4448 },
+    reviews: { type: Array as () => any[], default: () => [] },
     profileImage: {
       type: String,
       default: () => DefaultProfileImage,
@@ -86,6 +86,18 @@
       studentHome: locationId === 3 || locationId === 5 || locationId === 6 || locationId === 7,
     };
   });
+
+  const totalReviews = computed(() => {
+    return props.reviews?.length || 0;
+  });
+
+  const actualAverageRating = computed(() => {
+    return props.rating ?? 0;
+  });
+
+  const formattedRating = computed(() => {
+    return actualAverageRating.value.toFixed(1);
+  });
 </script>
 
 <template>
@@ -116,9 +128,9 @@
           </div>
           <div class="flex flex-wrap items-center gap-2">
             <span class="flex items-center text-sm font-semibold">
-              {{ rating }}
+              {{ formattedRating }}
               <font-awesome-icon :icon="['fas', 'star']" class="w-3.5 h-3.5 ml-1 text-yellow-400" />
-              <span class="ml-1 font-normal text-gray-500">({{ reviews }})</span>
+              <span class="ml-1 font-normal text-gray-500">({{ totalReviews }})</span>
             </span>
             <span class="flex items-center text-sm text-gray-500">
               <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="w-3.5 h-3.5 mr-1" />

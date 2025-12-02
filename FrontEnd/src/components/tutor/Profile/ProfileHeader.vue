@@ -16,9 +16,9 @@
         <div class="mt-2 text-white text-center">
           <div class="flex items-center justify-center space-x-1 text-yellow-400 text-lg">
             <font-awesome-icon :icon="['fas', 'star']" />
-            <span class="font-bold text-white">{{ profileStore.rating }}</span>
+            <span class="font-bold text-white">{{ actualAverageRating.toFixed(1) }}</span>
           </div>
-          <span class="text-sm text-gray-200">({{ profileStore.reviews }} reviews)</span>
+          <span class="text-sm text-gray-200">({{ totalReviews }} reviews)</span>
         </div>
       </div>
 
@@ -78,10 +78,29 @@
 
   library.add(faStar, faUserGraduate, faMedal, faMapMarkerAlt, faChalkboardTeacher);
 
-  const props = defineProps<{ hasIdFromUrl: boolean }>();
+  interface ReviewItem {
+    id: number;
+    rating: number;
+  }
+
+  const props = defineProps<{
+    hasIdFromUrl: boolean;
+    reviews: ReviewItem[];
+  }>();
+
   const isOwnProfile = computed(() => !props.hasIdFromUrl);
 
   const profileStore = useProfileStore();
+
+  const totalReviews = computed(() => {
+    return props.reviews?.length || 0;
+  });
+
+  const actualAverageRating = computed(() => {
+    if (totalReviews.value === 0) return 0;
+    const sum = props.reviews.reduce((acc, r) => acc + r.rating, 0);
+    return parseFloat((sum / totalReviews.value).toFixed(1));
+  });
 
   const getSubjectNames = computed(() => {
     return profileStore.subjects.map((subject) => subject.name).join(' & ');

@@ -2,13 +2,15 @@
   <div class="max-w-6xl p-6 mx-auto bg-white shadow-lg rounded-2xl">
     <template v-if="profileStore.isEditing">
       <ProfileHeaderEdit 
-        :editedProfile="editedProfile" 
+        :editedProfile="editedProfile"
+        :reviews="reviews"
         @save-profile="saveChanges"
-        @cancel-edit="cancelEditing" />
+        @cancel-edit="cancelEditing"
+      />
       <ProfileDetailsEdit :editedProfile="editedProfile" />
     </template>
     <template v-else>
-      <ProfileHeader :hasIdFromUrl="hasIdFromUrl" />
+      <ProfileHeader :hasIdFromUrl="hasIdFromUrl" :reviews="reviews" />
       <ProfileDetails />
     </template>
   </div>
@@ -28,6 +30,7 @@
     getTutorProfile,
     editTutorProfile,
   } from '../services/tutorService.ts';
+  import { getTutorReviews } from '../services/reviewService.ts';
   import { useUserStore } from '../store/userStore.ts';
   import { useRouter } from 'vue-router';
   import defaultProfileImage from '../assets/DefaultImg.png';
@@ -39,6 +42,7 @@
   const userStore = useUserStore();
 
   const editedProfile = ref<ProfileState>({ ...profileStore.$state });
+  const reviews = ref<any[]>([]);
 
   const hasIdFromUrl = !!route.params.id;
 
@@ -59,7 +63,15 @@
     try {
       const userIdFromUrl = route.params.id ? Number(route.params.id) : Number(userStore.userId);
       const serverData = await getTutorProfile(userIdFromUrl);
-      // console.log('Fetched profile data:', serverData);
+
+      try {
+        const reviewsData = await getTutorReviews(userIdFromUrl);
+        reviews.value = reviewsData.reviews || [];
+      } catch (err) {
+        console.error('Failed to fetch reviews:', err);
+        reviews.value = [];
+      }
+
       if (!serverData || !serverData.userProfile || !serverData.userProfile.username) {
         await router.push('/create-profile');
         return;
@@ -167,7 +179,7 @@
       console.error('Error saving profile changes:', error);
     }
   };
-  
+
   const cancelEditing = () => {
     profileStore.toggleEditing();
   };
