@@ -53,12 +53,42 @@ export function useAuth() {
     context: 'signup' | 'login' | 'google' | 'mfa',
     isSignup?: boolean,
   ): string => {
-    if (err.response) {
+    if (err?.response) {
       const { status, data } = err.response;
+
       if (status === 401) return 'Invalid email or password.';
       if (status === 409) return 'Email already in use.';
+
       if (typeof data === 'string') return data;
+
+      if (data?.errors && typeof data.errors === 'object') {
+        try {
+          const messages: string[] = [];
+          for (const key of Object.keys(data.errors)) {
+            const val = data.errors[key];
+            if (Array.isArray(val)) messages.push(...val.filter(Boolean));
+            else if (typeof val === 'string') messages.push(val);
+          }
+          if (messages.length) return messages.join(' ');
+        } catch {}
+      }
+
+      if (data?.modelState && typeof data.modelState === 'object') {
+        const messages: string[] = [];
+        for (const key of Object.keys(data.modelState)) {
+          const val = data.modelState[key];
+          if (Array.isArray(val)) messages.push(...val.filter(Boolean));
+          else if (typeof val === 'string') messages.push(val);
+        }
+        if (messages.length) return messages.join(' ');
+      }
+
       if (typeof data?.message === 'string') return data.message;
+
+      if (Array.isArray(data) && data.length) {
+        const strings = data.filter((d: any) => typeof d === 'string');
+        if (strings.length) return strings.join(' ');
+      }
     }
 
     if (context === 'signup') return 'Failed to create account. Please try again.';
@@ -214,7 +244,7 @@ export function useAuth() {
           headers: {
             Authorization: `Bearer ${store.accessToken}`,
           },
-        }
+        },
       );
     } catch (error) {
       console.error('Logout error:', error);
