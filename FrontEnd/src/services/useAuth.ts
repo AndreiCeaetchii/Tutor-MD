@@ -56,7 +56,28 @@ export function useAuth() {
     if (err?.response) {
       const { status, data } = err.response;
 
+      if (context === 'login' && (status === 400 || status === 401)) {
+        const dataStr = JSON.stringify(data).toLowerCase();
+        if (
+          dataStr.includes('user not found') ||
+          dataStr.includes('user does not exist') ||
+          dataStr.includes('account not found') ||
+          dataStr.includes('no user') ||
+          dataStr.includes('not registered') ||
+          dataStr.includes('invalid email')
+        ) {
+          return 'This account does not exist. Please sign up first.';
+        }
+        if (status === 400) {
+          return 'This account does not exist. Please sign up first.';
+        }
+        return 'Invalid email or password.';
+      }
+
       if (status === 401) return 'Invalid email or password.';
+      if (status === 404 && context === 'login') {
+        return 'This account does not exist. Please sign up first.';
+      }
       if (status === 409) return 'Email already in use.';
 
       if (typeof data === 'string') return data;
