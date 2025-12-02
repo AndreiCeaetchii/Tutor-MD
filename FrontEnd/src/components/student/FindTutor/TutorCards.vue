@@ -12,9 +12,10 @@
     faStar,
     faBookmark,
     faHeart,
+    faBook,
   } from '@fortawesome/free-solid-svg-icons';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  library.add(faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark, faHeart);
+  library.add(faHome, faMapMarkerAlt, faVideo, faCheckCircle, faStar, faBookmark, faHeart, faBook);
 
   const props = defineProps({
     id: { type: Number, required: true },
@@ -76,7 +77,7 @@
   function goToProfile() {
     router.push(`/tutor/${props.id}/profile`);
   }
-  
+
   const visibleLocations = computed(() => {
     const locationId = props.workingLocation;
     return {
@@ -95,7 +96,14 @@
         <div class="text-xl font-bold text-blue-500">{{ hourlyRate }} MDL</div>
       </div>
 
-      <div class="flex flex-col gap-3" :class="showHourlyRate ? 'pr-32 sm:flex-row sm:items-center sm:pr-0' : 'sm:flex-row sm:items-center'">
+      <div
+        class="flex flex-col gap-3"
+        :class="
+          showHourlyRate
+            ? 'pr-32 sm:flex-row sm:items-center sm:pr-0'
+            : 'sm:flex-row sm:items-center'
+        "
+      >
         <img
           :src="profileImage && profileImage.trim() !== '' ? profileImage : DefaultProfileImage"
           alt="Profile"
@@ -115,6 +123,25 @@
             <span class="flex items-center text-sm text-gray-500">
               <font-awesome-icon :icon="['fas', 'map-marker-alt']" class="w-3.5 h-3.5 mr-1" />
               {{ location }}
+            </span>
+          </div>
+          <div
+            v-if="services && services.length > 0"
+            class="flex flex-wrap items-center gap-1.5 mt-2"
+          >
+            <font-awesome-icon :icon="['fas', 'book']" class="w-3.5 h-3.5 text-purple-600" />
+            <span
+              v-for="(subject, index) in services.slice(0, 4)"
+              :key="index"
+              class="px-2 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 rounded-full"
+            >
+              {{ subject }}
+            </span>
+            <span
+              v-if="services.length > 4"
+              class="px-2 py-0.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full"
+            >
+              +{{ services.length - 4 }} more
             </span>
           </div>
         </div>
