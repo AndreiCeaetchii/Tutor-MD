@@ -60,7 +60,7 @@ const handleSaveToggled = async (isSaved: boolean, tutorId: number) => {
             :location="tutor.location"
             :hourlyRate="tutor.hourlyRate"
             :rating="tutor.rating"
-            :reviews="tutor.reviews"
+            :reviews="[tutor.reviews]"
             :profileImage="tutor.profileImage"
             :description="tutor.description"
             :services="tutor.services"
