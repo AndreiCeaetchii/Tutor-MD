@@ -30,12 +30,37 @@ services:
       - db
       - redis
     environment:
+      # ASP.NET Core Configuration
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB:-Tutor};Username=${POSTGRES_USER:-admin};Password=${POSTGRES_PASSWORD:-admin}
       - ASPNETCORE_URLS=http://+:8080
+
+      # Database & Redis
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=${POSTGRES_DB:-Tutor};Username=${POSTGRES_USER:-admin};Password=${POSTGRES_PASSWORD:-admin}
+      - ConnectionStrings__Redis=redis:6379,abortConnect=false,connectTimeout=30000
+
+      # JWT Configuration
+      - Jwt__Secret=${JWT_SECRET}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+
+      # SendGrid
+      - SendGrid__ApiKey=${SENDGRID_API_KEY}
+
+      # Google OAuth
+      - OAuth__Google__ClientId=${GOOGLE_CLIENT_ID}
+      - OAuth__Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
+
+      # Cloudinary
+      - CloudinarySettings__CloudName=${CLOUDINARY_CLOUD_NAME}
+      - CloudinarySettings__ApiKey=${CLOUDINARY_API_KEY}
+      - CloudinarySettings__ApiSecret=${CLOUDINARY_API_SECRET}
+
+      # Frontend URL
+      - FrontendUrl=${FRONTEND_URL}
+
+      # CORS
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,https://localhost:5173}
       - CORS_POLICY_NAME=${CORS_POLICY_NAME:-AllowFrontend}
-      - ConnectionStrings__Redis=redis:6379,abortConnect=false,connectTimeout=30000
     ports:
       - "8080:8080"
     networks:
