@@ -11,14 +11,14 @@
     { name: 'Availability', icon: 'calendar_month', path: '/tutor-dashboard/availability' },
     { name: 'Bookings', icon: 'book', path: '/tutor-dashboard/bookings' },
     { name: 'Reviews', icon: 'star', path: '/tutor-dashboard/reviews' },
-    { name: 'Messages', icon: 'chat', path: '/tutor-dashboard/messages' },
+    // { name: 'Messages', icon: 'chat', path: '/tutor-dashboard/messages' },
   ];
 
   const studentTabs = [
     { name: 'Find Tutors', icon: 'search', path: '/student-dashboard/find-tutors' },
     { name: 'My Bookings', icon: 'book', path: '/student-dashboard/bookings' },
     { name: 'Favourite Tutors', icon: 'star', path: '/student-dashboard/favourite-tutors' },
-    { name: 'Messages', icon: 'chat', path: '/student-dashboard/messages' },
+    // { name: 'Messages', icon: 'chat', path: '/student-dashboard/messages' },
     { name: 'My Account', icon: 'person', path: '/student-dashboard/account' },
   ];
 
