@@ -9,7 +9,7 @@ import StudentDashboard from '../pages/StudentDashboard.vue';
 import StudentProfile from '../components/student/profile/StudentProfile.vue';
 import TutorReview from '../components/tutor/Review/TutorReview.vue';
 import TutorBookings from '../components/tutor/Bookings/TutorBookings.vue';
-import TutorChat from '../components/tutor/Chat/TutorChat.vue';
+// import TutorChat from '../components/tutor/Chat/TutorChat.vue';
 import TutorAvailability from '../components/tutor/Availability/TutorAvailability.vue';
 
 import ProfilePage from '../pages/ProfilePage.vue';
@@ -22,7 +22,7 @@ import { useProfileStore } from '../store/profileStore';
 import { useStudentProfileStore } from '../store/studentProfileStore';
 import FindTutor from '../components/student/FindTutor/FindTutor.vue';
 import StudentBookings from '../components/student/Bookings/StudentBookings.vue';
-import StudentChat from '../components/student/Chat/StudentChat.vue';
+// import StudentChat from '../components/student/Chat/StudentChat.vue';
 import FavouriteTutors from '../components/student/FavouriteTutor/FavouriteTutors.vue';
 
 import GuestPage from '../pages/GuestPage.vue';
@@ -74,7 +74,7 @@ const routes = [
       { path: 'find-tutors', component: FindTutor },
       { path: 'bookings', component: StudentBookings },
       { path: 'favourite-tutors', component: FavouriteTutors },
-      { path: 'messages', component: StudentChat },
+      // { path: 'messages', component: StudentChat },
       { path: 'account', component: StudentProfile },
       { path: 'password-reset', component: PasswordResetPage },
     ],
@@ -90,7 +90,7 @@ const routes = [
       { path: 'reviews', component: TutorReview },
       { path: 'availability', component: TutorAvailability },
       { path: 'bookings', component: TutorBookings },
-      { path: 'messages', component: TutorChat },
+      // { path: 'messages', component: TutorChat },
       { path: 'password-reset', component: PasswordResetPage },
     ],
   },
