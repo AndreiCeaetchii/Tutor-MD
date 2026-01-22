@@ -95,11 +95,9 @@
       return;
     }
 
-    // Create Google Calendar URL with event details
     const startDateTime = new Date(`${booking.date}T${booking.startTime}:00`);
     const endDateTime = new Date(`${booking.date}T${booking.endTime}:00`);
 
-    // Format dates to Google Calendar format (YYYYMMDDTHHmmss)
     const formatDateForGoogle = (date: Date) => {
       return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
     };
@@ -117,7 +115,6 @@
     );
     googleCalendarUrl.searchParams.append('location', 'Online');
 
-    // Open Google Calendar in a new tab
     window.open(googleCalendarUrl.toString(), '_blank');
   };
 

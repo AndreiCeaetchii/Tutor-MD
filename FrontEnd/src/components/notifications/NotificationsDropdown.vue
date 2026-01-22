@@ -7,6 +7,7 @@
   import { type Notification } from '../../services/notificationService.ts';
   import { useUserStore } from '../../store/userStore.ts';
   import { useNotificationStore } from '../../store/notificationStore.ts';
+  import { getRecentActivities, type RecentActivityItem } from '../../services/adminService.ts';
 
   library.add(faBell);
 
@@ -15,10 +16,13 @@
   const notificationsMenu = ref<HTMLElement | null>(null);
   const userStore = useUserStore();
   const notificationStore = useNotificationStore();
+  const recentActivities = ref<RecentActivityItem[]>([]);
+  const loadingActivities = ref(false);
 
   const isLoading = computed(() => notificationStore.loading);
   const notifications = computed(() => notificationStore.notifications);
   const unreadCount = computed(() => notificationStore.unreadCount);
+  const isAdmin = computed(() => userStore.role === 'admin');
 
   const badgeSizeClass = computed(() => {
     const count = unreadCount.value;
@@ -31,12 +35,51 @@
     return notificationStore.locallyReadIds.includes(notificationId);
   }
 
-  function toggleNotificationsMenu() {
+  async function toggleNotificationsMenu() {
     showNotificationsMenu.value = !showNotificationsMenu.value;
+
+    if (showNotificationsMenu.value && isAdmin.value && notifications.value.length === 0) {
+      loadingActivities.value = true;
+      try {
+        recentActivities.value = await getRecentActivities();
+      } catch (error) {
+        console.error('Error loading recent activities:', error);
+      } finally {
+        loadingActivities.value = false;
+      }
+    }
   }
 
   function handleNotificationClick(notification: Notification) {
     notificationStore.markAsRead(notification.id);
+  }
+
+  function getActivityIcon(type: string) {
+    switch (type) {
+      case 'tutor':
+        return '👨‍🏫';
+      case 'student':
+        return '👨‍🎓';
+      case 'review':
+        return '⭐';
+      case 'booking':
+        return '📅';
+      default:
+        return '📌';
+    }
+  }
+
+  function getActivityTime(timestamp: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes} min ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    return `${days} day${days > 1 ? 's' : ''} ago`;
   }
 
   function parseNotificationPayload(payload: string, type: string) {
@@ -71,9 +114,9 @@
       case 1:
         return 'accepted';
       case 2:
-        return 'completed';
+        return 'canceled';
       case 3:
-        return 'cancelled';
+        return 'completed';
       default:
         return 'updated';
     }
@@ -112,34 +155,34 @@
 
   function formatNotificationTime(timestamp: string | undefined): string {
     if (timestamp === undefined || timestamp === null) return 'recently';
-    
+
     try {
       if (timestamp === '') return 'recently';
-      
+
       let date: Date;
-      
+
       if (!isNaN(Number(timestamp))) {
         const timestampNum = Number(timestamp);
         date = new Date(timestampNum < 10000000000 ? timestampNum * 1000 : timestampNum);
       } else {
         date = new Date(timestamp);
       }
-      
+
       if (isNaN(date.getTime())) {
         return 'recently';
       }
-      
+
       const now = new Date();
       const diffMs = now.getTime() - date.getTime();
       const diffMins = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMins / 60);
       const diffDays = Math.floor(diffHours / 24);
-      
+
       if (diffMins < 1) return 'just now';
       if (diffMins < 60) return diffMins === 1 ? '1 minute ago' : `${diffMins} minutes ago`;
       if (diffHours < 24) return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
       if (diffDays < 7) return diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
-      
+
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     } catch (e) {
       return 'recently';
@@ -206,9 +249,14 @@
 
 <template>
   <div class="relative">
-    <button @click="toggleNotificationsMenu" ref="notificationsButton"   class="flex items-center justify-center relative p-2 text-gray-600 rounded-full hover:bg-gray-100"
+    <button
+      @click="toggleNotificationsMenu"
+      ref="notificationsButton"
+      class="relative flex items-center justify-center p-2 text-gray-600 rounded-full hover:bg-gray-100"
     >
-      <Bell class="w-5 h-5 text-gray-600 transition-colors hover:text-gray-900 transform translate-y-0.5" />
+      <Bell
+        class="w-5 h-5 text-gray-600 transition-colors hover:text-gray-900 transform translate-y-0.5"
+      />
       <span
         v-if="unreadCount > 0"
         :class="[
@@ -232,7 +280,9 @@
         class="absolute right-0 z-50 py-2 mt-2 bg-white shadow-2xl w-80 rounded-xl"
       >
         <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
-          <p class="text-sm font-semibold text-gray-900">Notifications ({{ notifications.length }})</p>
+          <p class="text-sm font-semibold text-gray-900">
+            Notifications ({{ notifications.length }})
+          </p>
         </div>
 
         <div v-if="isLoading" class="px-4 py-2 text-sm text-center text-gray-500">
@@ -284,8 +334,37 @@
             </div>
           </div>
         </div>
-        <div v-else class="px-4 py-2 text-sm text-center text-gray-500">
-          You have no notifications.
+        <div v-else class="px-4 py-8 text-sm text-center text-gray-500">
+          <!-- Show recent activities for admin when no notifications -->
+          <div v-if="isAdmin && recentActivities.length > 0" class="text-left">
+            <p class="mb-3 text-xs font-semibold text-center text-gray-600 uppercase">
+              Recent Platform Activity
+            </p>
+            <div
+              v-for="activity in recentActivities.slice(0, 7)"
+              :key="activity.id"
+              class="flex items-start px-2 py-2 mb-1 transition-colors duration-200 rounded-lg cursor-default hover:bg-gray-50"
+            >
+              <span class="mt-0.5 mr-3 text-base">{{ getActivityIcon(activity.type) }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs text-gray-700" v-html="activity.message"></p>
+                <p class="mt-1 text-xs text-gray-400">{{ getActivityTime(activity.timestamp) }}</p>
+              </div>
+              <span
+                class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full"
+                :class="{
+                  'bg-green-100 text-green-700': activity.badge === 'tutor',
+                  'bg-blue-100 text-blue-700': activity.badge === 'student',
+                  'bg-orange-100 text-orange-700': activity.badge === 'review',
+                  'bg-purple-100 text-purple-700': activity.badge === 'booking',
+                }"
+              >
+                {{ activity.badge }}
+              </span>
+            </div>
+          </div>
+          <div v-else-if="isAdmin && loadingActivities">Loading activities...</div>
+          <div v-else>You have no notifications.</div>
         </div>
       </div>
     </transition>
