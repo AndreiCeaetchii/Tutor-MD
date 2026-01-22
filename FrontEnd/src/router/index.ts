@@ -49,6 +49,15 @@ import CareersPage from '../components/footer/CareersPage.vue';
 import PressPage from '../components/footer/PressPage.vue';
 import BlogPage from '../components/footer/BlogPage.vue';
 
+import MathematicsPage from '../pages/subjects/MathematicsPage.vue';
+import SciencePage from '../pages/subjects/SciencePage.vue';
+import LanguagesPage from '../pages/subjects/LanguagesPage.vue';
+import ProgrammingPage from '../pages/subjects/ProgrammingPage.vue';
+import StudentReviewPage from '../pages/StudentReviewPage.vue';
+import PrivacyPolicyPage from '../pages/legal/PrivacyPolicyPage.vue';
+import TermsOfServicePage from '../pages/legal/TermsOfServicePage.vue';
+import CookiePolicyPage from '../pages/legal/CookiePolicyPage.vue';
+
 const routes = [
   { path: '/login', component: LoginPage, meta: { requiresGuest: true } },
   { path: '/signup', component: SignupPage, meta: { requiresGuest: true } },
@@ -147,6 +156,7 @@ const routes = [
   { path: '/how-it-works', component: HowItWorksPage },
   { path: '/become-a-tutor', component: BecomeATutorPage },
   { path: '/pricing', component: PricingPage },
+  { path: '/student-review', component: StudentReviewPage },
 
   { path: '/help-center', component: HelpCenterPage },
   { path: '/contact-us', component: ContactUsPage },
@@ -157,6 +167,15 @@ const routes = [
   { path: '/careers', component: CareersPage },
   { path: '/press', component: PressPage },
   { path: '/blog', component: BlogPage },
+
+  { path: '/subjects/mathematics', component: MathematicsPage },
+  { path: '/subjects/science', component: SciencePage },
+  { path: '/subjects/languages', component: LanguagesPage },
+  { path: '/subjects/programming', component: ProgrammingPage },
+
+  { path: '/privacy-policy', component: PrivacyPolicyPage },
+  { path: '/terms-of-service', component: TermsOfServicePage },
+  { path: '/cookie-policy', component: CookiePolicyPage },
 
   {
     path: '/:pathMatch(.*)*',
