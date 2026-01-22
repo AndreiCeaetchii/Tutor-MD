@@ -224,11 +224,11 @@
         <span class="text-sm">{{ isSaved ? 'Favourite Tutor' : 'Add to favourite' }}</span>
       </div>
       <div class="flex gap-2">
-        <button
+        <!-- <button
           class="w-auto px-3 py-1.5 text-xs text-gray-500 transition bg-white border border-gray-300 rounded-md sm:px-5 sm:text-sm hover:bg-gray-100"
         >
           Let's chat
-        </button>
+        </button> -->
         <button
           class="w-auto px-3 py-1.5 text-xs text-white transition bg-purple-700 rounded-md sm:px-5 sm:text-sm hover:bg-purple-800"
           @click="goToProfile"
