@@ -7,7 +7,7 @@
     faLinkedinIn,
   } from '@fortawesome/free-brands-svg-icons';
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-  import { useRouter } from 'vue-router'; // Importul exista deja
+  import { useRouter } from 'vue-router';
 
   const router = useRouter();
 

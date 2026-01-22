@@ -51,10 +51,8 @@
     { value: 'teacher_home', label: "Teacher's Home" },
   ];
 
-  // Filter location options based on what the tutor offers
   const locationOptions = computed(() => {
     if (!props.availableLocations || props.availableLocations.length === 0) {
-      // If no locations specified, show all options (backward compatibility)
       return allLocationOptions;
     }
 
@@ -78,7 +76,6 @@
           selectedSubject.value = subjects.value[0].name;
         }
 
-        // Set default location to first available option
         if (locationOptions.value.length > 0) {
           selectedLocation.value = locationOptions.value[0].value;
         }

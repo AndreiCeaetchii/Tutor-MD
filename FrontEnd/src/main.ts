@@ -6,6 +6,7 @@ import router from './router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import vue3GoogleLogin from 'vue3-google-login';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import VueApexCharts from 'vue3-apexcharts';
 
 const app = createApp(App);
 
@@ -18,4 +19,5 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia);
+app.use(VueApexCharts);
 app.mount('#app');
