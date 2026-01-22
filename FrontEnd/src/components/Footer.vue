@@ -32,10 +32,6 @@
           <div class="flex items-center mb-4 space-x-2">
             <img class="h-8" src="../assets/tutor2.png" alt="TutorConnect Logo" />
           </div>
-          <p class="mb-4 text-sm leading-relaxed">
-            Connecting students and tutors worldwide for personalized, effective learning
-            experiences.
-          </p>
           <div class="space-y-2 text-sm">
             <a
               href="mailto:tutormd.online@gmail.com"
@@ -80,8 +76,8 @@
               >
             </li>
             <li>
-              <router-link to="/find-tutors" class="transition-colors hover:text-[#5f22d9]"
-                >Find Tutors</router-link
+              <router-link to="/student-review" class="transition-colors hover:text-[#5f22d9]"
+                >Students Review</router-link
               >
             </li>
             <li>
@@ -195,9 +191,15 @@
           © {{ currentYear }} Tutor. All rights reserved.
         </div>
         <div class="flex justify-center flex-1 space-x-4 md:justify-end">
-          <a href="#" class="transition-colors hover:text-[#5f22d9]">Privacy Policy</a>
-          <a href="#" class="transition-colors hover:text-[#5f22d9]">Terms of Service</a>
-          <a href="#" class="transition-colors hover:text-[#5f22d9]">Cookie Policy</a>
+          <router-link to="/privacy-policy" class="transition-colors hover:text-[#5f22d9]"
+            >Privacy Policy</router-link
+          >
+          <router-link to="/terms-of-service" class="transition-colors hover:text-[#5f22d9]"
+            >Terms of Service</router-link
+          >
+          <router-link to="/cookie-policy" class="transition-colors hover:text-[#5f22d9]"
+            >Cookie Policy</router-link
+          >
         </div>
         <div class="justify-end flex-1 hidden space-x-4 text-[#5f22d9] md:flex">
           <a href="#" class="transition-colors hover:text-[#8f63e6]"

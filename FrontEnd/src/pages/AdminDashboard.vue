@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import AdminNavBar from '../components/navigation/AdminNavBar.vue';
-  import Footer from '../components/Footer.vue';
 </script>
 
 <template>
@@ -23,7 +22,5 @@
         <router-view />
       </div>
     </div>
-
-    <Footer />
   </div>
 </template>

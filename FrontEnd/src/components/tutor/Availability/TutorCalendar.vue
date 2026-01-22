@@ -192,10 +192,10 @@
           <span class="inline-block w-3 h-3 mr-2 bg-orange-200 rounded-full"></span>
           Days highlighted in orange have available time slots
         </div>
-        <div class="flex items-center">
+        <!-- <div class="flex items-center">
           <span class="inline-block w-3 h-3 mr-2 bg-red-200 rounded-full"></span>
           Days highlighted in red have edited past slots
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
