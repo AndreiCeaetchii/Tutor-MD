@@ -71,12 +71,12 @@ const formattedJoinDate = (dateString: string) => {
 </script>
 
 <template>
-  <div class="hidden sm:block overflow-x-auto">
+  <div class="hidden overflow-x-auto sm:block">
     <table class="min-w-full bg-white rounded-lg shadow-md">
       <thead>
-      <tr class="w-full bg-gray-50 text-left text-gray-500 uppercase text-sm leading-normal">
-        <th class="py-3 px-6">User</th>
-        <th class="py-3 px-6 cursor-pointer hover:bg-gray-200 transition-colors duration-200" @click="emit('sort', 'type')">
+      <tr class="w-full text-sm leading-normal text-left text-gray-500 uppercase bg-gray-50">
+        <th class="px-6 py-3">User</th>
+        <th class="px-6 py-3 transition-colors duration-200 cursor-pointer hover:bg-gray-200" @click="emit('sort', 'type')">
           <div class="flex items-center">
             <span>Type</span>
             <font-awesome-icon
@@ -85,7 +85,7 @@ const formattedJoinDate = (dateString: string) => {
             />
           </div>
         </th>
-        <th class="py-3 px-6 cursor-pointer hover:bg-gray-200 transition-colors duration-200" @click="emit('sort', 'status')">
+        <th class="px-6 py-3 transition-colors duration-200 cursor-pointer hover:bg-gray-200" @click="emit('sort', 'status')">
           <div class="flex items-center">
             <span>Status</span>
             <font-awesome-icon
@@ -94,16 +94,16 @@ const formattedJoinDate = (dateString: string) => {
             />
           </div>
         </th>
-        <th class="py-3 px-6 cursor-pointer hover:bg-gray-200 transition-colors duration-200" @click="emit('sort', 'joinDate')">
+        <th class="px-6 py-3 transition-colors duration-200 cursor-pointer hover:bg-gray-200" @click="emit('sort', 'joinDate')">
           <div class="flex items-center">
-            <span>Join Date</span>
+            <span>Birthday Date</span>
             <font-awesome-icon
               :icon="props.sortBy === 'joinDate' ? (props.sortDirection === 'asc' ? 'fa-solid fa-sort-up' : 'fa-solid fa-sort-down') : 'fa-solid fa-sort'"
               class="ml-1"
             />
           </div>
         </th>
-        <th class="py-3 px-6 cursor-pointer hover:bg-gray-200 transition-colors duration-200" @click="emit('sort', 'bookings')">
+        <th class="px-6 py-3 transition-colors duration-200 cursor-pointer hover:bg-gray-200" @click="emit('sort', 'bookings')">
           <div class="flex items-center">
             <span>Reviews</span>
             <font-awesome-icon
@@ -112,44 +112,44 @@ const formattedJoinDate = (dateString: string) => {
             />
           </div>
         </th>
-        <th class="py-3 px-6 text-center">Actions</th>
+        <th class="px-6 py-3 text-center">Actions</th>
       </tr>
       </thead>
-      <tbody class="text-gray-600 text-sm font-light">
+      <tbody class="text-sm font-light text-gray-600">
       <tr v-for="user in users" :key="user.id" class="border-b border-gray-200 hover:bg-gray-100">
-        <td class="py-3 px-6 text-left whitespace-nowrap">
+        <td class="px-6 py-3 text-left whitespace-nowrap">
           <div class="flex items-center">
-            <img :src="DefaultImg" alt="Profile" class="w-10 h-10 rounded-full mr-3" />
+            <img :src="DefaultImg" alt="Profile" class="w-10 h-10 mr-3 rounded-full" />
             <div>
               <p class="font-medium">{{ user.name }}</p>
-              <p class="text-gray-500 text-xs">{{ user.email }}</p>
+              <p class="text-xs text-gray-500">{{ user.email }}</p>
             </div>
           </div>
         </td>
-        <td class="py-3 px-6 text-left">
+        <td class="px-6 py-3 text-left">
             <span class="flex items-center">
               <font-awesome-icon
                 :icon="user.type === 'Student' ? 'fa-solid fa-graduation-cap' : 'fa-solid fa-chalkboard-teacher'"
-                class="text-purple-500 mr-2"
+                class="mr-2 text-purple-500"
               />
               {{ user.type }}
             </span>
         </td>
-        <td class="py-3 px-6 text-left">
+        <td class="px-6 py-3 text-left">
             <span :class="['py-1 px-3 rounded-full text-xs font-semibold', getStatusClasses(getDisplayStatus(user))]">
               {{ getDisplayStatus(user) }}
             </span>
 
         </td>
-        <td class="py-3 px-6 text-left">{{ formattedJoinDate(user.joinDate)  }}</td>
-        <td class="py-3 px-6 text-left">{{ user.bookings }}</td>
-        <td class="py-3 px-6 text-center">
+        <td class="px-6 py-3 text-left">{{ formattedJoinDate(user.joinDate)  }}</td>
+        <td class="px-6 py-3 text-left">{{ user.bookings }}</td>
+        <td class="px-6 py-3 text-center">
           <div class="flex justify-center space-x-2">
             <div class="relative group">
-              <button @click="emit('view', user)" class="w-6 h-6 hover:text-purple-500 hover:scale-110 transform">
+              <button @click="emit('view', user)" class="w-6 h-6 transform hover:text-purple-500 hover:scale-110">
                 <font-awesome-icon icon="fa-solid fa-eye" />
               </button>
-              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+              <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
                 View User
               </div>
             </div>
@@ -160,7 +160,7 @@ const formattedJoinDate = (dateString: string) => {
               >
                 <font-awesome-icon :icon="user.status === 'Active' ? 'fa-solid fa-times' : 'fa-solid fa-check'" />
               </button>
-              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+              <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
                 {{ user.status === 'Active' ? 'Decline' : 'Approve' }}
               </div>
             </div>
@@ -171,7 +171,7 @@ const formattedJoinDate = (dateString: string) => {
               >
                 <font-awesome-icon :icon="user.isActive ? 'fa-solid fa-ban' : 'fa-solid fa-unlock'" />
               </button>
-              <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+              <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
                 {{ user.isActive ? 'Suspend' : 'Restore' }}
               </div>
             </div>
@@ -181,21 +181,21 @@ const formattedJoinDate = (dateString: string) => {
       </tbody>
     </table>
   </div>
-  <div class="block sm:hidden space-y-4">
+  <div class="block space-y-4 sm:hidden">
     <div
       v-for="user in users"
       :key="user.id"
-      class="bg-white p-4 rounded-lg shadow-md flex flex-col space-y-3 max-w-sm mx-auto"
+      class="flex flex-col max-w-sm p-4 mx-auto space-y-3 bg-white rounded-lg shadow-md"
     >
       <div class="flex items-center">
-        <img :src="DefaultImg" alt="Profile" class="w-10 h-10 rounded-full mr-4" />
+        <img :src="DefaultImg" alt="Profile" class="w-10 h-10 mr-4 rounded-full" />
         <div>
-          <h3 class="font-bold text-lg">{{ user.name }}</h3>
+          <h3 class="text-lg font-bold">{{ user.name }}</h3>
           <p class="text-sm text-gray-500">{{ user.email }}</p>
         </div>
       </div>
 
-      <div class="text-sm text-gray-700 space-y-1">
+      <div class="space-y-1 text-sm text-gray-700">
         <p><span class="font-semibold">Type:</span> {{ user.type }}</p>
         <p><span class="font-semibold">Join Date:</span> {{ formattedJoinDate(user.joinDate)  }}</p>
         <p><span class="font-semibold">Bookings:</span> {{ user.bookings }}</p>
@@ -209,10 +209,10 @@ const formattedJoinDate = (dateString: string) => {
 
       <div class="flex justify-between pt-2 border-t">
         <div class="relative group">
-          <button @click="emit('view', user)" class="w-6 h-6 hover:text-purple-500 hover:scale-110 transform">
+          <button @click="emit('view', user)" class="w-6 h-6 transform hover:text-purple-500 hover:scale-110">
             <font-awesome-icon icon="fa-solid fa-eye" />
           </button>
-          <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+          <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
             View User
           </div>
         </div>
@@ -223,7 +223,7 @@ const formattedJoinDate = (dateString: string) => {
           >
             <font-awesome-icon :icon="user.status === 'Active' ? 'fa-solid fa-times' : 'fa-solid fa-check'" />
           </button>
-          <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+          <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
             {{ user.status === 'Active' ? 'Decline' : 'Approve' }}
           </div>
         </div>
@@ -234,7 +234,7 @@ const formattedJoinDate = (dateString: string) => {
           >
             <font-awesome-icon :icon="user.isActive ? 'fa-solid fa-ban' : 'fa-solid fa-unlock'" />
           </button>
-          <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-0 bg-gray-700 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+          <div class="absolute z-10 px-2 py-1 text-xs text-white transition-opacity transform -translate-x-1/2 bg-gray-700 rounded-md opacity-0 -top-6 left-1/2 group-hover:opacity-100 duration-0 whitespace-nowrap">
             {{ user.isActive ? 'Suspend' : 'Restore' }}
           </div>
         </div>
