@@ -3,13 +3,11 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '../store/userStore.ts';
   import NavigationBar from '../components/navigation/NavigationBar.vue';
-  import Footer from '../components/Footer.vue';
 
   const store = useUserStore();
   const router = useRouter();
   const activeTab = ref('find');
   // const activeTab = ref('calendar');
-
 
   const handleTabChange = (tab: string) => {
     activeTab.value = tab;
@@ -32,8 +30,8 @@
           Welcome to your <span class="text-purple-600">Student Dashboard</span>
         </h1>
         <p class="mt-2 text-sm text-gray-600 md:text-base">
-          Find the perfect <span class="font-semibold text-purple-600">tutor</span>, manage your 
-          <span class="font-semibold text-purple-600">learning sessions</span>, and track your 
+          Find the perfect <span class="font-semibold text-purple-600">tutor</span>, manage your
+          <span class="font-semibold text-purple-600">learning sessions</span>, and track your
           <span class="font-semibold text-purple-600">educational progress</span> with ease.
         </p>
       </div>
@@ -44,6 +42,5 @@
         <router-view />
       </div>
     </div>
-    <Footer />
   </div>
 </template>

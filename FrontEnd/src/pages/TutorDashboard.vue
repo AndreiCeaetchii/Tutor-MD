@@ -3,7 +3,6 @@
   import { useRouter } from 'vue-router';
   import { useUserStore } from '../store/userStore.ts';
   import NavigationBar from '../components/navigation/NavigationBar.vue';
-  import Footer from '../components/Footer.vue';
 
   const store = useUserStore();
   const router = useRouter();
@@ -42,6 +41,5 @@
         <router-view />
       </div>
     </div>
-    <Footer />
   </div>
 </template>
